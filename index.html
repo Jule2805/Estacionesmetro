@@ -3,23 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metro Madrid - Academia</title>
+    <title>Transporte Madrid - Academia</title>
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #007bff;
-            --l1: #00a1df; --l2: #eb1c24; --l3: #ffcd00; --l4: #64207e;
-            --l5: #95c11f; --l6: #6e7a7d; --l7: #f37321; --l8: #f38abb;
-            --l9: #93117e; --l10: #003882; --l11: #009846; --l12: #aaad00; --lr: #003882;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 450px; background: var(--card); padding: 20px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
-        .station-name { font-size: 26px; font-weight: 800; margin: 15px 0; color: #fff; min-height: 70px; display: flex; align-items: center; justify-content: center; }
+        /* Menú Superior */
+        .menu-nav { width: 100%; max-width: 450px; display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .menu-tab { background: #333; padding: 8px 15px; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; border: 1px solid #444; }
+        .menu-tab.active { background: var(--accent); border-color: white; }
+
+        .container { width: 100%; max-width: 450px; background: var(--card); padding: 20px; border-radius: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box; }
         
-        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
+        #progress-fill { height: 100%; background: #28a745; width: 0%; transition: 0.3s; }
+
+        .station-name { font-size: 24px; font-weight: 800; margin: 10px 0 20px 0; color: #fff; min-height: 60px; display: flex; align-items: center; justify-content: center; }
+        
+        .options-list { display: flex; flex-direction: column; gap: 8px; }
         .opt-btn { 
-            background: #2a2a2a; border: 1px solid #444; color: white; padding: 18px; 
-            border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; text-align: left;
+            background: #2a2a2a; border: 1px solid #444; color: white; padding: 16px; 
+            border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; text-align: left;
         }
         
         .correct { background: #28a745 !important; border-color: #fff !important; }
@@ -27,41 +33,40 @@
         
         #next-btn { margin-top: 20px; width: 100%; padding: 18px; border-radius: 12px; border: none; background: var(--accent); color: white; font-weight: bold; display: none; cursor: pointer; }
         
-        /* SECCIÓN DE REPASO */
-        .review-section { width: 100%; max-width: 450px; margin-top: 25px; text-align: left; }
-        .review-title { font-size: 14px; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        .log-item { background: #252525; padding: 12px; border-radius: 10px; margin-bottom: 8px; font-size: 13px; border-left: 4px solid #dc3545; display: flex; justify-content: space-between; align-items: center; }
-        .log-item.hit { border-left-color: #28a745; }
-        .log-info b { color: #fff; display: block; margin-bottom: 2px; }
-        .log-lines { color: #aaa; font-family: monospace; }
-        
-        .stats { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; background: #000; padding: 10px; border-radius: 10px; }
+        .review-section { width: 100%; max-width: 450px; margin-top: 20px; }
+        .log-item { background: #252525; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 13px; border-left: 4px solid #dc3545; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-card { background: #000; padding: 10px; border-radius: 12px; font-size: 12px; }
+        .stat-card b { display: block; font-size: 16px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="stats">
-        <span>✅ <b id="hits">0</b></span>
-        <span>❌ <b id="misses">0</b></span>
-        <span>🎯 <b id="percent">0%</b></span>
+    <div class="menu-nav">
+        <div class="menu-tab active">🚇 Metro</div>
+        <div class="menu-tab" onclick="alert('Próximamente: Cercanías C1, C2...')">🚆 Cercanías</div>
+        <div class="menu-tab" onclick="alert('Próximamente: Interurbanos...')">🚌 Autobuses</div>
+        <div class="menu-tab" onclick="alert('Próximamente: Bibliometros, Objetos perdidos...')">➕ Otros</div>
     </div>
-    <div style="color: #888; font-size: 11px;"> 🐧¿QUÉ LÍNEAS PASAN POR...? 🐼</div>
-    <div class="station-name" id="station-display">Cargando...</div>
 
-    <div class="options-list" id="options-container"></div>
-    <button id="next-btn" onclick="nextQuestion()">CONTINUAR → ❤️‍🩹</button>
-</div>
+    <div class="container">
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">Vistas<b id="counter">0/0</b></div>
+            <div class="stat-card">Aciertos<b id="hits">0</b></div>
+            <div class="stat-card">Fallos<b id="misses">0</b></div>
+        </div>
 
-<div class="review-section">
-    <div class="review-title">Historial de Fallos Recientes</div>
-    <div id="review-log">
-        <div style="color:#444; font-style: italic; font-size: 12px;">Aquí aparecerán las estaciones que falles para que las repases reina.</div>
+        <div class="station-name" id="station-display">Cargando...</div>
+
+        <div class="options-list" id="options-container"></div>
+        <button id="next-btn" onclick="nextQuestion()">SIGUIENTE ESTACIÓN → ❤️‍🩹</button>
     </div>
-</div>
 
+    <div class="review-section" id="review-log"></div>
 <script>
-    const metroDB = [
+const metroDB = [
     // LÍNEA 1
     { name: "Pinar de Chamartín", lines: ["1", "4", "ML1"] },
     { name: "Bambú", lines: ["1"] },
@@ -365,14 +370,28 @@
     { name: "Puerta de Boadilla", lines: ["ML3"] }
 ];
 
+    let pendingStations = [...metroDB];
     let hits = 0;
     let misses = 0;
-    let reviewList = [];
+    let totalSeen = 0;
+    let failedStations = []; // Para el resumen final
 
     function nextQuestion() {
+        // Comprobar si hemos terminado el saco
+        if (pendingStations.length === 0) {
+            showFinalResults();
+            return;
+        }
+
         document.getElementById('next-btn').style.display = "none";
-        const station = metroDB[Math.floor(Math.random() * metroDB.length)];
+        
+        const randomIndex = Math.floor(Math.random() * pendingStations.length);
+        const station = pendingStations.splice(randomIndex, 1)[0];
+        
         document.getElementById('station-display').innerText = station.name;
+
+        totalSeen++;
+        updateUI();
 
         const container = document.getElementById('options-container');
         container.innerHTML = '';
@@ -397,61 +416,69 @@
         });
     }
 
-    function formatLines(arr) {
-        return arr.sort((a,b) => (a==='R'||a==='ML1'||a==='ML2'||a==='ML3') ? 1 : parseInt(a)-parseInt(b))
-                  .map(l => (l.startsWith('ML') ? l : (l === "R" ? "R" : "L" + l))).join(" - ");
-    }
-
-    function generateSmartFake(realLines) {
-        const all = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "R", "ML1"];
-        let fake = [...realLines];
-        if(realLines.length === 1) return [all[Math.floor(Math.random() * all.length)]];
-        let mode = Math.random();
-        if(mode < 0.5 && fake.length > 1) fake.splice(Math.floor(Math.random() * fake.length), 1);
-        else fake.push(all[Math.floor(Math.random() * all.length)]);
-        return [...new Set(fake)];
-    }
-
     function check(btn, selected, correct, stationName) {
-        const allBtns = document.querySelectorAll('.opt-btn');
-        allBtns.forEach(b => b.disabled = true);
+        const buttons = document.querySelectorAll('.opt-btn');
+        buttons.forEach(b => b.disabled = true);
 
         if(selected === correct) {
             btn.classList.add('correct');
             hits++;
         } else {
             btn.classList.add('wrong');
-            allBtns.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+            buttons.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
             misses++;
-            addToReview(stationName, correct);
+            // Guardamos el fallo para el resumen final
+            failedStations.push({name: stationName, correct: correct});
         }
         
-        updateStats();
         document.getElementById('next-btn').style.display = "block";
     }
 
-    function addToReview(name, lines) {
-        // Añadir al principio de la lista de repaso
-        reviewList.unshift({name, lines});
-        if(reviewList.length > 5) reviewList.pop(); // Solo guardamos los últimos 5 fallos
+    function showFinalResults() {
+        const container = document.querySelector('.container');
+        const percent = Math.round((hits / metroDB.length) * 100);
         
-        const log = document.getElementById('review-log');
-        log.innerHTML = reviewList.map(item => `
-            <div class="log-item">
-                <div class="log-info">
-                    <b>${item.name}</b>
-                    <span class="log-lines">${item.lines}</span>
-                </div>
-                <div style="font-size:10px; color:#dc3545">FALLADA</div>
+        let reviewHTML = failedStations.length > 0 
+            ? `<p style="color:#888">Debes repasar estas estaciones reina:</p>` + 
+              failedStations.map(s => `<div style="font-size:14px; margin-bottom:5px;"><b>${s.name}</b>: ${s.correct}</div>`).join('')
+            : `<p style="color:#28a745">¡Increíble chamaaaaa! No has tenido ni un solo fallo. ¡¡ESA ES MI CHICA LISTA!! 🐼🐧</p>`;
+
+        container.innerHTML = `
+            <h2 style="margin-top:0">🏆 ¡Sesión Terminada!</h2>
+            <div style="font-size:40px; margin:20px 0;">${percent}%</div>
+            <p>Has acertado ${hits} de ${metroDB.length} estaciones.</p>
+            <div style="background:#2a2a2a; padding:15px; border-radius:15px; text-align:left; max-height:250px; overflow-y:auto; margin-bottom:20px;">
+                ${reviewHTML}
             </div>
-        `).join('');
+            <button class="opt-btn" style="background:#28a745; text-align:center; width:100%" onclick="location.reload()">
+                REINICIAR ACADEMIA
+            </button>
+        `;
     }
 
-    function updateStats() {
+    function updateUI() {
+        const prog = (totalSeen / metroDB.length) * 100;
+        document.getElementById('progress-fill').style.width = prog + "%";
+        document.getElementById('counter').innerText = `${totalSeen}/${metroDB.length}`;
         document.getElementById('hits').innerText = hits;
         document.getElementById('misses').innerText = misses;
-        let total = hits + misses;
-        document.getElementById('percent').innerText = Math.round((hits/total)*100) + "%";
+    }
+
+    function formatLines(arr) {
+        return arr.sort((a,b) => {
+            if(a.includes('ML') || a === 'R') return 1;
+            return parseInt(a) - parseInt(b);
+        }).join(" - ");
+    }
+
+    function generateSmartFake(realLines) {
+        const all = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "R", "ML1", "ML2", "ML3"];
+        let fake = [...realLines];
+        if(realLines.length === 1) return [all[Math.floor(Math.random() * all.length)]];
+        let mode = Math.random();
+        if(mode < 0.5) fake.splice(Math.floor(Math.random() * fake.length), 1);
+        else fake.push(all[Math.floor(Math.random() * all.length)]);
+        return [...new Set(fake)];
     }
 
     nextQuestion();
