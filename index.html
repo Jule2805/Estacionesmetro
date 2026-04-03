@@ -72,26 +72,9 @@
         .bg-11 { background-color: #009846; } 
         .bg-12 { background-color: #aaad00; }
         .bg-R { background-color: #003882; } 
-.bg-ML1 { 
-    background-color: transparent !important; 
-    border: 3px solid #146c82 !important; 
-    color: #ffffff !important;
-    font-size: 9px !important; 
-}
-
-.bg-ML2 { 
-    background-color: transparent !important; 
-    border: 3px solid #59187e !important; 
-    color: #f4f4f4 !important;
-    font-size: 9px !important; 
-}
-
-.bg-ML3 { 
-    background-color: transparent !important; 
-    border: 3px solid #d21212 !important; 
-    color: #ffffff !important;
-    font-size: 9px !important; 
-}
+        .bg-ML1 { background-color: white !important; border: 3px solid #146c82 !important; color: #146c82 !important; font-size: 9px !important; }
+        .bg-ML2 { background-color: white !important; border: 3px solid #59187e !important; color: #59187e !important; font-size: 9px !important; }
+        .bg-ML3 { background-color: white !important; border: 3px solid #d21212 !important; color: #d21212 !important; font-size: 9px !important; }
 
         .correct { border: 2px solid #28a745 !important; background: #1a3a20 !important; }
         .wrong { border: 2px solid #dc3545 !important; background: #3a1a1a !important; }
@@ -500,32 +483,38 @@ function nextQuestion() {
         container.appendChild(btn);
     });
 }
-
 function check(btn, selected, correct, stationName) {
-    const buttons = document.querySelectorAll('.opt-btn');
-    buttons.forEach(b => b.disabled = true);
-    const isCorrect = JSON.stringify(selected) === JSON.stringify(correct);
+        const buttons = document.querySelectorAll('.opt-btn');
+        buttons.forEach(b => b.disabled = true); // Bloqueamos interacción
+        
+        // Comparamos los arrays convirtiéndolos a texto (ej: "1,2" === "1,2")
+        const isCorrect = selected.join(',') === correct.join(',');
 
-    if(isCorrect) {
-        btn.classList.add('correct');
-        hits++;
-        updateUI();
-        setTimeout(() => { nextQuestion(); }, 800);
-    } else {
-        btn.classList.add('wrong');
-        misses++;
-        updateUI();
-        failedStations.push({name: stationName, correct: formatLines(correct)});
-        // Mostrar cuál era la correcta
-        buttons.forEach(b => {
-            // Buscamos el botón que tiene las líneas correctas (comparación simple por texto interno)
-            if(b.innerHTML.includes(`bg-${correct[0]}`) && b.children.length === correct.length) {
-                b.classList.add('correct');
-            }
-        });
-        document.getElementById('next-btn').style.display = "block";
+        if (isCorrect) {
+            btn.classList.add('correct');
+            hits++;
+            updateUI();
+            setTimeout(() => {
+                nextQuestion();
+            }, 800);
+        } else {
+            btn.classList.add('wrong');
+            misses++;
+            updateUI();
+            failedStations.push({ name: stationName, correct: correct.join(' - ') });
+
+            // BUSCAR EL BOTÓN CORRECTO DE FORMA PRECISA
+            buttons.forEach(b => {
+                // Obtenemos los números de las bolitas de este botón
+                const btnLines = Array.from(b.querySelectorAll('.line-badge')).map(span => span.innerText);
+                if (btnLines.join(',') === correct.join(',')) {
+                    b.classList.add('correct');
+                }
+            });
+
+            document.getElementById('next-btn').style.display = "block";
+        }
     }
-}
 
 function formatLines(arr) { return arr.join(" - "); }
 
@@ -538,13 +527,37 @@ function updateUI() {
         document.getElementById('misses').innerText = misses;
     }
 }
-
 function generateSmartFake(realLines) {
-    const all = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "R", "ML1", "ML2", "ML3"];
-    let fake = [...realLines];
-    if(Math.random() < 0.5 && fake.length > 1) fake.splice(Math.floor(Math.random() * fake.length), 1);
-    else fake.push(all[Math.floor(Math.random() * all.length)]);
-    return [...new Set(fake)].sort((a,b) => a.localeCompare(b, undefined, {numeric: true}));
+    const allMetro = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+    const allSpecial = ["R", "ML1", "ML2", "ML3"];
+    const all = [...allMetro, ...allSpecial];
+    
+    let fake = [];
+    let numLines = realLines.length;
+
+    if (numLines === 1) {
+        // Si solo tiene una línea, buscamos otra línea aleatoria que NO sea la correcta
+        let randomLine;
+        do {
+            randomLine = all[Math.floor(Math.random() * all.length)];
+        } while (randomLine === realLines[0]);
+        fake = [randomLine];
+    } else {
+        // MODO TRAMPA: Si tiene trasbordo (2 o más líneas)
+        // Mantenemos la primera línea de la correcta para que te confunda
+        fake.push(realLines[0]); 
+
+        // Rellenamos el resto con líneas que NO estén en la combinación correcta
+        while (fake.length < numLines) {
+            let randomLine = all[Math.floor(Math.random() * all.length)];
+            if (!realLines.includes(randomLine) && !fake.includes(randomLine)) {
+                fake.push(randomLine);
+            }
+        }
+    }
+
+    // Ordenamos para que el orden de los colores no te dé pistas
+    return fake.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 }
 
 function showFinalResults() {
