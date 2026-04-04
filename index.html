@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #007bff;
-            --metro: #f31431; --cercanias: #ff6600; --bus: #00a550; --otros: #6e7a7d;
+            --metro: #f31431; --cercanias: #ff6600; --bus: #00a550; --otros: #36cdf3;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
@@ -27,7 +27,7 @@
         .block-metro { background: var(--metro); }
         .block-cercanias { background: var(--cercanias); opacity: 0.6; }
         .block-bus { background: var(--bus); opacity: 0.6; }
-        .block-otros { background: var(--otros); opacity: 0.6; }
+        .block-otros { background: var(--otros);}
 
         /* ESTILOS DEL JUEGO */
         .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
@@ -410,14 +410,11 @@ function showMainMenu() {
             <button class="menu-block block-metro" onclick="startMetroGame()">
                 <span>🚇</span> METRO<br><small style="font-weight:normal; font-size:10px">Tandas de 50</small>
             </button>
-            <button class="menu-block block-cercanias" onclick="alert('Próximamente...')">
-                <span>🚆</span> RENFE
-            </button>
             <button class="menu-block block-bus" onclick="alert('Próximamente...')">
-                <span>🚌</span> BUS
+                <span>🚌🚆➕</span> DE TODITO
             </button>
-            <button class="menu-block block-otros" onclick="alert('Próximamente...')">
-                <span>➕</span> OTROS
+            <button class="menu-block block-otros" onclick="window.location.href='tarifas.html'">
+                <span>💸</span> TARIFAS
             </button>
         </div>
     `;
