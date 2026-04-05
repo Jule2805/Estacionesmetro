@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeTodito - Modo Estudio</title>
+    <style>
+        :root {
+            --metro-red: #646969cf; 
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --border-color: #333;
+            --correct-green: #009543;
+            --metro-blue: #0055a4;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--metro-red);
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 900px;
+            margin: 20px auto;
+        }
+
+        .back-btn { 
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid white; 
+            color: white; 
+            cursor: pointer; 
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .card:hover { border-color: white; background: #252525; }
+
+        .l1 { border-bottom: 4px solid #00a0dc; } .l2 { border-bottom: 4px solid #ee3224; }
+        .l3 { border-bottom: 4px solid #ffcc00; } .l4 { border-bottom: 4px solid #a6552a; }
+        .l5 { border-bottom: 4px solid #a1be1f; } .l6 { border-bottom: 4px solid #9e9e9e; }
+        .l7 { border-bottom: 4px solid #f37021; } .l8 { border-bottom: 4px solid #f38abb; }
+        .l9 { border-bottom: 4px solid #92278f; } .l10 { border-bottom: 4px solid #003399; }
+        .l11 { border-bottom: 4px solid #009543; } .l12 { border-bottom: 4px solid #b29700; }
+        .lr { border-bottom: 4px solid #fff; } .r-renfe { border-bottom: 4px solid #004282; }
+
+        #pantalla-juego {
+            display: none;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        .opciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .btn-opcion {
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .btn-opcion.selected { background: var(--metro-blue); border-color: white; }
+
+        #mensaje-resultado {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .correcto { background: var(--correct-green); }
+        .incorrecto { background: var(--metro-red); }
+
+        .btn-accion {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            color: white;
+        }
+
+        .btn-check { background: var(--metro-blue); }
+        .btn-next { background: var(--correct-green); display: none; }        
+        .back-menu-btn { background: #444; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+
+  
+        @media (max-width: 480px) {
+            .opciones-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+        <button class="back-menu-btn" onclick="window.location.href='index.html'">VOLVER AL MENÚ</button>
+    <h1>🚇 DE TODITO</h1>
+</header>
+
+<div class="container">
+    <div id="menu-principal">
+        <div class="card" style="background: #2c0000; border: 1px solid red; margin-bottom: 15px;" onclick="iniciarExamen('todos')">🚀 EXAMEN TOTAL</div>
+        <div class="grid-menu">
+            <div class="card l1" onclick="iniciarExamen('linea1')">L1</div>
+            <div class="card l2" onclick="iniciarExamen('linea2')">L2</div>
+            <div class="card l3" onclick="iniciarExamen('linea3')">L3</div>
+            <div class="card l4" onclick="iniciarExamen('linea4')">L4</div>
+            <div class="card l5" onclick="iniciarExamen('linea5')">L5</div>
+            <div class="card l6" onclick="iniciarExamen('linea6')">L6</div>
+            <div class="card l7" onclick="iniciarExamen('linea7')">L7</div>
+            <div class="card l8" onclick="iniciarExamen('linea8')">L8</div>
+            <div class="card l9" onclick="iniciarExamen('linea9')">L9</div>
+            <div class="card l10" onclick="iniciarExamen('linea10')">L10</div>
+            <div class="card l11" onclick="iniciarExamen('linea11')">L11</div>
+            <div class="card l12" onclick="iniciarExamen('linea12')">L12</div>
+            <div class="card lr" onclick="iniciarExamen('ramal')">R</div>
+            <div class="card r-renfe" onclick="iniciarExamen('renfe')">RENFE</div>
+        </div>
+    </div>
+
+    <div id="pantalla-juego">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div id="progreso"></div>
+            <button onclick="irAlMenu()" style="background:none; border:1px solid #666; color:#ccc; cursor:pointer; padding:5px;">✕ Salir</button>
+        </div>
+        <h2 id="pregunta-texto"></h2>
+        <p id="indicador-tipo" style="color: #00fffb; font-weight: bold; font-size: 0.9em;"></p>
+        <div id="opciones-container" class="opciones-grid"></div>
+        <div id="mensaje-resultado"></div>
+        <button id="btn-comprobar" class="btn-accion btn-check" onclick="verificarSeleccion()">Comprobar</button>
+        <button id="btn-siguiente" class="btn-accion btn-next" onclick="proximaPregunta()">Siguiente Pregunta</button>
+    </div>
+</div>
+
+<script>
+    let tarifasDB = [];
+
+    const estacionesL1 = [
+    "Pinar de Chamartín", "Bambú", "Chamartín", "Plaza de Castilla", "Valdeacederas", 
+    "Tetuán", "Estrecho", "Alvarado", "Cuatro Caminos", "Ríos Rosas", "Iglesia", 
+    "Bilbao", "Tribunal", "Gran Vía", "Sol", "Tirso de Molina", "Antón Martín", 
+    "Estación del Arte", "Atocha", "Menéndez Pelayo", "Pacífico", "Puente de Vallecas", 
+    "Nueva Numancia", "Portazgo", "Buenos Aires", "Alto del Arenal", "Miguel Hernández", 
+    "Sierra de Guadalupe", "Villa de Vallecas", "Congosto", "La Gavia", "Las Suertes", "Valdecarros"
+];
+
+const serviciosL1 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    { 
+        category: "linea1", 
+        question: "De las siguientes, ¿cuáles son estaciones de correspondencia con la LÍNEA 2?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Cuatro Caminos", "Sol"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 tienen correspondencia con la LÍNEA 4?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Pinar de Chamartín", "Bilbao"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 tienen correspondencia con la LÍNEA 5?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Gran Vía"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estaciones de la L1 se cruza la LÍNEA 3?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Sol"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Cuáles de estas estaciones tienen conexión con la LÍNEA 9?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 tienen conexión directa con CERCANÍAS RENFE?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Sol", "Atocha", "Sierra de Guadalupe"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estación de la L1 se puede transbordar al METRO LIGERO (ML1)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Pinar de Chamartín"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "Estaciones con terminal de AUTOBUSES INTERURBANOS o largo recorrido:", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla", "Chamartín"], 
+        type: "multiple" 
+    },
+
+    // --- SERVICIOS AL CLIENTE Y GESTIÓN ---
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones tienen Oficina de GESTIÓN DE TARJETA TRANSPORTE PÚBLICO (TTP)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla", "Sol", "Atocha"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estación de la L1 se encuentra la oficina central de OBJETOS PERDIDOS de Metro?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones disponen de tienda de PRODUCTOS OFICIALES de Metro (Metro de Madrid Shop)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Sol", "Plaza de Castilla"], 
+        type: "multiple" 
+    },
+
+    // --- CULTURA Y OCIO ---
+    { 
+        category: "linea1", 
+        question: "¿En qué estaciones de la L1 hay servicio de BIBLIOMETRO?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Sierra de Guadalupe"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones cuentan con el servicio de METROTECA?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Tetuán", "Puente de Vallecas", "Miguel Hernández"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "Selecciona las estaciones consideradas ESPACIO HISTÓRICO o con museos:", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Iglesia", "Tirso de Molina", "Pacífico"], 
+        type: "multiple" 
+    },
+
+    // --- APARCAMIENTO Y BICICLETAS ---
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones tienen APARCAMIENTO DISUASORIO (incluye gratuitos y de pago)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Plaza de Castilla", "Atocha", "Miguel Hernández", "Sierra de Guadalupe"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 disponen de APARCAMIENTO DISUASORIO DE PAGO?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Plaza de Castilla", "Atocha", "Miguel Hernández"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estaciones hay áreas específicas de ESTACIONAMIENTO DE BICICLETAS?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín"], 
+        type: "single" 
+    },
+
+    // --- SEGURIDAD Y VALIDACIÓN ---
+    { 
+        category: "linea1", 
+        question: "¿Qué estación requiere VALIDACIÓN DE SALIDA?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Pinar de Chamartín"], 
+        type: "single" 
+    },
+    // --- TRANSBORDOS Y ACCESIBILIDAD ---
+{ 
+    category: "linea1", 
+    question: "¿Qué estaciones de la L1 cuentan con TRANSBORDO CORTO?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Pinar de Chamartín", "Chamartín", "Plaza de Castilla", "Cuatro Caminos", "Bilbao", "Tribunal", "Gran Vía", "Sol", "Pacífico"], 
+    type: "multiple" 
+},
+{ 
+    category: "linea1", 
+    question: "De las siguientes estaciones de la L1, ¿cuáles SÍ son ACCESIBLES (tienen ascensor/símbolo de discapacidad)?",
+    options: [...estacionesL1].sort(), 
+    answer: [
+        "Pinar de Chamartín", "Bambú", "Chamartín", "Plaza de Castilla", 
+        "Cuatro Caminos", "Iglesia", "Bilbao", "Tribunal", 
+        "Gran Vía", "Sol", "Atocha", "Menéndez Pelayo", 
+        "Pacífico", "Portazgo", "Alto del Arenal", "Miguel Hernández", 
+        "Sierra de Guadalupe", "Villa de Vallecas", "Congosto", "La Gavia", 
+        "Las Suertes", "Valdecarros"
+    ], 
+    type: "multiple" 
+},
+// --- AEROPUERTO Y TREN ---
+{ 
+    category: "linea1", 
+    question: "¿En qué estación de la L1 se puede tomar el AUTOBÚS EXPRÉS AEROPUERTO?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Atocha"], 
+    type: "single" 
+},
+{ 
+    category: "linea1", 
+    question: "¿Qué estaciones están catalogadas específicamente como ESTACIÓN DE TREN en el esquema?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Chamartín", "Atocha"], 
+    type: "multiple" 
+},
+
+// --- ATENCIÓN AL CLIENTE ---
+{ 
+    category: "linea1", 
+    question: "¿Qué estaciones de la L1 disponen de puestos de ATENCIÓN AL CLIENTE?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Plaza de Castilla", "Sol"], 
+    type: "multiple" 
+}
+];
+
+    tarifasDB.push(...serviciosL1);
+
+    let filtradas = [];
+    let actual = 0;
+    let seleccionados = [];
+    let preguntasFalladas = [];
+
+    function iniciarExamen(modo) {
+        filtradas = modo === 'todos' ? [...tarifasDB] : tarifasDB.filter(p => p.category === modo);
+        if (filtradas.length === 0) return alert("Todavía no hay preguntas en este bloque.");
+        
+        filtradas.sort(() => Math.random() - 0.5);
+        actual = 0;
+        preguntasFalladas = [];
+        document.getElementById('menu-principal').style.display = 'none';
+        document.getElementById('pantalla-juego').style.display = 'block';
+        mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+        const p = filtradas[actual];
+        seleccionados = [];
+        document.getElementById('progreso').innerText = `PREGUNTA ${actual + 1} / ${filtradas.length}`;
+        document.getElementById('pregunta-texto').innerText = p.question;
+        document.getElementById('indicador-tipo').innerText = p.type === "multiple" ? "⚠️ SELECCIÓN MÚLTIPLE" : "☝️ SELECCIÓN ÚNICA";
+        
+        document.getElementById('mensaje-resultado').style.display = 'none';
+        document.getElementById('btn-comprobar').style.display = 'block';
+        document.getElementById('btn-siguiente').style.display = 'none';
+        
+        const container = document.getElementById('opciones-container');
+        container.innerHTML = "";
+
+        p.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-opcion';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (p.type === "single") {
+                    document.querySelectorAll('.btn-opcion').forEach(b => b.classList.remove('selected'));
+                    seleccionados = [opt];
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.toggle('selected');
+                    if (btn.classList.contains('selected')) {
+                        seleccionados.push(opt);
+                    } else {
+                        seleccionados = seleccionados.filter(i => i !== opt);
+                    }
+                }
+            };
+            container.appendChild(btn);
+        });
+    }
+
+    function verificarSeleccion() {
+        if (seleccionados.length === 0) return alert("Selecciona algo, ¡no te la juegues en blanco!");
+
+        const p = filtradas[actual];
+        const correctas = [...p.answer].sort();
+        const marcadas = [...seleccionados].sort();
+        
+        const esCorrecto = marcadas.length === correctas.length && 
+                           marcadas.every((val, index) => val === correctas[index]);
+
+        const msgDiv = document.getElementById('mensaje-resultado');
+        msgDiv.style.display = 'block';
+        
+        if (esCorrecto) {
+            msgDiv.className = 'correcto';
+            msgDiv.innerHTML = "✅ ¡ASÍ SE HACE!";
+        } else {
+            msgDiv.className = 'incorrecto';
+            msgDiv.innerHTML = `❌ ERROR<br><small>Eran: ${p.answer.join(", ")}</small>`;
+            
+            preguntasFalladas.push({
+                pregunta: p.question,
+                tuRespuesta: seleccionados.join(", "),
+                respuestaCorrecta: p.answer.join(", ")
+            });
+        }
+
+        document.getElementById('btn-comprobar').style.display = 'none';
+        document.getElementById('btn-siguiente').style.display = 'block';
+    }
+
+    function proximaPregunta() {
+        actual++;
+        if (actual < filtradas.length) {
+            mostrarPregunta();
+        } else {
+            finalizarTest();
+        }
+    }
+
+   function finalizarTest() {
+        const pantallaJuego = document.getElementById('pantalla-juego');
+        const total = filtradas.length;
+        const aciertos = total - preguntasFalladas.length;
+        const porcentaje = Math.round((aciertos / total) * 100);
+        
+        // Creamos una estructura limpia para los resultados
+        let htmlFinal = `
+            <div id="resultados-finales" style="text-align:center;">
+                <h2 style="margin-top:0;">¡Test Finalizado!</h2>
+                <div style="font-size: 1.2em; margin-bottom: 20px;">
+                    Puntuación: <span style="color:${porcentaje >= 50 ? 'var(--correct-green)' : 'var(--metro-red)'}">${porcentaje}%</span><br>
+                    <small>(${aciertos} aciertos de ${total} preguntas)</small>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #444; margin: 20px 0;">
+        `;
+        
+        if (preguntasFalladas.length === 0) {
+            htmlFinal += `
+                <div style="padding: 20px;">
+                    <p style="color:var(--correct-green); font-weight:bold; font-size: 1.1em;">
+                        🥇 ¡PERFECTO! <br> No has fallado ninguna estación.
+                    </p>
+                </div>
+            `;
+        } else {
+            htmlFinal += `
+                <p style="color:#aaa; font-size: 0.9em; text-align:left;">Repaso de errores (${preguntasFalladas.length}):</p>
+                <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; padding-right: 10px;">
+            `;
+            
+            preguntasFalladas.forEach((f, index) => {
+                htmlFinal += `
+                    <div style="background:#2a2a2a; padding:12px; margin-bottom:12px; border-radius:8px; border-left:4px solid var(--metro-red); text-align:left; font-size:0.85em;">
+                        <strong style="color:#fff; display:block; margin-bottom:5px;">${index + 1}. ${f.pregunta}</strong>
+                        <div style="color:#ff8888; margin-bottom:3px;">❌ Marcaste: ${f.tuRespuesta}</div>
+                        <div style="color:#88ff88;">✅ Correcta: ${f.respuestaCorrecta}</div>
+                    </div>`;
+            });
+            htmlFinal += `</div>`;
+        }
+        
+        // Botones de acción final
+        htmlFinal += `
+                <button class="btn-accion btn-check" onclick="location.reload()">🔄 REINTENTAR TODO</button>
+                <button class="btn-accion" style="background:#444; margin-top:10px;" onclick="irAlMenu()">🏠 VOLVER AL MENÚ</button>
+            </div>
+        `;
+        
+        pantallaJuego.innerHTML = htmlFinal;
+    }
+
+    function irAlMenu() {
+        // La forma más efectiva de resetear el estado y volver al menú principal
+        window.location.reload();
+    }
+</script>
+</body>
+</html>
