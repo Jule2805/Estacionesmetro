@@ -238,7 +238,7 @@ const serviciosL1 = [
         category: "linea1", 
         question: "¿Qué estaciones de la L1 tienen conexión directa con CERCANÍAS RENFE?", 
         options: [...estacionesL1].sort(), 
-        answer: ["Chamartín", "Sol", "Atocha", "Sierra de Guadalupe"], 
+        answer: ["Chamartín", "Sol", "Atocha","Gran Via", "Sierra de Guadalupe"], 
         type: "multiple" 
     },
     { 
@@ -522,6 +522,599 @@ const serviciosL2 = [
 // Para que funcione, no olvides añadir esto al final de tu script o donde cargues los datos:
 tarifasDB.push(...serviciosL2);
 
+const estacionesL3 = [
+    "El Casar", "Villaverde Alto", "San Cristóbal", "Villaverde Bajo-Cruce", 
+    "Ciudad de los Ángeles", "San Fermín-Orcasur", "Hospital 12 de Octubre", 
+    "Almendrales", "Legazpi", "Delicias", "Palos de la Frontera", 
+    "Embajadores", "Lavapiés", "Sol", "Callao", "Plaza de España", 
+    "Ventura Rodríguez", "Argüelles", "Moncloa"
+];
+
+const serviciosL3 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    {
+        category: "linea3",
+        question: "¿Qué estación de la L3 tiene correspondencia con la LÍNEA 12 (Metrosur)?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar"],
+        type: "single"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen conexión con CERCANÍAS?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar", "Villaverde Alto", "Embajadores", "Sol"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 6?",
+        options: [...estacionesL3].sort(),
+        answer: ["Legazpi", "Argüelles", "Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 1?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+     {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 2?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol", "Plaza de España"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 5?",
+        options: [...estacionesL3].sort(),
+        answer: ["Embajadores", "Callao"],
+        type: "multiple"
+    },
+
+    // --- CARACTERÍSTICAS DE ESTACIÓN (Transbordos y Accesibilidad) ---
+   { 
+    category: "linea3", 
+    question: "¿Qué estaciones de la L3 tienen el icono de ACCESIBILIDAD (silla de ruedas) en el esquema?", 
+    options: [
+        ...estacionesL3, 
+        "Todas las estaciones de la L3 son ACCESIBLES"
+    ].sort(), 
+    answer: ["Todas las estaciones de la L3 son ACCESIBLES"], 
+    type: "single" 
+},
+    {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen TRANSBORDO LARGO?",
+        options: [...estacionesL3].sort(),
+        answer: ["Embajadores", "Plaza de España"],
+        type: "multiple"
+    },
+      {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL3].sort(),
+        answer: ["Legazpi", "sol","Callao", "Plaza España","Argüelles","Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿A qué estaciones se realiza el transbordo largo desde Embajadores y Plaza de España respectivamente?",
+        options: ["Acacias y Noviciado", "Noviciado y Callao", "Acacias y Ópera", "Noviciado y Sol"],
+        answer: ["Acacias y Noviciado"],
+        type: "single"
+    },
+
+    // --- AUTOBUSES Y VALIDACIÓN ---
+    {
+        category: "linea3",
+        question: "¿Qué estación de la L3 requiere VALIDACIÓN A LA SALIDA?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar"],
+        type: "single"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL3].sort(),
+        answer: ["Villaverde Bajo-Cruce", "Legazpi", "Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estación de la L3 hay terminal de AUTOBUSES DE LARGO RECORRIDO?",
+        options: [...estacionesL3].sort(),
+        answer: ["Moncloa"],
+        type: "single"
+    },
+
+    // --- SERVICIOS AL CLIENTE Y CULTURA ---
+    {
+        category: "linea3",
+        question: "¿Qué estación cuenta con Atención al Cliente?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estación cuenta con Productos Oficiales?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+    
+    {
+        category: "linea3",
+        question: "¿En qué estación de la L3 hay Oficina de Gestión de TARJETA TRANSPORTE PÚBLICO (TTP)?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol","Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estación de la L3 dispone de METROTECA?",
+        options: [...estacionesL3].sort(),
+        answer: ["Delicias"],
+        type: "single"
+    },
+
+    // --- APARCAMIENTO Y BICICLETAS ---
+    {
+        category: "linea3",
+        question: "¿Qué estaciones tienen APARCAMIENTO DISUASORIO GRATUITO?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar", "Villaverde Alto"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estación de la L3 hay ESTACIONAMIENTO DE BICICLETAS?",
+        options: [...estacionesL3].sort(),
+        answer: ["Moncloa"],
+        type: "single"
+    }
+];
+
+// Añadir a la base de datos general
+tarifasDB.push(...serviciosL3);
+
+const estacionesL4 = [
+    "Argüelles", "San Bernardo", "Bilbao", "Alonso Martínez", "Colón", "Serrano", 
+    "Velázquez", "Goya", "Lista", "Diego de León", "Avenida de América", 
+    "Prosperidad", "Alfonso XIII", "Avenida de la Paz", "Arturo Soria", 
+    "Esperanza", "Canillas", "Mar de Cristal", "San Lorenzo", 
+    "Parque de Santa María", "Hortaleza", "Manoteras", "Pinar de Chamartín"
+];
+
+const serviciosL4 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    {
+        category: "linea4",
+        question: "¿Qué estaciones de la L4 conectan con la LÍNEA 6?",
+        options: [...estacionesL4].sort(),
+        answer: ["Argüelles", "Diego de León", "Avenida de América"],
+        type: "multiple"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 8?",
+        options: [...estacionesL4].sort(),
+        answer: ["Mar de Cristal"],
+        type: "single"
+    },
+      {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 1?",
+        options: [...estacionesL4].sort(),
+        answer: ["Bilbao", "Pinar de Chamartin"],
+        type: "multiple"
+    },
+      {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 5?",
+        options: [...estacionesL4].sort(),
+        answer: ["Alonso Martinez", "Diego de Leon"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 se puede transbordar al METRO LIGERO (ML1)?",
+        options: [...estacionesL4].sort(),
+        answer: ["Pinar de Chamartín"],
+        type: "single"
+    },
+
+    // --- CARACTERÍSTICAS DE ESTACIÓN (Transbordos y Accesibilidad) ---
+    {
+        category: "linea4",
+        question: "¿Qué estaciones de la L4 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL4].sort(), 
+        answer: ["Argüelles", "San Bernardo", "Bilbao", "Alonso Martínez", "Goya", "Avenida de América", "Mar de Cristal", "Pinar de Chamartín"],
+        type: "multiple"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 está marcada con un TRANSBORDO LARGO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Diego de León"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "De las siguientes estaciones de la L4, ¿cuáles tienen el icono de ACCESIBILIDAD?",
+        options: [...estacionesL4].sort(),
+        answer: ["Argüelles","Bilbao","Goya", "Avenida de América","Canillas","Mar de Cristal","San Lorenzo","Parque de Santa Maria","Hortaleza","Manoteras","Pinar de Chamartin"],
+        type: "multiple"
+    },
+
+    // --- SERVICIOS Y AUTOBUSES ---
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 hay parada de terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL4].sort(),
+        answer: ["Alonso Martínez"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene conexión con AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+     {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene conexión LARGO RECORRIDO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación requiere VALIDACIÓN A LA SALIDA en la L4?",
+        options: [...estacionesL4].sort(),
+        answer: ["Pinar de Chamartín"],
+        type: "single"
+    },
+
+    // --- GESTIÓN Y CULTURA ---
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 hay Oficina de Gestión de TTP?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 cuenta con BIBLIOMETRO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Mar de Cristal"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 se encuentra la METROTECA?",
+        options: [...estacionesL4].sort(),
+        answer: ["Prosperidad"],
+        type: "single"
+    },
+
+    // --- APARCAMIENTO ---
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 dispone de APARCAMIENTO DISUASORIO DE PAGO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    }
+];
+
+// No olvides el push para que se carguen en el examen
+tarifasDB.push(...serviciosL4);
+const estacionesL5 = [
+    "Alameda de Osuna", "El Capricho", "Canillejas", "Torre Arias", "Suanzes", 
+    "Ciudad Lineal", "Pueblo Nuevo", "Quintana", "El Carmen", "Ventas", 
+    "Diego de León", "Núñez de Balboa", "Rubén Darío", "Alonso Martínez", 
+    "Chueca", "Gran Vía", "Callao", "Ópera", "La Latina", "Puerta de Toledo", 
+    "Acacias", "Pirámides", "Marqués de Vadillo", "Urgel", "Oporto", 
+    "Vista Alegre", "Carabanchel", "Eugenia de Montijo", "Aluche", 
+    "Empalme", "Campamento", "Casa de Campo"
+];
+
+const serviciosL5 = [
+    // --- CORRESPONDENCIAS ---
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen correspondencia con la LÍNEA 6?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de León", "Oporto"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 2?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ventas", "Ópera"],
+        type: "multiple"
+    },
+      {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 7?",
+        options: [...estacionesL5].sort(),
+        answer: ["Pueblo Nuevo"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 3?",
+        options: [...estacionesL5].sort(),
+        answer: ["Callao", "Acacias"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con el RAMAL?",
+        options: [...estacionesL5].sort(),
+        answer: ["Opera"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 4?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de Leon", "Alosno Martinez"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿En qué estaciones de la L5 hay conexión con CERCANÍAS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Gran Vía", "Pirámides", "Aluche"],
+        type: "multiple"
+    },
+
+    // --- ACCESIBILIDAD (Solo las marcadas con X) ---
+    {
+        category: "linea5",
+        question: "Selecciona las estaciones de la L5 que SÍ son ACCESIBLES según la tabla:",
+        options: [...estacionesL5].sort(),
+        answer: [
+            "Alameda de Osuna", "El Capricho", "Pueblo Nuevo", 
+            "Gran Vía", "Callao", "Ópera", "Pirámides", 
+            "Eugenia de Montijo", "Aluche", "Empalme", "Casa de Campo"
+        ],
+        type: "multiple"
+    },
+
+    // --- TRANSBORDOS ---
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen marcado un TRANSBORDO LARGO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de León", "Núñez de Balboa", "Acacias"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿A qué estación se realiza el transbordo largo desde ACACIAS?",
+        options: ["Embajadores", "Pirámides", "Puerta de Toledo", "La Latina"],
+        answer: ["Embajadores"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Pueblo Nuevo", "Ventas", "Alonso Martínez", "Gran Vía", "Callao", "Ópera", "Oporto"],
+        type: "multiple"
+    },
+
+    // --- OTROS SERVICIOS ---
+    {
+        category: "linea5",
+        question: "¿En qué estación de la L5 hay terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Alonso Martínez"],
+        type: "single"
+    },
+
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Canillejas", "Ciudad Lineal", "Oporto", "Aluche"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones disponen de ATENCIÓN AL CLIENTE?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+     {
+        category: "linea5",
+        question: "¿Qué estaciones disponen de PRODUCTOS OFICIALES?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿En qué estación de la L5 hay METROTECA?",
+        options: [...estacionesL5].sort(),
+        answer: ["Suanzes"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación está marcada como ESPACIO HISTÓRICO en la L5?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera", "Gran Vía"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen APARCAMIENTO DISUASORIO GRATUITO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Canillejas", "Aluche"],
+        type: "multiple"
+    }
+];
+
+tarifasDB.push(...serviciosL5);
+
+const estacionesL6 = [
+    "Ciudad Universitaria", "Vicente Aleixandre", "Guzmán el Bueno", "Cuatro Caminos",
+    "Nuevos Ministerios", "República Argentina", "Avenida de América", "Diego de León",
+    "Manuel Becerra", "O'Donnell", "Sainz de Baranda", "Conde de Casal", "Pacífico",
+    "Méndez Álvaro", "Arganzuela-Planetario", "Legazpi", "Usera", "Plaza Elíptica",
+    "Opañel", "Oporto", "Carpetana", "Laguna", "Lucero", "Alto de Extremadura",
+    "Puerta del Ángel", "Príncipe Pío", "Argüelles", "Moncloa"
+];
+
+const serviciosL6 = [
+    // --- CORRESPONDENCIAS ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 conectan con la LÍNEA 10?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Príncipe Pío"],
+        type: "multiple"
+    },
+       {
+    category: "linea6",
+    question: "Selecciona TODAS las estaciones de la L6 que tienen terminal de AUTOBUSES DE LARGO RECORRIDO:",
+    options: [...estacionesL6].sort(),
+    answer: ["Avenida de América", "Méndez Álvaro", "Plaza Elíptica", "Príncipe Pío", "Moncloa"],
+    type: "multiple"
+},
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 11?",
+        options: [...estacionesL6].sort(),
+        answer: ["Plaza Elíptica"],
+        type: "single"
+    },
+     {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 3?",
+        options: [...estacionesL6].sort(),
+        answer: ["Legazpi", "Argüelles"],
+        type: "multiple"
+    },
+     {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 4?",
+        options: [...estacionesL6].sort(),
+        answer: ["Avenida de America", "Diego de Leon","Argüelles"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 7?",
+        options: [...estacionesL6].sort(),
+        answer: ["Avenida de América", "Guzman el Bueno"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 tienen conexión con CERCANÍAS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Méndez Álvaro", "Laguna", "Príncipe Pío"],
+        type: "multiple"
+    },
+
+    // --- TRANSBORDOS (Cortos y Largos) ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 están marcadas con TRANSBORDO LARGO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Diego de León"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "Selecciona las estaciones de la L6 que tienen TRANSBORDO CORTO:",
+        options: [...estacionesL6].sort(),
+        answer: ["Cuatro Caminos", "Avenida de América", "Manuel Becerra", "Sainz de Baranda", "Legazpi", "Plaza Elíptica", "Oporto", "Príncipe Pío", "Argüelles", "Moncloa"],
+        type: "multiple"
+    },
+
+    // --- ACCESIBILIDAD ---
+    {
+        category: "linea6",
+        question: "De las siguientes estaciones de la L6, ¿cuáles SÍ son ACCESIBLES?",
+        options: [...estacionesL6].sort(),
+        answer: [
+            "Ciudad Universitaria", "Guzmán el Bueno", "Cuatro Caminos", "Nuevos Ministerios", 
+            "Avenida de América", "Sainz de Baranda", "Conde de Casal", "Pacífico", "Arganzuela-Planetario", "Legazpi", "Usera", 
+            "Plaza Elíptica", "Carpetana", "Laguna", "Lucero", "Príncipe Pío", 
+            "Argüelles", "Moncloa"
+        ],
+        type: "multiple"
+    },
+
+    // --- AUTOBUSES Y GESTIÓN ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Avenida de América", "Conde de Casal", "Méndez Álvaro", "Legazpi", "Plaza Elíptica", "Oporto", "Príncipe Pío", "Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estaciones de la L6 hay parada de AUTOBÚS EXPRÉS AEROPUERTO?",
+        options: [...estacionesL6].sort(),
+        answer: ["O'Donnell"],
+        type: "single"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estaciones disponen de Oficina de Gestión de TTP?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Avenida de América", "Méndez Álvaro", "Príncipe Pío", "Moncloa"],
+        type: "multiple"
+    },
+
+    // --- CULTURA Y OTROS ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 están marcadas como ESPACIO HISTÓRICO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Pacífico", "Carpetana"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se encuentra la METROTECA?",
+        options: [...estacionesL6].sort(),
+        answer: ["Laguna"],
+        type: "single"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estación de la L6 dispone de APARCAMIENTO DISUASORIO DE PAGO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Ciudad Universitaria","Nuevos Ministerios","Avenida de América"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 hay ESTACIONAMIENTO DE BICICLETAS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Arganzuela-Planetario", "Moncloa"],
+        type: "multiple"
+    }
+];
+
+tarifasDB.push(...serviciosL6);
 
     let filtradas = [];
     let actual = 0;
@@ -669,9 +1262,22 @@ tarifasDB.push(...serviciosL2);
     }
 
     function irAlMenu() {
-        // La forma más efectiva de resetear el estado y volver al menú principal
-        window.location.reload();
-    }
+    document.getElementById('menu-principal').style.display = 'block';
+    document.getElementById('pantalla-juego').style.display = 'none';
+    // Opcional: limpiar el contenido de pantalla-juego para la próxima vez
+    document.getElementById('pantalla-juego').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div id="progreso"></div>
+            <button onclick="irAlMenu()" style="background:none; border:1px solid #666; color:#ccc; cursor:pointer; padding:5px;">✕ Salir</button>
+        </div>
+        <h2 id="pregunta-texto"></h2>
+        <p id="indicador-tipo" style="color: #00fffb; font-weight: bold; font-size: 0.9em;"></p>
+        <div id="opciones-container" class="opciones-grid"></div>
+        <div id="mensaje-resultado"></div>
+        <button id="btn-comprobar" class="btn-accion btn-check" onclick="verificarSeleccion()">Comprobar</button>
+        <button id="btn-siguiente" class="btn-accion btn-next" onclick="proximaPregunta()">Siguiente Pregunta</button>
+    `;
+}
 </script>
 </body>
 </html>
