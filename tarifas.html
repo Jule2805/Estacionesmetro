@@ -59,163 +59,183 @@
 
 <script>
 const tarifasDB = [
-        // METRO (Basado en image_8f8904.jpg)
-        { question: "¿Cuánto cuesta un billete Sencillo de Metro Zona A (hasta 5 estaciones)?", options: ["1,50€", "2,00€", "1,80€", "3,00€"], answer: "1,50€" },
-        { question: "¿Cuál es el precio máximo de un billete Sencillo de Metro Zona A (10 estaciones o más)?", options: ["2,00€", "1,50€", "3,00€", "2,50€"], answer: "2,00€" },
-        { question: "¿Precio del Metrobus de 10 viajes en la Zona A?", options: ["7,30€", "6,70€", "10,90€", "8,50€"], answer: "7,30€" },
-        { question: "¿Qué precio tiene el Billetes Sencillo de MetroNorte, MetroEste o MetroSur?", options: ["1,50€", "2,00€", "3,00€", "1,20€"], answer: "1,50€" },
-        { question: "¿Cuánto cuesta el Billete Combinado de 10 viajes (toda la red)?", options: ["10,90€", "18,30€", "7,30€", "12,50€"], answer: "10,90€" },
+    // --- METRO Y METROBÚS ---
+    { question: "¿Cuánto cuesta un billete Sencillo de Metro Zona A (hasta 5 estaciones)?", options: ["1,50€", "2,00€", "1,80€", "3,00€"], answer: "1,50€" },
+    { question: "¿Cuál es el precio de un billete sencillo de Metro si recorres entre 6 y 9 estaciones en Zona A?", options: ["1,50€ + 0,10€ por estación extra", "1,80€ tarifa plana", "2,00€ tarifa fija", "1,70€ fijos"], answer: "1,50€ + 0,10€ por estación extra" },
+    { question: "¿Cuál es el precio máximo de un billete Sencillo de Metro Zona A (10 estaciones o más)?", options: ["2,00€", "1,50€", "3,00€", "2,50€"], answer: "2,00€" },
+    { question: "¿Precio del Metrobus de 10 viajes en la Zona A?", options: ["7,30€", "6,70€", "10,90€", "8,50€"], answer: "7,30€" },
+    { question: "¿Qué precio tiene el Billetes Sencillo de MetroNorte, MetroEste o MetroSur?", options: ["1,50€", "2,00€", "3,00€", "1,20€"], answer: "1,50€" },
+    { question: "¿Cuánto cuesta el Billete Combinado de 10 viajes (toda la red)?", options: ["10,90€", "18,30€", "7,30€", "12,50€"], answer: "10,90€" },
+    { question: "¿Cuál es el precio máximo de un billete sencillo en TFM (L9), Metro Ligero 2 o Metro Ligero 3?", options: ["2,00€", "1,50€", "3,00€", "2,50€"], answer: "2,00€" },
 
-        // EMT (Basado en image_8f88e2.jpg)
-        { question: "¿Precio del billete Bus Exprés Aeropuerto?", options: ["5,00€", "3,00€", "2,00€", "6,00€"], answer: "5,00€" },
-        { question: "¿Cuánto cuesta el billete TransBus (trasbordo en EMT)?", options: ["1,80€", "1,50€", "2,00€", "1,30€"], answer: "1,80€" },
-        { question: "¿Donde se adquieren los billetes Sencillo y Exprés Aeropuerto de la EMT?", options: ["A bordo del bus", "En el Metro", "En Estancos", "En la App"], answer: "A bordo del bus" },
+    // --- EMT (AUTOBUSES MADRID) ---
+    { question: "¿Precio del billete Bus Exprés Aeropuerto?", options: ["5,00€", "3,00€", "2,00€", "6,00€"], answer: "5,00€" },
+    { question: "¿Cuánto cuesta el billete TransBus (trasbordo en EMT)?", options: ["1,80€", "1,50€", "2,00€", "1,30€"], answer: "1,80€" },
+    { question: "¿Donde se adquieren los billetes Sencillo y Exprés Aeropuerto de la EMT?", options: ["A bordo del bus", "En el Metro", "En Estancos", "En la App"], answer: "A bordo del bus" },
+    { question: "¿Cuál es la ventaja principal del billete 'TransBus' de la EMT?", options: ["Permite transbordos durante 60 min", "Es válido para Metro y Bus", "Es más barato que el sencillo", "Permite ir al Aeropuerto"], answer: "Permite transbordos durante 60 min" },
 
-        // INTERURBANOS (Basado en image_8f88c0.jpg)
-        { question: "¿Precio de 10 viajes para Interurbanos de 2 zonas (ej: A-B1)?", options: ["7,30€", "5,10€", "9,60€", "13,80€"], answer: "7,30€" },
-        { question: "¿Precio de 10 viajes para Interurbanos de 6 zonas (A-C2)?", options: ["22,40€", "17,80€", "20,50€", "15,00€"], answer: "22,40€" },
+    // --- INTERURBANOS ---
+    { question: "¿Precio de 10 viajes para Interurbanos de 2 zonas (ej: A-B1)?", options: ["7,30€", "5,10€", "9,60€", "13,80€"], answer: "7,30€" },
+    { question: "¿Precio de 10 viajes para Autobuses Interurbanos de 3 zonas (ej: A-B2)?", options: ["9,60€", "7,30€", "13,80€", "5,10€"], answer: "9,60€" },
+    { question: "¿Precio de 10 viajes para Autobuses Interurbanos de 4 zonas (ej: B1-C1)?", options: ["13,80€", "9,60€", "17,80€", "12,20€"], answer: "13,80€" },
+    { question: "¿Precio de 10 viajes para Interurbanos de 6 zonas (A-C2)?", options: ["22,40€", "17,80€", "20,50€", "15,00€"], answer: "22,40€" },
+    { question: "¿Precio de 10 viajes para recorridos Urbanos en otros municipios (B1-C2)?", options: ["5,10€", "7,30€", "1,50€", "6,20€"], answer: "5,10€" },
 
-        // TURÍSTICO (Basado en image_8f8be4.jpg)
-        { question: "¿Qué descuento tienen los menores de 11 años en el Título Turístico?", options: ["50%", "20%", "Gratis", "30%"], answer: "50%" },
-        { question: "¿Precio del Billete Turístico de 1 día para la Zona A?", options: ["10,30€", "15,40€", "8,40€", "12,00€"], answer: "10,30€" },
+    // --- TURÍSTICO ---
+    { question: "¿Qué descuento tienen los menores de 11 años en el Título Turístico?", options: ["50%", "20%", "Gratis", "30%"], answer: "50%" },
+    { question: "¿Precio del Billete Turístico de 1 día para la Zona A?", options: ["10,30€", "15,40€", "8,40€", "12,00€"], answer: "10,30€" },
+    { question: "¿Cuánto paga un niño de 10 años por un Billete Turístico de 1 día para Zona A (50% dto)?", options: ["5,15€", "10,30€", "7,20€", "Gratis"], answer: "5,15€" },
+    { question: "¿Cuál es el precio de un Billete Turístico de 3 días para la Zona T (todas las zonas)?", options: ["35,00€", "23,10€", "26,20€", "15,40€"], answer: "35,00€" },
 
-        // ABONOS 30 DÍAS - NORMAL (Basado en image_8f9b09.jpg)
-        { question: "¿Cuál es el precio del Abono 30 días Normal para la Zona A?", options: ["32,70€", "38,20€", "43,20€", "49,20€"], answer: "32,70€" },
-        { question: "¿Cuál es el precio del Abono 30 días Normal para las Zonas B3, C1 o C2?", options: ["49,20€", "43,20€", "66,30€", "79,00€"], answer: "49,20€" },
-        { question: "¿Cuál es el precio del Abono 30 días Normal para la Zona E2?", options: ["79,00€", "66,30€", "49,20€", "53,70€"], answer: "79,00€" },
+    // --- ABONOS 30 DÍAS (NORMAL E INTERZONAL) ---
+    { question: "¿Cuál es el precio del Abono 30 días Normal para la Zona A?", options: ["32,70€", "38,20€", "43,20€", "49,20€"], answer: "32,70€" },
+    { question: "¿Cuál es el precio del Abono 30 días Normal para las Zonas B3, C1 o C2?", options: ["49,20€", "43,20€", "66,30€", "79,00€"], answer: "49,20€" },
+    { question: "¿Cuál es el precio del Abono 30 días Normal para la Zona E2?", options: ["79,00€", "66,30€", "49,20€", "53,70€"], answer: "79,00€" },
+    { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 2 Zonas (ej: B1-B2)?", options: ["28,70€", "32,70€", "38,20€", "43,20€"], answer: "28,70€" },
+    { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 3 Zonas (ej: B1-B3)?", options: ["32,70€", "28,70€", "38,20€", "43,20€"], answer: "32,70€" },
+    { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 4 Zonas (ej: B3-E1)?", options: ["38,20€", "43,20€", "49,20€", "32,70€"], answer: "38,20€" },
+    { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 5 Zonas (ej: B2-E1)?", options: ["43,20€", "38,20€", "49,20€", "53,70€"], answer: "43,20€" },
+    { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 6 Zonas (ej: B1-E1)?", options: ["49,20€", "43,20€", "53,70€", "38,20€"], answer: "49,20€" },
+    { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 7 Zonas (B1-E2)?", options: ["53,70€", "49,20€", "62,80€", "43,20€"], answer: "53,70€" },
 
-        // INTERZONALES - SEGÚN TUS NOTAS ROJAS (Basado en image_8f9b09.jpg)
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 2 Zonas (ej: B1-B2)?", options: ["28,70€", "32,70€", "38,20€", "43,20€"], answer: "28,70€" },
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 3 Zonas (ej: B1-B3)?", options: ["32,70€", "28,70€", "38,20€", "43,20€"], answer: "32,70€" },
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 4 Zonas (ej: B3-E1)?", options: ["38,20€", "43,20€", "49,20€", "32,70€"], answer: "38,20€" },
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 5 Zonas (ej: B2-E1)?", options: ["43,20€", "38,20€", "49,20€", "53,70€"], answer: "43,20€" },
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 6 Zonas (ej: B1-E1)?", options: ["49,20€", "43,20€", "53,70€", "38,20€"], answer: "49,20€" },
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 7 Zonas (B1-E2)?", options: ["53,70€", "49,20€", "62,80€", "43,20€"], answer: "53,70€" },
-       
-        // METRO DETALLES (image_8f8904.jpg)
-        { question: "¿Cuál es el precio de un billete sencillo de Metro si recorres entre 6 y 9 estaciones en Zona A?", options: ["1,50€ + 0,10€ por estación extra", "1,80€ tarifa plana", "2,00€ tarifa fija", "1,70€ fijos"], answer: "1,50€ + 0,10€ por estación extra" },
-        { question: "¿Cuál es el precio máximo de un billete sencillo en TFM (L9), Metro Ligero 2 o Metro Ligero 3?", options: ["2,00€", "1,50€", "3,00€", "2,50€"], answer: "2,00€" },
-        
-        // EMT DETALLES (image_8f88e2.jpg)
-        { question: "¿Cuál es la ventaja principal del billete 'TransBus' de la EMT?", options: ["Permite transbordos durante 60 min", "Es válido para Metro y Bus", "Es más barato que el sencillo", "Permite ir al Aeropuerto"], answer: "Permite transbordos durante 60 min" },
-        { question: "¿A qué precio se vende el billete TransBus de la EMT?", options: ["1,80€", "1,50€", "2,00€", "3,00€"], answer: "1,80€" },
+    // --- NORMATIVA, EDADES Y REGLAS ---
+    { question: "¿Cuál es el límite de carga de viajes de un mismo tipo en una tarjeta Multi o TTP?", options: ["20 viajes (2 cargas)", "30 viajes (3 cargas)", "10 viajes (1 carga)", "50 viajes"], answer: "20 viajes (2 cargas)" },
+    { question: "¿Cuándo debe consumirse obligatoriamente un billete Sencillo de Metro?", options: ["El día de la compra", "En las siguientes 24h", "En el plazo de una semana", "No tiene caducidad"], answer: "El día de la compra" },
+    { question: "Si compras un billete sencillo después de las 00:00, ¿hasta cuándo es válido?", options: ["Hasta el cierre del servicio de ese día", "24 horas exactas", "Hasta las 12 de la mañana", "Solo 2 horas"], answer: "Hasta el cierre del servicio de ese día" },
+    { question: "¿Hasta qué edad exacta es válido el Abono Infantil gratuito?", options: ["Hasta el día que cumplen 7 años", "Hasta los 4 años", "Hasta los 6 años inclusive", "Hasta los 14 años"], answer: "Hasta el día que cumplen 7 años" },
+    { question: "¿A qué edades corresponde el Abono Joven (todas las zonas)?", options: ["De 7 a 26 años", "De 15 a 25 años", "De 14 a 30 años", "De 18 a 25 años"], answer: "De 7 a 26 años" }, // Corregida opción
+    { question: "¿Qué niños pueden viajar SIN necesidad de ningún título de transporte?", options: ["Menores de 4 años", "Menores de 7 años", "Menores de 3 años", "Todos los que midan menos de 1 metro"], answer: "Menores de 4 años" },
+    { question: "¿Con qué títulos NO es necesario pagar el Suplemento de Aeropuerto en Metro?", options: ["Abono 30 días, Anual o Turístico", "Metrobús de 10 viajes", "Billete Sencillo de Metro", "Solo con el Abono Joven"], answer: "Abono 30 días, Anual o Turístico" },
+    { question: "¿Es necesario el suplemento de aeropuerto para los autobuses de la EMT?", options: ["No, no es necesario", "Sí, siempre", "Solo si vas a la T4", "Solo con billete sencillo"], answer: "No, no es necesario" },
+    { question: "Si cargas un Abono de 30 días y no lo usas, ¿cuándo empieza a descontar el tiempo?", options: ["A los 10 días de la carga", "A los 15 días de la carga", "Nunca, si no se usa no caduca", "Al mes siguiente"], answer: "A los 10 días de la carga" },
+    { question: "¿Qué soporte es gratuito al comprar un Título Turístico?", options: ["La Tarjeta Multi", "La TTP Personal", "La Tarjeta Azul", "La Tarjeta Virtual"], answer: "La Tarjeta Multi" },
+    { question: "¿Cuál es la condición para poder recargar un billete de 10 viajes en la tarjeta?", options: ["Que queden como máximo 10 viajes", "Que esté la tarjeta vacía", "Que falten 2 días para caducar", "Se puede recargar en cualquier momento"], answer: "Que queden como máximo 10 viajes" },
+    { question: "Si tengo un Abono 30 días de la zona B2, ¿por qué otras zonas puedo viajar?", options: ["Zonas A, B1 y B2", "Solo por la zona B2", "Por todas las zonas verdes", "Por la zona B1 y B2"], answer: "Zonas A, B1 y B2" },
+    { question: "¿En qué zona se incluye la línea ML1 (Pinar de Chamartín - Las Tablas)?", options: ["Zona A", "Zona B1", "Zona B2", "Zona A y B1"], answer: "Zona A" }
+];
 
-        // INTERURBANOS 10 VIAJES (image_8f88c0.jpg)
-        { question: "¿Precio de 10 viajes para Autobuses Interurbanos de 3 zonas (ej: A-B2)?", options: ["9,60€", "7,30€", "13,80€", "5,10€"], answer: "9,60€" },
-        { question: "¿Precio de 10 viajes para Autobuses Interurbanos de 4 zonas (ej: B1-C1)?", options: ["13,80€", "9,60€", "17,80€", "12,20€"], answer: "13,80€" },
-        { question: "¿Precio de 10 viajes para recorridos Urbanos en otros municipios (B1-C2)?", options: ["5,10€", "7,30€", "1,50€", "6,20€"], answer: "5,10€" },
+let pendingQuestions = [];
+let hits = 0, misses = 0, currentIndex = 0;
+let preguntasFalladas = []; // Lista para guardar los errores
 
-        // ABONOS INTERZONALES - SEGÚN TUS MARCAS ROJAS (image_8f9b09.jpg)
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 4 Zonas (ej: B3-E1)?", options: ["38,20€", "32,70€", "43,20€", "49,20€"], answer: "38,20€" },
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 5 Zonas (ej: B2-E1)?", options: ["43,20€", "38,20€", "49,20€", "53,70€"], answer: "43,20€" },
-        { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 6 Zonas (ej: B1-E1)?", options: ["49,20€", "43,20€", "53,70€", "38,20€"], answer: "49,20€" },
+function initGame() {
+    // 1. Restauramos el diseño original del contenedor que borramos en showResults
+    const container = document.getElementById('game-container');
+    container.innerHTML = `
+        <div class="stats-grid">
+            <div class="stat-card">Pregunta<b id="counter">0/0</b></div>
+            <div class="stat-card">Aciertos<b id="hits">0</b></div>
+            <div class="stat-card">Fallos<b id="misses">0</b></div>
+        </div>
+        <div class="question-text" id="question-display">Cargando pregunta...</div>
+        <div class="options-list" id="options-container"></div>
+        <button id="next-btn" style="display:none" onclick="loadNextQuestion()">CONTINUAR →</button>
+    `;
 
-        // TURÍSTICO NIÑOS (image_8f8be4.jpg)
-        { question: "¿Cuánto paga un niño de 10 años por un Billete Turístico de 1 día para Zona A (50% dto)?", options: ["5,15€", "10,30€", "7,20€", "Gratis"], answer: "5,15€" },
-        { question: "¿Cuál es el precio de un Billete Turístico de 3 días para la Zona T (todas las zonas)?", options: ["35,00€", "23,10€", "26,20€", "15,40€"], answer: "35,00€" },
-        // --- PREGUNTAS DE NORMATIVA Y TÍTULOS (RESUMEN TARIFAS.docx) ---
-
-        // REGLAS DE ORO
-        { question: "¿Cuál es el límite de carga de viajes de un mismo tipo en una tarjeta Multi o TTP?", options: ["20 viajes (2 cargas)", "30 viajes (3 cargas)", "10 viajes (1 carga)", "50 viajes"], answer: "20 viajes (2 cargas)" },
-        { question: "¿Cuándo debe consumirse obligatoriamente un billete Sencillo de Metro?", options: ["El día de la compra", "En las siguientes 24h", "En el plazo de una semana", "No tiene caducidad"], answer: "El día de la compra" },
-        { question: "Si compras un billete sencillo después de las 00:00, ¿hasta cuándo es válido?", options: ["Hasta el cierre del servicio de ese día", "24 horas exactas", "Hasta las 12 de la mañana", "Solo 2 horas"], answer: "Hasta el cierre del servicio de ese día" },
-
-        // EDADES Y GRATUIDAD
-        { question: "¿Hasta qué edad exacta es válido el Abono Infantil gratuito?", options: ["Hasta el día que cumplen 7 años", "Hasta los 4 años", "Hasta los 6 años inclusive", "Hasta los 14 años"], answer: "Hasta el día que cumplen 7 años" },
-        { question: "¿A qué edades corresponde el Abono Joven (todas las zonas)?", options: ["De 15 a 25 años", "De 7 a 26 años", "De 14 a 30 años", "De 18 a 25 años"], answer: "De 15 a 25 años" },
-        { question: "¿Qué niños pueden viajar SIN necesidad de ningún título de transporte?", options: ["Menores de 4 años", "Menores de 7 años", "Menores de 3 años", "Todos los que midan menos de 1 metro"], answer: "Menores de 4 años" },
-
-        // AEROPUERTO
-        { question: "¿Con qué títulos NO es necesario pagar el Suplemento de Aeropuerto en Metro?", options: ["Abono 30 días, Anual o Turístico", "Metrobús de 10 viajes", "Billete Sencillo de Metro", "Solo con el Abono Joven"], answer: "Abono 30 días, Anual o Turístico" },
-        { question: "¿Es necesario el suplemento de aeropuerto para los autobuses de la EMT?", options: ["No, no es necesario", "Sí, siempre", "Solo si vas a la T4", "Solo con billete sencillo"], answer: "No, no es necesario" },
-
-        // SOPORTES Y CARGA
-        { question: "Si cargas un Abono de 30 días y no lo usas, ¿cuándo empieza a descontar el tiempo?", options: ["A los 10 días de la carga", "A los 15 días de la carga", "Nunca, si no se usa no caduca", "Al mes siguiente"], answer: "A los 10 días de la carga" },
-        { question: "¿Qué soporte es gratuito al comprar un Título Turístico?", options: ["La Tarjeta Multi", "La TTP Personal", "La Tarjeta Azul", "La Tarjeta Virtual"], answer: "La Tarjeta Multi" },
-        { question: "¿Cuál es la condición para poder recargar un billete de 10 viajes en la tarjeta?", options: ["Que queden como máximo 10 viajes", "Que esté la tarjeta vacía", "Que falten 2 días para caducar", "Se puede recargar en cualquier momento"], answer: "Que queden como máximo 10 viajes" },
-
-        // ZONAS (LÓGICA)
-        { question: "Si tengo un Abono 30 días de la zona B2, ¿por qué otras zonas puedo viajar?", options: ["Zonas A, B1 y B2", "Solo por la zona B2", "Por todas las zonas verdes", "Por la zona B1 y B2"], answer: "Zonas A, B1 y B2" },
-        { question: "¿En qué zona se incluye la línea ML1 (Pinar de Chamartín - Las Tablas)?", options: ["Zona A", "Zona B1", "Zona B2", "Zona A y B1"], answer: "Zona A" },  
-    ];
-
-    let pendingQuestions = [];
-    let hits = 0, misses = 0, currentIndex = 0;
-
- function initGame() {
-    // Ahora cargará TODAS las preguntas que existan en tarifasDB
+    // 2. Mezclamos y reseteamos variables
     pendingQuestions = [...tarifasDB].sort(() => Math.random() - 0.5); 
-    currentIndex = 0; hits = 0; misses = 0;
+    currentIndex = 0; 
+    hits = 0; 
+    misses = 0;
+    preguntasFalladas = []; 
+    
+    // 3. Lanzamos la primera pregunta
     loadNextQuestion();
 }
-    function loadNextQuestion() {
-        if (currentIndex >= pendingQuestions.length) {
-            showResults();
-            return;
-        }
 
-        const qData = pendingQuestions[currentIndex];
-        document.getElementById('question-display').innerText = qData.question;
-        document.getElementById('next-btn').style.display = "none";
+function showResults() {
+    const container = document.getElementById('game-container');
+    const percent = Math.round((hits / pendingQuestions.length) * 100);
+    
+    let htmlFinal = `
+        <h2 style="color:white">Resultado Final: ${percent}%</h2>
+        <p style="color:#aaa">Has acertado ${hits} de ${pendingQuestions.length}</p>
+        <div style="max-height: 300px; overflow-y: auto; margin: 15px 0; padding-right: 5px;">
+    `;
+
+    if (preguntasFalladas.length > 0) {
+        htmlFinal += `<h3 style="color:var(--accent); text-align:left;">Repaso de fallos:</h3>`;
+        preguntasFalladas.forEach((f, i) => {
+            htmlFinal += `
+                <div style="background:#000; padding:12px; margin-bottom:10px; border-radius:12px; border-left:4px solid #dc3545; text-align:left; font-size:13px;">
+                    <strong style="color:#fff;">${i+1}. ${f.pregunta}</strong><br>
+                    <span style="color:#ff6b6b;">Tú: ${f.tuRespuesta}</span><br> 
+                    <span style="color:#51cf66;">Correcta: ${f.respuestaCorrecta}</span>
+                </div>`;
+        });
+    } else {
+        htmlFinal += `<p style="color:#51cf66; font-weight:bold;">¡Increíble! 0 fallos. Eres un experto.</p>`;
+    }
+
+    htmlFinal += `</div>
+        <button class="retry-btn" onclick="initGame()">REINTENTAR</button>
+        <button class="back-menu-btn" onclick="window.location.href='index.html'">VOLVER AL MENÚ</button>
+    `;
+    
+    container.innerHTML = htmlFinal;
+}
+
+function loadNextQuestion() {
+    if (currentIndex >= pendingQuestions.length) {
+        showResults();
+        return;
+    }
+
+    const qData = pendingQuestions[currentIndex];
+    document.getElementById('question-display').innerText = qData.question;
+    document.getElementById('next-btn').style.display = "none";
+    
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    let options = [...qData.options].sort(() => Math.random() - 0.5);
+
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(btn, opt, qData.answer, qData.question);
+        container.appendChild(btn);
+    });
+
+    currentIndex++;
+    updateUI();
+}
+
+function checkAnswer(btn, selected, correct, question) {
+    const allBtns = document.querySelectorAll('.opt-btn');
+    allBtns.forEach(b => b.disabled = true);
+
+    if (selected === correct) {
+        btn.classList.add('correct');
+        hits++;
+        setTimeout(loadNextQuestion, 600);
+    } else {
+        btn.classList.add('wrong');
+        misses++;
         
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
-
-        // Mezclar las opciones que ya vienen en el objeto
-        let options = [...qData.options].sort(() => Math.random() - 0.5);
-
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'opt-btn';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(btn, opt, qData.answer);
-            container.appendChild(btn);
+        // REGISTRAMOS EL FALLO
+        preguntasFalladas.push({
+            pregunta: question,
+            tuRespuesta: selected,
+            respuestaCorrecta: correct
         });
 
-        currentIndex++;
-        updateUI();
+        allBtns.forEach(b => {
+            if (b.innerText === correct) b.classList.add('correct');
+        });
+        document.getElementById('next-btn').style.display = "block";
     }
+    updateUI();
+}
 
-    function checkAnswer(btn, selected, correct) {
-        const allBtns = document.querySelectorAll('.opt-btn');
-        allBtns.forEach(b => b.disabled = true);
-
-        if (selected === correct) {
-            btn.classList.add('correct');
-            hits++;
-            updateUI();
-            setTimeout(loadNextQuestion, 800);
-        } else {
-            btn.classList.add('wrong');
-            misses++;
-            updateUI();
-            allBtns.forEach(b => {
-                if (b.innerText === correct) b.classList.add('correct');
-            });
-            document.getElementById('next-btn').style.display = "block";
-        }
-    }
-
-    function updateUI() {
-        document.getElementById('counter').innerText = `${currentIndex}/${pendingQuestions.length}`;
-        document.getElementById('hits').innerText = hits;
-        document.getElementById('misses').innerText = misses;
-    }
-
-    function showResults() {
-        const container = document.getElementById('game-container');
-        const percent = Math.round((hits / pendingQuestions.length) * 100);
-        container.innerHTML = `
-            <h2 style="color:white">Resultado Final</h2>
-            <div style="font-size:60px; color:var(--accent); font-weight:bold; margin:20px 0;">${percent}%</div>
-            <p style="color:#aaa">Has acertado ${hits} de ${pendingQuestions.length} preguntas.</p>
-            <button class="retry-btn" onclick="location.reload()">REINTENTAR</button>
-            <button class="back-menu-btn" onclick="window.location.href='index.html'">VOLVER AL MENÚ</button>
-        `;
-    }
-
-    // Arrancar el juego al cargar la página
-    initGame();
+function updateUI() {
+    document.getElementById('counter').innerText = `${currentIndex}/${pendingQuestions.length}`;
+    document.getElementById('hits').innerText = hits;
+    document.getElementById('misses').innerText = misses;
+}
+// Arrancar al cargar
+initGame();
 </script>
 </body>
 </html>
