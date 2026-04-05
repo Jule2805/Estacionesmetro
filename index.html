@@ -25,8 +25,7 @@
             border: none; color: white; font-weight: bold; font-size: 16px; gap: 10px;
         }
         .block-metro { background: var(--metro); }
-        .block-cercanias { background: var(--cercanias); opacity: 0.6; }
-        .block-bus { background: var(--bus); opacity: 0.6; }
+        .block-detodito { background: var(--cercanias); }
         .block-otros { background: var(--otros);}
 
         /* ESTILOS DEL JUEGO */
@@ -90,7 +89,7 @@
         <p>Prepara tu examen de movilidad</p>
     </div>
 
-    <button id="go-back" class="back-btn" onclick="showMainMenu()">← Menú Principal</button>
+    <button id="go-back" class="back-btn" onclick="showMainMenu()">← Volver al Menú</button>
 
     <div id="main-content" class="container"></div>
 
@@ -410,7 +409,7 @@ function showMainMenu() {
             <button class="menu-block block-metro" onclick="startMetroGame()">
                 <span>🚇</span> METRO<br><small style="font-weight:normal; font-size:10px">Tandas de 50</small>
             </button>
-            <button class="menu-block block-bus" onclick="alert('Próximamente...')">
+            <button class="menu-block block-detodito" onclick="window.location.href='detodito.html'">
                 <span>🚌🚆➕</span> DE TODITO
             </button>
             <button class="menu-block block-otros" onclick="window.location.href='tarifas.html'">
