@@ -98,12 +98,12 @@ const tarifasDB = [
     { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 6 Zonas (ej: B1-E1)?", options: ["49,20€", "43,20€", "53,70€", "38,20€"], answer: "49,20€" },
     { question: "¿Precio de un Abono 30 días Normal para un recorrido Interzonal de 7 Zonas (B1-E2)?", options: ["53,70€", "49,20€", "62,80€", "43,20€"], answer: "53,70€" },
 
-    // --- NORMATIVA, EDADES Y REGLAS ---
+// --- NORMATIVA, EDADES Y REGLAS ---
     { question: "¿Cuál es el límite de carga de viajes de un mismo tipo en una tarjeta Multi o TTP?", options: ["20 viajes (2 cargas)", "30 viajes (3 cargas)", "10 viajes (1 carga)", "50 viajes"], answer: "20 viajes (2 cargas)" },
     { question: "¿Cuándo debe consumirse obligatoriamente un billete Sencillo de Metro?", options: ["El día de la compra", "En las siguientes 24h", "En el plazo de una semana", "No tiene caducidad"], answer: "El día de la compra" },
     { question: "Si compras un billete sencillo después de las 00:00, ¿hasta cuándo es válido?", options: ["Hasta el cierre del servicio del dia siguiente", "24 horas exactas", "Hasta las 12 de la mañana", "Solo 2 horas"], answer: "Hasta el cierre del servicio del dia siguiente" },
     { question: "¿Hasta qué edad exacta es válido el Abono Infantil gratuito?", options: ["Hasta el día que cumplen 7 años", "Hasta los 4 años", "Hasta los 6 años inclusive", "Hasta los 14 años"], answer: "Hasta el día que cumplen 7 años" },
-    { question: "¿A qué edades corresponde el Abono Joven (todas las zonas)?", options: ["De 7 a 26 años", "De 15 a 25 años", "De 14 a 30 años", "De 18 a 25 años"], answer: "De 7 a 26 años" }, // Corregida opción
+    { question: "¿A qué edades corresponde el Abono Joven?", options: ["De 7 a 26 años", "De 15 a 25 años", "De 14 a 30 años", "De 18 a 25 años"], answer: "De 7 a 26 años" },
     { question: "¿Qué niños pueden viajar SIN necesidad de ningún título de transporte?", options: ["Menores de 4 años", "Menores de 7 años", "Menores de 3 años", "Todos los que midan menos de 1 metro"], answer: "Menores de 4 años" },
     { question: "¿Con qué títulos NO es necesario pagar el Suplemento de Aeropuerto en Metro?", options: ["Abono 30 días, Anual o Turístico", "Metrobús de 10 viajes", "Billete Sencillo de Metro", "Solo con el Abono Joven"], answer: "Abono 30 días, Anual o Turístico" },
     { question: "¿Es necesario el suplemento de aeropuerto para los autobuses de la EMT?", options: ["No, no es necesario", "Sí, siempre", "Solo si vas a la T4", "Solo con billete sencillo"], answer: "No, no es necesario" },
@@ -111,7 +111,9 @@ const tarifasDB = [
     { question: "¿Qué soporte es gratuito al comprar un Título Turístico?", options: ["La Tarjeta Multi", "La TTP Personal", "La Tarjeta Azul", "La Tarjeta Virtual"], answer: "La Tarjeta Multi" },
     { question: "¿Cuál es la condición para poder recargar un billete de 10 viajes en la tarjeta?", options: ["Que queden como máximo 10 viajes", "Que esté la tarjeta vacía", "Que falten 2 días para caducar", "Se puede recargar en cualquier momento"], answer: "Que queden como máximo 10 viajes" },
     { question: "Si tengo un Abono 30 días de la zona B2, ¿por qué otras zonas puedo viajar?", options: ["Zonas A, B1 y B2", "Solo por la zona B2", "Por todas las zonas verdes", "Por la zona B1 y B2"], answer: "Zonas A, B1 y B2" },
-    { question: "¿En qué zona se incluye la línea ML1 (Pinar de Chamartín - Las Tablas)?", options: ["Zona A", "Zona B1", "Zona B2", "Zona A y B1"], answer: "Zona A" }
+    { question: "¿En qué zona se incluye la línea ML1 (Pinar de Chamartín - Las Tablas)?", options: ["Zona A", "Zona B1", "Zona B2", "Zona A y B1"], answer: "Zona A" },
+    { question: "¿Cuál es el límite máximo de edad para utilizar el abono del tramo 7-14 años?", options: ["Hasta el día que cumple 14 años", "Hasta el día que cumple 15 años (inclusive)", "Hasta el día anterior a cumplir los 15 años", "No hay límite"], answer: "Hasta el día anterior a cumplir los 15 años" },
+    { question: "VERDADERO O FALSO: El Abono Transporte de 7 a 14 años se puede usar el mismo día que el usuario cumple 15 años.", options: ["Verdadero", "Falso"], answer: "Falso" }
 ];
 
 let pendingQuestions = [];
