@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normativa y Reglamentos - Academia</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --ley: #2c3e50;
+            --reglamento: #34495e;
+            --sistema: #5d6d7e;
+            --accent: #007bff;
+        }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: white; 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+        
+        .header { text-align: center; margin-bottom: 20px; width: 100%; max-width: 450px; }
+        .header h1 { font-size: 22px; margin: 10px 0 5px 0; }
+        .header p { color: #888; font-size: 14px; margin: 0; }
+
+        .container { 
+            width: 100%; 
+            max-width: 450px; 
+            background: var(--card); 
+            padding: 20px; 
+            border-radius: 25px; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            box-sizing: border-box; 
+        }
+
+        .submenu-grid { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            width: 100%; 
+        }
+
+        .menu-item { 
+            padding: 20px; 
+            border-radius: 15px; 
+            cursor: pointer; 
+            transition: transform 0.2s, background 0.2s;
+            border: none; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 16px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            text-align: left;
+        }
+
+        .menu-item:active { transform: scale(0.98); }
+
+        .item-reglamento { background: var(--reglamento); }
+        .item-ley { background: var(--ley); }
+        .item-sistema { background: var(--sistema); }
+
+        .icon { font-size: 24px; }
+
+        .back-btn { 
+            margin-bottom: 10px; 
+            background: none; 
+            border: none; 
+            color: #888; 
+            cursor: pointer; 
+            font-size: 14px; 
+            align-self: flex-start; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Normativa y Leyes</h1>
+        <p>Selecciona el bloque de estudio</p>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='index.html'">← Volver al Menú Principal</button>
+
+    <div class="container">
+        <div class="submenu-grid">
+            
+            <button class="menu-item item-reglamento" onclick="irA('reglamentoviajeros')">
+                <span class="icon">📜</span>
+                <span>REGLAMENTO DE VIAJEROS</span>
+            </button>
+
+            <button class="menu-item item-ley" onclick="irA('leycrtm')">
+                <span class="icon">⚖️</span>
+                <span>LEY CRTM</span>
+            </button>
+
+            <button class="menu-item item-sistema" onclick="irA('sistematarifas')">
+                <span class="icon">💳</span>
+                <span>SISTEMAS DE TARIFAS</span>
+            </button>
+
+        </div>
+    </div>
+
+    <script>
+        function irA(seccion) {
+            // Esto redirigirá automáticamente a, por ejemplo, reglamento.html
+            window.location.href = seccion + ".html";
+        }
+    </script>
+</body>
+</html>

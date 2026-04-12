@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #007bff;
-            --metro: #f31431; --cercanias: #ff6600; --bus: #00a550; --otros: #36cdf3;
+            --metro: #f31431; --cercanias: #ff6600; --bus: #00a550; --otros: #36cdf3;--sistema: #93117e;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
@@ -27,7 +27,7 @@
         .block-metro { background: var(--metro); }
         .block-detodito { background: var(--cercanias); }
         .block-otros { background: var(--otros);}
-
+        .block-sistema { background: var(--sistema) !important; }
         /* ESTILOS DEL JUEGO */
         .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
         #progress-fill { height: 100%; background: #28a745; width: 0%; transition: 0.3s; }
@@ -414,6 +414,9 @@ function showMainMenu() {
             </button>
             <button class="menu-block block-otros" onclick="window.location.href='tarifas.html'">
                 <span>💸</span> TARIFAS
+            </button>
+            <button class="menu-block block-sistema" onclick="window.location.href='detodo.html'">
+                <span>💸⚖️📏</span> LEY, SISTEMA TARIFAS, REGLAMENTO VIAJEROS,ETC
             </button>
         </div>
     `;

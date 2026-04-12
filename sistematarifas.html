@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistemas de Tarifas - Academia</title>
+    <style>
+        :root {
+            --bg: #121212; --card: #1e1e1e; --accent: #007bff;
+            --correct: #28a745; --wrong: #dc3545;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-test { background: #2a2a2a; border: 1px solid #444; color: white; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-test:hover { border-color: var(--accent); background: #333; }
+        .btn-test b { display: block; font-size: 20px; }
+        .hidden { display: none; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #aaa; }
+        .question { font-size: 18px; font-weight: bold; margin-bottom: 20px; min-height: 60px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt { background: #333; border: 1px solid #444; color: white; padding: 15px; border-radius: 12px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 15px; width: 100%; }
+        .correct { background: var(--correct) !important; border-color: var(--correct); }
+        .wrong { background: var(--wrong) !important; border-color: var(--wrong); }
+        #next-btn { width: 100%; padding: 15px; margin-top: 20px; background: var(--accent); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: none; }
+        .back-btn { background: none; border: none; color: #888; cursor: pointer; margin-bottom: 15px; align-self: flex-start; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" id="btn-volver-menu" onclick="location.href='detodo.html'">← Volver a Normativa</button>
+    <button class="back-btn hidden" id="btn-salir-test" onclick="location.reload()">← Salir del Test</button>
+
+    <div class="container">
+        <div id="selector">
+            <h2 style="text-align:center">Sistemas de Tarifas</h2>
+            <div class="menu-grid">
+                <button class="btn-test" onclick="startTest(1)"><b>1</b><span>Test 1</span></button>
+                <button class="btn-test" onclick="startTest(2)"><b>2</b><span>Test 2</span></button>
+                <button class="btn-test" onclick="startTest(3)"><b>3</b><span>Test 3</span></button>
+                <button class="btn-test" onclick="startTest(4)"><b>4</b><span>Test 4</span></button>
+                <button class="btn-test" onclick="startTest(5)"><b>5</b><span>Test 5</span></button>
+                <button class="btn-test" onclick="startTest(7)"><b>7</b><span>Test 7</span></button>
+                <button class="btn-test" onclick="startTest(9)"><b>9</b><span>Test 9</span></button>
+                <button class="btn-test" onclick="startTest(10)"><b>10</b><span>Test 10</span></button>
+
+
+
+            </div>
+        </div>
+
+        <div id="quiz-area" class="hidden">
+            <div class="stats">
+                <span id="progreso">Pregunta 1/30</span>
+                <span>Aciertos: <b id="score" style="color:var(--correct)">0</b></span>
+            </div>
+            <div class="question" id="q-text"></div>
+            <div class="options" id="q-options"></div>
+            <button id="next-btn" onclick="nextQuestion()">SIGUIENTE PREGUNTA</button>
+        </div>
+
+        <div id="results" class="hidden">
+            <h2 style="text-align:center">Test Finalizado</h2>
+            <div id="final-score" style="font-size: 40px; text-align:center; margin: 20px 0;"></div>
+            <div id="failed-list" style="font-size:13px; color:#ccc; background:#000; padding:15px; border-radius:10px; max-height:250px; overflow-y:auto; margin-bottom:20px"></div>
+            <button class="btn-test" style="width:100%" onclick="location.reload()">REPETIR O OTRO BLOQUE</button>
+        </div>
+    </div>
+
+<script>
+const db = {
+    // Cuestionario "Sistema de tarifas CRTM 1"
+    1: [
+        { q: "¿Cuál es el número máximo de viajes de un mismo billete Sencillo que puede haber en una Tarjeta de Transporte Público?", opts: ["20 viajes", "15 viajes", "5 viajes", "10 viajes"], a: "10 viajes" },
+        { q: "¿Qué combinación corresponde a interurbanos de 6 zonas?", opts: ["B1-C2", "B2-C2", "A-C2", "A-C1"], a: "A-C2" },
+        { q: "¿Qué título NO requiere Suplemento de Aeropuerto?", opts: ["Sencillo Combinado", "10 Viajes Metrobús", "Abono 30 días", "Sencillo Zona A"], a: "Abono 30 días" },
+        { q: "¿En qué tipo de tarjeta puede cargarse el Abono 30 Días?", opts: ["Tarjeta Turística", "Tarjeta Transporte Público Personal", "Tarjeta Multi", "Cualquier tarjeta sin contacto"], a: "Tarjeta Transporte Público Personal" },
+        { q: "¿Cuál es el máximo de viajes de un mismo tipo de billete de 10 Viajes que admite una Tarjeta de Transporte Público?", opts: ["10 viajes", "15 viajes", "30 viajes", "20 viajes"], a: "20 viajes" },
+        { q: "¿Qué tarjeta NO permite cargar un Abono 30 Días?", opts: ["Tarjeta con perfil +65", "Tarjeta Multi", "Tarjeta con perfil Joven", "TTP Personal"], a: "Tarjeta Multi" },
+        { q: "¿Qué es obligatorio para viajar en Metro de Madrid?", opts: ["Una Tarjeta de Transporte Público con un título válido", "Un abono anual únicamente", "Un billete sencillo en papel", "Una tarjeta bancaria"], a: "Una Tarjeta de Transporte Público con un título válido" },
+        { q: "¿Qué ocurre si se intenta usar el Suplemento de Aeropuerto al día siguiente de su compra?", opts: ["Los validadores no permiten el paso por estar caducado", "Se permite el acceso con aviso", "Se aplica una penalización", "Se descuenta automáticamente otro suplemento"], a: "Los validadores no permiten el paso por estar caducado" },
+        { q: "¿Con qué títulos se puede cargar conjuntamente el Suplemento de Aeropuerto?", opts: ["Billetes Sencillos o 10 Viajes válidos", "Abonos mensuales", "Abonos anuales", "Títulos turísticos"], a: "Billetes Sencillos o 10 Viajes válidos" },
+        { q: "¿Cuál es el precio de '10 viajes' para interurbanos de 2 zonas?", opts: ["13,80 €", "5,10 €", "7,30 €", "9,60 €"], a: "7,30 €" },
+        { q: "¿Cuál es la validez general de un billete Sencillo una vez comprado?", opts: ["Debe consumirse el mismo día de la compra", "Una semana", "Dos días naturales", "Hasta consumirlo"], a: "Debe consumirse el mismo día de la compra" },
+        { q: "¿Quiénes pueden viajar sin título de transporte?", opts: ["Los mayores de 65 años", "Los estudiantes", "Los menores de dos años", "Los niños menores de cuatro años"], a: "Los niños menores de cuatro años" },
+        { q: "¿En qué estaciones es obligatorio el Suplemento de Aeropuerto?", opts: ["En todas las estaciones de Metro", "En estaciones de Cercanías", "En Aeropuerto T1-T2-T3 y Aeropuerto T4", "Solo en estaciones de la zona A"], a: "En Aeropuerto T1-T2-T3 y Aeropuerto T4" },
+        { q: "¿Cuál es el precio 'Sencillo' del billete urbano (B1, B2, B3, C1, C2)?", opts: ["3,00 €", "7,30 €", "5,10 €", "1,50 €"], a: "1,50 €" },
+        { q: "¿Qué información muestran los tornos al validar un Billete Sencillo o de 10 Viajes?", opts: ["El tipo de tarjeta utilizada", "La fecha de compra", "El precio del billete", "Los viajes disponibles"], a: "Los viajes disponibles" },
+        { q: "¿Cuál es el precio de '10 viajes' para interurbanos de 3 zonas?", opts: ["17,80 €", "9,60 €", "7,30 €", "13,80 €"], a: "9,60 €" },
+        { q: "¿Cuál de estas combinaciones está en interurbanos de 5 zonas?", opts: ["B3-C1", "A-C1", "A-B3", "B2-C1"], a: "A-C1" },
+        { q: "¿Dónde se pueden cargar los títulos de transporte para viajar en Metro de Madrid?", opts: ["Únicamente en oficinas del Consorcio", "Solo en estancos", "Solo a través de la app", "En las máquinas disponibles en las estaciones, exceptuando el Abono Anual"], a: "En las máquinas disponibles en las estaciones, exceptuando el Abono Anual" },
+        { q: "¿En qué tipo de tarjetas se pueden cargar los billetes Sencillos y de 10 Viajes?", opts: ["En Tarjeta de Transporte Público Personal y Multi", "Solo en tarjetas Multi", "Solo en tarjetas personales", "Únicamente en tarjetas turísticas"], a: "En Tarjeta de Transporte Público Personal y Multi" },
+        { q: "¿Para qué sirve la app 'Tarjeta Transporte Público' desarrollada por el CRTM?", opts: ["Para validar el viaje", "Para consultar el saldo disponible de cada título cargado", "Para comprar billetes", "Para bloquear la tarjeta"], a: "Para consultar el saldo disponible de cada título cargado" },
+        { q: "¿Qué viajeros deben disponer del Suplemento de Aeropuerto?", opts: ["Los que viajan con billete Sencillo o 10 Viajes válidos en zona A", "Los que usan Título Turístico", "Los que usan cualquier título de transporte", "Los que tienen Abono Anual"], a: "Los que viajan con billete Sencillo o 10 Viajes válidos en zona A" },
+        { q: "¿Qué información muestran los tornos en el caso de títulos Turísticos y abonos cuando se acerca su caducidad?", opts: ["El importe pendiente", "El número de viajes restantes", "La fecha hasta la cual es válido", "La zona tarifaria"], a: "La fecha hasta la cual es válido" },
+        { q: "¿Cuál es el número máximo de Suplementos de Aeropuerto que se pueden adquirir?", opts: ["Uno por tarjeta", "Tantos como viajes disponibles del billete al que acompañan", "Ilimitados", "Diez por usuario"], a: "Tantos como viajes disponibles del billete al que acompañan" },
+        { q: "¿Qué indica el ámbito de validez del billete urbano?", opts: ["Líneas de toda la provincia", "Líneas urbanas de la zona de validez del billete, con independencia de la empresa", "Solo líneas interurbanas", "Solo una empresa concreta"], a: "Líneas urbanas de la zona de validez del billete, con independencia de la empresa" },
+        { q: "¿Es posible cargar el Suplemento de Aeropuerto posteriormente al billete?", opts: ["No, solo conjuntamente", "Solo en estaciones de aeropuerto", "Solo en estancos", "Sí, también es posible cargarlos posteriormente"], a: "Sí, también es posible cargarlos posteriormente" },
+        { q: "¿Cuál es el precio de '10 viajes' para el billete urbano?", opts: ["7,30 €", "5,10 €", "9,60 €", "13,80 €"], a: "5,10 €" },
+        { q: "¿Cuándo debe consumirse el Suplemento de Aeropuerto una vez cargado?", opts: ["En cualquier momento", "Antes de finalizar el mes", "En un plazo de 7 días", "En el día de la compra"], a: "En el día de la compra" },
+        { q: "¿Cuál es el precio de '10 viajes' para interurbanos de 6 zonas?", opts: ["9,60 €", "13,80 €", "22,40 €", "17,80 €"], a: "22,40 €" },
+        { q: "¿Cuál es el precio de '10 viajes' para interurbanos de 4 zonas?", opts: ["17,80 €", "9,60 €", "22,40 €", "13,80 €"], a: "13,80 €" },
+        { q: "¿Hasta cuándo es válido el billete sencillo cargado a partir de las 12 de la noche?", opts: ["Hasta el cierre del día siguiente", "Solo hasta las 6:00", "Hasta las 12 del mediodía", "24 horas después"], a: "Hasta el cierre del día siguiente" }
+    ],
+
+    // Cuestionario "Sistema de tarifas CRTM 2"
+    2: [
+        { q: "¿Cuál es el precio del billete sencillo de Metro Zona A?", opts: ["2,50 €", "1,30 €", "3,00 €", "1,50-2,00 €"], a: "1,50-2,00 €" },
+        { q: "¿Cuál es el precio del billete sencillo de MetroOeste?", opts: ["1,50 €", "2,00 €", "1,80 €", "3,00 €"], a: "2,00 €" },
+        { q: "¿Cuándo se puede realizar la segunda carga del mismo abono?", opts: ["Solo si ya se ha comenzado a utilizar la primera", "En cualquier momento", "Antes de usar la primera", "Al finalizar la validez"], a: "Solo si ya se ha comenzado a utilizar la primera" },
+        { q: "¿Cuál es el precio del Bus Exprés Aeropuerto?", opts: ["3,00 €", "1,80 €", "7,30 €", "5,00 €"], a: "5,00 €" },
+        { q: "¿A qué línea pertenece MetroEste?", opts: ["Línea 9", "Línea 12", "Linea 7", "Línea 10"], a: "Linea 7" },
+        { q: "¿Cuántos días tiene el usuario para empezar a usar el Abono 30 Días desde su carga?", opts: ["10 días", "15 días", "5 días", "30 días"], a: "10 días" },
+        { q: "¿Cuál es el precio del billete sencillo de EMT?", opts: ["1,30 €", "1,80 €", "1,50 €", "2,00 €"], a: "1,50 €" },
+        { q: "¿Qué perfiles pueden cargar abonos 30 Días E1 o E2?", opts: ["Solo perfil Joven", "Solo perfil Normal", "Perfil +65", "Perfil Turístico"], a: "Perfil +65" },
+        { q: "¿De qué depende el tipo de Abono 30 Días que puede cargarse?", opts: ["De la edad del propietario de la tarjeta", "Del punto de venta", "De la zona elegida", "Del número de viajes"], a: "De la edad del propietario de la tarjeta" },
+        { q: "¿Qué servicios incluye el Billete Combinado?", opts: ["Metro y Metro Ligero (ML1, ML2 y ML3) y TFM", "Solo Metro", "Metro y EMT", "Solo Metro Ligero"], a: "Metro y Metro Ligero (ML1, ML2 y ML3) y TFM" },
+        { q: "¿Cuánto cuesta el billete de 10 viajes TFM?", opts: ["6,70 €", "7,30 €", "10,90 €", "5,00 €"], a: "7,30 €" },
+        { q: "¿Qué suplemento se aplica de 6 a 9 estaciones?", opts: ["No hay suplemento", "0,10 € por estación", "0,50 € fijo", "0,20 € por estación"], a: "0,10 € por estación" },
+        { q: "¿Qué tipos de Abono 30 Días existen según el perfil?", opts: ["Normal y Senior", "Básico y Plus", "Urbano e Interurbano", "Joven, Normal y +65"], a: "Joven, Normal y +65" },
+        { q: "¿Qué zonas cubre un Abono 30 Días interzonal B2-C1?", opts: ["B1, B2 y C1", "Solo B2 y C1", "B2, B3 y C1", "B2 y C2"], a: "B2, B3 y C1" },
+        { q: "¿Qué tramo cubre el billete TFM?", opts: ["Puerta de Arganda - Arganda del Rey", "Joaquín Vilumbrales - Puerta del Sur", "Barrio del Puerto - Hospital Infanta Sofía", "Hospital Infanta Sofía - La Granja"], a: "Puerta de Arganda - Arganda del Rey" },
+        { q: "¿Cuánto cuesta el billete de 10 viajes de MetroBus?", opts: ["5,00 €", "7,30 €", "6,70 €", "12,20 €"], a: "7,30 €" },
+        { q: "¿Cuántos tipos de abono pueden coexistir en una misma tarjeta?", opts: ["Uno solo", "Dos distintos", "Ilimitados", "Tres"], a: "Uno solo" },
+        { q: "¿Qué municipio está incluido en la zona C1?", opts: ["Fresno de Torote", "Fuentidueña de Tajo", "Aldea del Fresno", "Cobeña"], a: "Fresno de Torote" },
+        { q: "¿Cuánto cuesta el billete de 10 viajes de MetroOeste?", opts: ["10,90 €", "5,00 €", "6,70 €", "7,30 €"], a: "7,30 €" },
+        { q: "¿Para qué zonas es válido un Abono 30 Días zonal B3?", opts: ["A, B1, B2 y B3", "B3 y C1", "B2 y B3", "Solo B3"], a: "A, B1, B2 y B3" },
+        { q: "¿Qué líneas incluye MetroOeste?", opts: ["ML2 y ML3", "ML3 únicamente", "ML1 y ML2", "ML1 y ML3"], a: "ML2 y ML3" },
+        { q: "¿Cuándo se puede consumir el billete sencillo?", opts: ["Solo el día siguiente", "Durante un mes", "Durante una semana", "El día de la compra"], a: "El día de la compra" },
+        { q: "¿Cuál es el precio del billete sencillo TFM?", opts: ["1,50 €", "3,00 €", "1,80 €", "2,00 €"], a: "2,00 €" },
+        { q: "¿Entre qué estaciones discurre MetroNorte?", opts: ["Joaquín Vilumbrales – Puerta del Sur", "Puerta de Arganda – Arganda del Rey", "Barrio del Puerto – Hospital Infanta Sofía", "La Granja – Hospital Infanta Sofía"], a: "La Granja – Hospital Infanta Sofía" },
+        { q: "¿Qué sucede si no se empieza a usar el Abono 30 Días dentro del plazo establecido?", opts: ["Se devuelve el importe", "Comienza el descuento de días de validez", "Se anula automáticamente", "Se bloquea la tarjeta"], a: "Comienza el descuento de días de validez" },
+        { q: "¿Cuál es el precio del Billete Turístico zona A para 7 días?", opts: ["43,20 €", "44,20 €", "42,20 €", "35,40 €"], a: "43,20 €" },
+        { q: "¿Cuánto cuesta el billete para 10 estaciones o más?", opts: ["2,00 €", "3,00 €", "2,50 €", "1,50 €"], a: "2,00 €" },
+        { q: "¿Cuánto cuesta el billete de 10 viajes de MetroEste?", opts: ["10,90 €", "7,30 €", "5,00 €", "6,70 €"], a: "6,70 €" },
+        { q: "¿Cuál es el precio del billete sencillo combinado?", opts: ["3,00 €", "5,00 €", "1,80 €", "2,00 €"], a: "3,00 €" },
+        { q: "¿Cuál es el precio del Billete Turístico zona T para 4 días?", opts: ["44,20 €", "45,20 €", "43,20 €", "42,20 €"], a: "43,20 €" }
+    ],
+
+    // Cuestionario "Sistema de tarifas CRTM 3"
+    3: [
+        { q: "¿Dónde puede cargarse el Abono 30 Días además de en máquinas de Metro?", opts: ["En estancos, puntos autorizados y estaciones de Renfe-Cercanías", "En autobuses interurbanos", "Solo en oficinas centrales", "Solo por internet"], a: "En estancos, puntos autorizados y estaciones de Renfe-Cercanías" },
+        { q: "¿Cuál es el coste del Billete Turístico zona T para 1 día?", opts: ["15,40 €", "15,00 €", "17,00 €", "10,00 €"], a: "15,40 €" },
+        { q: "¿Cuántas zonas se definen para el Título Turístico?", opts: ["Una", "Dos", "Cuatro", "Tres"], a: "Dos" },
+        { q: "¿Qué abarca la zona T del Título Turístico?", opts: ["Solo la ciudad de Madrid", "Las zonas interiores", "La totalidad de la cobertura geográfica de los Abonos Transporte", "Únicamente la zona A"], a: "La totalidad de la cobertura geográfica de los Abonos Transporte" },
+        { q: "¿Cuál es el precio del Billete Turístico zona A para 1 día?", opts: ["15,00 €", "22,50 €", "10,00 €", "10,30 €"], a: "10,30 €" },
+        { q: "¿Qué línea de Metro Ligero está incluida en la zona A?", opts: ["ML2", "ML1", "ML3", "ML4"], a: "ML1" },
+        { q: "¿Cuánto cuesta el Billete Turístico zona T para 3 días?", opts: ["34,00 €", "35,00 €", "49,00 €", "25,50 €"], a: "35,00 €" },
+        { q: "¿Cuál es el precio del abono interzonal B1-E2?", opts: ["53,70 €", "38,20 €", "43,20 €", "49,20 €"], a: "53,70 €" },
+        { q: "¿Qué líneas de Metro Ligero están incluidas en la zona T?", opts: ["ML2, ML3 y ML4", "ML1 y ML2", "Todas las líneas sin excepción", "Solo ML1"], a: "Todas las líneas sin excepción" },
+        { q: "¿Hasta qué hora se extiende la validez en los servicios nocturnos el último día?", opts: ["Hasta las 02:00 h", "Hasta las 06:00 h", "Hasta las 00:00 h", "Hasta las 05:00 h"], a: "Hasta las 05:00 h" },
+        { q: "¿Qué precio corresponde a la zona T para 5 días?", opts: ["50,40 €", "42,00 €", "49,00 €", "34,00 €"], a: "50,40 €" },
+        { q: "¿En qué medio puede utilizarse un título válido para la zona A?", opts: ["Metro Ligero ML3", "Autobuses exprés al Aeropuerto", "Metro en todas sus líneas dentro de la zona", "Servicios Regionales de RENFE"], a: "Metro en todas sus líneas dentro de la zona" },
+        { q: "¿Qué decisión se tomó respecto a la venta de Abonos Anuales?", opts: ["Se redujo su precio", "Se mantuvo la suspensión para particulares", "Se reanudó la venta general", "Se eliminó definitivamente"], a: "Se mantuvo la suspensión para particulares" },
+        { q: "¿En qué servicio de RENFE es válido el título de la zona A?", opts: ["En toda la red ferroviaria", "En servicios Regionales", "Solo en trenes de largo recorrido", "Entre las estaciones de Cercanías de la zona A"], a: "Entre las estaciones de Cercanías de la zona A" },
+        { q: "¿Con qué tarifas cargan los perfiles +65 los abonos E1 y E2?", opts: ["Con tarifa reducida", "Con las mismas tarifas que el perfil Normal", "Con tarifa especial", "Con tarifa gratuita"], a: "Con las mismas tarifas que el perfil Normal" },
+        { q: "¿Con qué territorio coincide prácticamente la zona A del Título Turístico?", opts: ["La Comunidad de Madrid", "La zona B1", "El área metropolitana", "El término municipal de Madrid"], a: "El término municipal de Madrid" },
+        { q: "¿Qué servicio adicional incluye la zona T respecto a la zona A?", opts: ["Servicios regulares de transporte por carretera", "Servicios Regionales de RENFE", "Autobuses exprés al Aeropuerto", "Líneas internacionales"], a: "Servicios regulares de transporte por carretera" },
+        { q: "¿En qué red de Cercanías puede utilizarse el título de la zona T?", opts: ["Solo en la zona A", "Solo en horario nocturno", "En líneas seleccionadas", "En toda la red de Cercanías"], a: "En toda la red de Cercanías" },
+        { q: "¿Qué títulos pueden seguir cargándose en la TTP Personal tras la suspensión del Abono Anual?", opts: ["Solo billetes sencillos", "Solo títulos turísticos", "Exclusivamente Metrobús", "Abono 30 días o títulos de 10 viajes"], a: "Abono 30 días o títulos de 10 viajes" },
+        { q: "¿Qué descuento se aplica a los abonos anuales para empresas?", opts: ["Ninguno", "Un descuento reducido", "El mismo que en el ejercicio 2023", "Uno nuevo en 2024"], a: "El mismo que en el ejercicio 2023" },
+        { q: "¿Es obligatorio que la fecha de compra coincida con la de la primera utilización?", opts: ["Solo en títulos de un día", "Depende del tipo de título", "No es necesario que coincida", "Sí, siempre"], a: "No es necesario que coincida" },
+        { q: "¿Cuál es el precio del Billete Turístico zona T para 7 días?", opts: ["59,80 €", "62,80 €", "60,80 €", "59,00 €"], a: "62,80 €" },
+        { q: "¿Qué precio tiene la zona T para 2 días?", opts: ["42,00 €", "25,50 €", "26,20 €", "22,50 €"], a: "26,20 €" },
+        { q: "¿Qué línea de autobús queda excluida en la zona A?", opts: ["Las líneas interurbanas", "La línea exprés al Aeropuerto", "Todas las líneas nocturnas", "Las líneas circulares"], a: "La línea exprés al Aeropuerto" },
+        { q: "¿Para quién se mantiene la comercialización del Abono Anual?", opts: ["Personas jurídicas (empresas)", "Personas mayores de 65 años", "Turistas", "Jóvenes"], a: "Personas jurídicas (empresas)" },
+        { q: "¿Cuál es el precio del Billete Turístico zona A para 3 días?", opts: ["22,50 €", "25,50 €", "23,10 €", "17,00 €"], a: "23,10 €" },
+        { q: "¿Qué coste tiene la combinación B3-E1?", opts: ["32,70 €", "38,20 €", "43,20 €", "49,20 €"], a: "38,20 €" },
+        { q: "¿Hasta qué zona llega la cobertura de la zona T del Título Turístico?", opts: ["Hasta B3", "Hasta C2", "Hasta la zona E2", "Hasta E1"], a: "Hasta la zona E2" },
+        { q: "¿Desde cuándo comienza a contarse la validez de un título turístico?", opts: ["Desde las 00:00 h del día siguiente a la compra", "Desde la fecha indicada en el recibo", "Desde la fecha de la primera utilización", "Desde la fecha de compra"], a: "Desde la fecha de la primera utilización" },
+        { q: "¿Cuál es el precio del abono para la combinación B2-E1?", opts: ["43,20 €", "38,20 €", "49,20 €", "53,70 €"], a: "43,20 €" }
+    ],
+    // Cuestionario "Sistema de tarifas CRTM 4"
+    4: [
+        { q: "¿Cuál es el precio del abono Normal para la zona B3?", opts: ["79,00 €", "43,20 €", "49,20 €", "66,30 €"], a: "49,20 €" },
+        { q: "¿Qué tarjeta se está trabajando para incorporar a la tarjeta transporte virtual?", opts: ["Tarjeta Anónima", "Tarjeta Joven", "Tarjeta Transporte Público Personal", "Tarjeta Infantil"], a: "Tarjeta Transporte Público Personal" },
+        { q: "¿Es posible tener dos títulos Turísticos distintos en una misma tarjeta?", opts: ["Solo en la zona A", "No, solo un tipo de título Turístico", "Sí, sin limitaciones", "Solo si son de distinta duración"], a: "No, solo un tipo de título Turístico" },
+        { q: "¿Dónde puede cargarse el título Turístico además de en las máquinas de Metro?", opts: ["Solo en oficinas del Consorcio", "En estancos, puntos autorizados y estaciones de Renfe-Cercanías", "Únicamente en estancos", "En aeropuertos"], a: "En estancos, puntos autorizados y estaciones de Renfe-Cercanías" },
+        { q: "¿Son válidos los títulos turísticos en los Servicios Regionales de RENFE Operadora?", opts: ["Sí, siempre", "No, no son válidos", "Solo con suplemento", "Solo en la zona T"], a: "No, no son válidos" },
+        { q: "¿Qué carácter tiene el título Turístico?", opts: ["Colectivo", "Familiar", "Personal", "Transferible"], a: "Personal" },
+        { q: "¿Es posible cargar otros títulos en la tarjeta mientras esté vigente el título Turístico?", opts: ["Sí, sin limitación", "Solo títulos de la misma zona", "Solo títulos de menor duración", "No es posible"], a: "No es posible" },
+        { q: "¿Qué municipio está incluido en la zona E2?", opts: ["Camarenilla", "Cenicientos", "Camarena", "Carranque"], a: "Camarenilla" },
+        { q: "¿Cuál es el precio del abono Normal para la zona B1?", opts: ["32,70 €", "43,20 €", "38,20 €", "49,20 €"], a: "38,20 €" },
+        { q: "¿Qué municipio pertenece a la zona C1?", opts: ["Aldea del Fresno", "Casarrubuelos", "Torrelodones", "Villanueva del Pardillo"], a: "Casarrubuelos" },
+        { q: "¿Quién puede establecer excepciones a las condiciones indicadas?", opts: ["Las empresas concesionarias", "El Ministerio de Transportes", "El Consorcio Regional de Transportes de Madrid", "RENFE Operadora"], a: "El Consorcio Regional de Transportes de Madrid" },
+        { q: "¿Qué billetes pueden cargarse en la Tarjeta Transporte Virtual?", opts: ["Todos los billetes", "10 viajes, suplemento aeropuerto y billete turístico", "Abono mensual", "Abono anual"], a: "10 viajes, suplemento aeropuerto y billete turístico" },
+        { q: "¿Qué municipio está incluido en la zona E1?", opts: ["Escalona", "El Cubillo de Uceda", "El Casar", "El Berrueco"], a: "El Casar" },
+        { q: "¿Para cuántos días naturales consecutivos puede adquirirse el título Turístico?", opts: ["Para un máximo de 10 días", "Para cualquier número de días", "Para 1, 2, 3, 4, 5 o 7 días", "Solo para 1 o 7 días"], a: "Para 1, 2, 3, 4, 5 o 7 días" },
+        { q: "¿Qué zonas tienen el mismo precio de 49,20€ en el abono de una sola zona?", opts: ["A y B1", "B2 y B3", "B3, C1 y C2", "E1 y E2"], a: "B3, C1 y C2" },
+        { q: "¿Desde dónde se descarga la Tarjeta Transporte Virtual?", opts: ["Play Store", "Página de Metro", "App Store", "Web del Consorcio"], a: "Play Store" },
+        { q: "¿Qué municipio está incluido en la zona C2?", opts: ["Colmenarejo", "Colmenar de Oreja", "Ugena", "Colmenar Viejo"], a: "Colmenar de Oreja" },
+        { q: "¿Cuál es el precio del abono Normal para la zona E2?", opts: ["66,30 €", "53,70 €", "49,20 €", "79,00 €"], a: "79,00 €" },
+        { q: "¿Cuál es el precio del abono Normal para la zona A?", opts: ["43,20 €", "49,20 €", "38,20 €", "32,70 €"], a: "32,70 €" },
+        { q: "¿Qué municipio está incluido en la zona B3?", opts: ["Algete", "Villaviciosa de Odón", "El Álamo", "Tres Cantos"], a: "Algete" },
+        { q: "¿En qué tipo de tarjeta puede cargarse el título Turístico?", opts: ["En tarjetas personalizadas", "En cualquier tarjeta de transporte", "Exclusivamente en la tarjeta Multi", "En tarjetas bancarias"], a: "Exclusivamente en la tarjeta Multi" },
+        { q: "¿Cuál es el precio del abono Normal para la zona C1?", opts: ["49,20 €", "43,20 €", "79,00 €", "66,30 €"], a: "49,20 €" },
+        { q: "¿Cómo se llama la app para usar la tarjeta en el móvil?", opts: ["Tarjeta Transporte Virtual", "Tarjeta Móvil", "Mi Transporte", "Transporte Madrid"], a: "Tarjeta Transporte Virtual" },
+        { q: "¿Cuál es el precio del abono Normal para la zona E1?", opts: ["49,20 €", "38,20 €", "79,00 €", "66,30 €"], a: "66,30 €" },
+        { q: "¿Cuál es el precio del abono Normal para la zona B2?", opts: ["66,30 €", "43,20 €", "38,20 €", "49,20 €"], a: "43,20 €" },
+        { q: "¿Cuál es el precio del abono interzonal B1-B3?", opts: ["32,70 €", "43,20 €", "38,20 €", "28,70 €"], a: "32,70 €" },
+        { q: "¿Qué municipio está incluido en la zona B2?", opts: ["Pinto", "Coslada", "Valdemoro", "Cantoblanco"], a: "Pinto" },
+        { q: "¿Cuál es el precio del abono Normal para la zona C2?", opts: ["49,20 €", "79,00 €", "66,30 €", "43,20 €"], a: "49,20 €" },
+        { q: "¿Cuándo comienza a descontarse la validez del título Turístico?", opts: ["En el momento de la primera validación", "Al día siguiente de la compra", "Al comprarlo", "Al activarlo manualmente"], a: "En el momento de la primera validación" },
+        { q: "¿Qué ocurre con el precio de la tarjeta cuando se adquiere junto con un título Turístico?", opts: ["Tiene un descuento del 50%", "Está incluido en el precio del título", "No se incluye en ningún caso", "Se paga por separado"], a: "Está incluido en el precio del título" }
+    ],
+    // Cuestionario "Sistema de tarifas CRTM 5"
+    5: [
+        { q: "¿Qué característica tiene el abono infantil?", opts: ["Es solo para zona A", "Es transferible", "Es gratuito", "Es de pago"], a: "Es gratuito" },
+        { q: "¿Qué municipio está incluido en la zona E1?", opts: ["Torrijos", "Ocaña", "Toledo", "Illescas"], a: "Illescas" },
+        { q: "¿Qué información recopila exclusivamente la App?", opts: ["Datos personales", "Modelo de teléfono y versión del sistema operativo", "Historial de viajes", "Localización del usuario"], a: "Modelo de teléfono y versión del sistema operativo" },
+        { q: "¿Qué ocurre con los menores de 4 años?", opts: ["Pagan tarifa reducida", "Viajan gratis sin título", "Necesitan abono infantil", "Solo pueden usar Metro"], a: "Viajan gratis sin título" },
+        { q: "¿Para qué trayectos puede utilizarse el abono E1?", opts: ["Dentro de Castilla-La Mancha", "En cualquier zona", "Entre esta zona y la Comunidad de Madrid", "Dentro de Madrid"], a: "Entre esta zona y la Comunidad de Madrid" },
+        { q: "¿Qué título permite realizar un número concreto de viajes cuando se necesite?", opts: ["Sencillos y 10 viajes", "Abono mensual", "Abono +65", "Abono infantil"], a: "Sencillos y 10 viajes" },
+        { q: "¿Cuándo puede utilizarse la App para cargar billetes?", opts: ["24 horas al día, 365 días al año", "Solo en horario comercial", "Solo fines de semana", "De lunes a viernes"], a: "24 horas al día, 365 días al año" },
+        { q: "¿Cuántas tarjetas de transporte pueden utilizarse con un teléfono?", opts: ["Una", "Cinco", "Un número ilimitado", "Dos"], a: "Un número ilimitado" },
+        { q: "¿Qué entidad desarrolló la App de carga de billetes?", opts: ["RENFE", "Metro de Madrid", "Consorcio Regional de Transportes de Madrid", "Comunidad de Madrid"], a: "Consorcio Regional de Transportes de Madrid" },
+        { q: "¿Cuántos días naturales permite viajar el Abono +65?", opts: ["400", "30", "180", "365"], a: "365" },
+        { q: "¿En qué tarjeta se carga el Abono +65?", opts: ["Tarjeta Transporte Público Personal", "Tarjeta Multi", "Tarjeta Azul", "Tarjeta Infantil"], a: "Tarjeta Transporte Público Personal" },
+        { q: "¿Para qué perfiles está disponible el Abono 30 días?", opts: ["Infantil y +65", "Solo general", "Normal o joven", "Turístico"], a: "Normal o joven" },
+        { q: "¿Cuál de estos municipios pertenece a C2?", opts: ["Alpedrete", "Hoyo de Manzanares", "Buitrago de Lozoya", "Villalbilla"], a: "Buitrago de Lozoya" },
+        { q: "¿Cuál es el perfil correspondiente a personas de 26 a 64 años?", opts: ["Más de 65", "Infantil", "General", "Joven"], a: "General" },
+        { q: "¿Qué edad corresponde al perfil Joven de 15 a 25 años?", opts: ["Menores de 6", "26 a 64", "7 a 14", "15 a 25"], a: "15 a 25" },
+        { q: "¿Qué ciudad figura en E1?", opts: ["Toledo", "Madrid", "Guadalajara", "Talavera"], a: "Guadalajara" },
+        { q: "¿Dónde se registran los datos del usuario para el abono?", opts: ["En una base de datos online", "En el billete físico", "En la app móvil", "En el chip de la TTP Personal"], a: "En el chip de la TTP Personal" },
+        { q: "¿Qué característica tiene el Abono +65?", opts: ["Es de pago", "Es anual solo en zona A", "Es gratuito", "Es interzonal"], a: "Es gratuito" },
+        { q: "¿Cuántos días naturales consecutivos permite el Abono 30 días?", opts: ["30", "28", "365", "31"], a: "30" },
+        { q: "¿Qué son los billetes en el Sistema de Transporte Público de la Comunidad de Madrid?", opts: ["Tarjetas bancarias", "Títulos de transporte que permiten acceder al sistema", "Documentos de identificación", "Contratos de movilidad"], a: "Títulos de transporte que permiten acceder al sistema" },
+        { q: "¿En función de qué se personalizan los abonos?", opts: ["De la edad y posibles descuentos", "Del municipio", "Del medio de transporte", "Del horario"], a: "De la edad y posibles descuentos" },
+        { q: "¿Hasta qué edad permite viajar el abono infantil?", opts: ["Hasta el día que se cumplen 7 años", "Hasta los 6 años", "Hasta los 10 años", "Hasta los 11 años"], a: "Hasta el día que se cumplen 7 años" },
+        { q: "¿Qué tipo de títulos permiten viajes ilimitados durante un periodo determinado?", opts: ["Abonos", "Sencillos", "Turísticos anuales", "10 viajes"], a: "Abonos" },
+        { q: "¿Dónde se cargan los billetes de transporte?", opts: ["En las tarjetas de transporte", "En validadores de acceso", "En documentos impresos", "En aplicaciones móviles únicamente"], a: "En las tarjetas de transporte" },
+        { q: "¿Qué municipio pertenece a la zona E2?", opts: ["Illescas", "Seseña", "Azuqueca", "Ocaña"], a: "Ocaña" },
+        { q: "¿Qué zona incluye Toledo capital?", opts: ["C1", "E2", "C2", "E1"], a: "E2" },
+        { q: "¿Qué característica define al Abono Transporte?", opts: ["Es exclusivo del Metro", "Es personal e intransferible", "Es transferible", "Es válido solo un día"], a: "Es personal e intransferible" },
+        { q: "¿Qué abono se carga en una tarjeta anónima?", opts: ["Abono joven", "Abono infantil", "Abono +65", "Abono turístico"], a: "Abono turístico" },
+        { q: "¿En qué tarjeta se carga el Abono Transporte general?", opts: ["Tarjeta Transporte Público Personal", "Tarjeta anónima", "Tarjeta bancaria", "Tarjeta Multi"], a: "Tarjeta Transporte Público Personal" },
+        { q: "¿De qué depende la variedad de títulos del sistema tarifario madrileño?", opts: ["Del número de viajes, zonas, medios y situación personal", "Del tipo de tarjeta bancaria", "Del horario de uso", "Del operador de transporte"], a: "Del número de viajes, zonas, medios y situación personal" }
+    ],
+    // Cuestionario "Sistema de tarifas CRTM 7"
+    7: [
+        { q: "¿Cuántos billetes puede contener como máximo la TTP Multi?", opts: ["Tres", "Dos", "Cuatro", "Uno"], a: "Tres" },
+        { q: "¿Dónde se puede adquirir la TTP Multi?", opts: ["Online", "En el Ayuntamiento", "Máquinas automáticas y estancos autorizados", "Oficinas de gestión"], a: "Máquinas automáticas y estancos autorizados" },
+        { q: "¿Cuál es la validez del Abono 30 días tras la primera utilización?", opts: ["30 días naturales", "28 días", "Un mes natural fijo", "40 días"], a: "30 días naturales" },
+        { q: "¿Qué precio inicial se indica para el Abono 30 días?", opts: ["30,00€", "25,00€", "Desde 28,70 €", "35,00€"], a: "Desde 28,70 €" },
+        { q: "¿Qué ocurre si se cambia un abono interzonal por otro interzonal del mismo precio?", opts: ["Se pierde el abono", "Se paga una penalización", "Se reinicia el periodo de validez", "El cambio se realiza sin coste"], a: "El cambio se realiza sin coste" },
+        { q: "¿Cuánto dura la Tarjeta Transporte Público Multi?", opts: ["Indefinidamente", "3 años", "10 años", "5 años"], a: "10 años" },
+        { q: "¿En qué soporte está disponible el Abono 7-14?", opts: ["Tarjeta Infantil", "Tarjeta Virtual", "Tarjeta de Transporte Público Personal", "Tarjeta Multi"], a: "Tarjeta de Transporte Público Personal" },
+        { q: "¿Qué línea de EMT está excluida del uso del abono?", opts: ["Exprés Aeropuerto", "Línea Circular", "Línea nocturna", "Línea universitaria"], a: "Exprés Aeropuerto" },
+        { q: "¿Cuál es el precio de la Tarjeta Transporte Público Multi?", opts: ["4 euros", "2,50 euros", "Incluido siempre en el billete", "6 euros"], a: "2,50 euros" },
+        { q: "¿Cuál es la duración del Abono 7-14?", opts: ["30 días", "365 días", "15 días", "90 días"], a: "30 días" },
+        { q: "¿Qué servicio NO admite el abono en zona A?", opts: ["Cercanías", "Metro", "Autobuses interurbanos", "EMT"], a: "Autobuses interurbanos" },
+        { q: "¿Puede la TTP Multi ser utilizada por varios usuarios?", opts: ["No", "Sí, incluso simultáneamente si hacen el mismo trayecto", "Solo familiares", "Solo de forma alterna"], a: "Sí, incluso simultáneamente si hacen el mismo trayecto" },
+        { q: "¿Dónde NO se puede realizar un cambio de zona del abono?", opts: ["Intercambiadores", "Máquinas de autoventa", "App Tarjeta Transporte", "Estancos"], a: "App Tarjeta Transporte" },
+        { q: "¿Qué ocurre al cambiar a una zona de precio superior?", opts: ["Se abona la diferencia entre tarifas completas", "Se pierde la validez", "Se reinicia el abono", "No se paga diferencia"], a: "Se abona la diferencia entre tarifas completas" },
+        { q: "¿Cuándo deja de ser válido un abono no validado tras la carga?", opts: ["A los 60 días", "A los 20 días", "A los 40 días desde la carga", "A los 30 días"], a: "A los 40 días desde la carga" },
+        { q: "¿Qué título debe consumirse el mismo día de la compra?", opts: ["Abono transporte", "Bonobús", "Billete sencillo de Metro", "Billete turístico"], a: "Billete sencillo de Metro" },
+        { q: "¿Cuántos viajes permite el Abono 30 días?", opts: ["Ilimitados", "30", "Según la zona", "10"], a: "Ilimitados" },
+        { q: "¿Hasta qué zonas permite viajar el Abono 7-14?", opts: ["Solo zona A", "Hasta zona B1", "Desde zona A hasta C2", "Hasta zona E2"], a: "Desde zona A hasta C2" },
+        { q: "¿Qué ocurre si no se valida el abono en los primeros 10 días tras la carga?", opts: ["Se devuelve el importe", "Se amplía automáticamente", "Se anula", "La validez se calcula tras esos 10 días"], a: "La validez se calcula tras esos 10 días" },
+        { q: "¿A qué tarjeta es similar la Tarjeta Transporte Virtual?", opts: ["TTP Personal", "Tarjeta Infantil", "TTP Multi", "Tarjeta Azul"], a: "TTP Multi" },
+        { q: "¿A partir de qué edad puede usarse el Abono Joven?", opts: ["15 años", "18 años", "16 años", "14 años"], a: "15 años" },
+        { q: "¿Qué requisito es necesario para adquirir el Abono 7-14?", opts: ["Tarjeta Multi", "Tarjeta de Transporte Público Personal", "DNI físico", "Tarjeta Virtual"], a: "Tarjeta de Transporte Público Personal" },
+        { q: "¿Qué títulos pueden adquirirse con la Tarjeta Transporte Virtual?", opts: ["Billetes sencillos de autobús", "Billetes de Cercanías", "Abonos personales", "Billetes de 10 viajes o turísticos"], a: "Billetes de 10 viajes o turísticos" },
+        { q: "¿Cuál es el precio del Abono 7-14?", opts: ["Gratuito", "5 €", "20 €", "10 €"], a: "Gratuito" }, // Nota: El doc muestra opciones pero la respuesta oficial en tarifario para 7-14 suele ser 8€ o gratuito según perfil; en el texto dice opciones 120-123.
+        { q: "¿Dónde se puede cargar el Abono 7-14?", opts: ["Solo en oficinas de gestión", "En puntos de venta autorizados", "Solo en estancos", "Solo por correo"], a: "En puntos de venta autorizados" },
+        { q: "¿Qué tipo de tarjeta funciona integrada en el dispositivo móvil?", opts: ["TTP Personal", "Tarjeta Transporte Virtual", "TTP Multi", "Tarjeta Azul"], a: "Tarjeta Transporte Virtual" },
+        { q: "¿Qué ocurre si el abono no se valida en los 10 días posteriores a la carga?", opts: ["Se amplía su validez", "Se devuelve el importe", "Empieza a contar el plazo de 30 días", "Se anula automáticamente"], a: "Empieza a contar el plazo de 30 días" },
+        { q: "¿Cuántos viajes permite el Abono 7-14?", opts: ["30 viajes", "60 viajes", "Ilimitados", "10 viajes"], a: "Ilimitados" },
+        { q: "¿Qué ocurre si se pierde o sustrae una TTP Multi?", opts: ["No hay reembolso ni reedición", "Se bloquea automáticamente", "Se devuelve el saldo", "Se repone gratuitamente"], a: "No hay reembolso ni reedición" },
+        { q: "¿Cuándo deja de ser válido un abono no validado tras la carga?", opts: ["A los 30 días", "A los 60 días", "A los 40 días desde la carga", "A los 35 días"], a: "A los 40 días desde la carga" }
+    ],
+
+    // Cuestionario "Sistema de tarifas CRTM 9"
+    9: [
+        { q: "¿Hasta cuándo es válido el Abono Infantil?", opts: ["Hasta los 10 años", "Durante 30 días", "Hasta cumplir 7 años", "Durante un año"], a: "Hasta cumplir 7 años" },
+        { q: "¿Desde qué precio parte el Billete Turístico?", opts: ["5 €", "10.30 €", "20 €", "1,50 €"], a: "10.30 €" },
+        { q: "¿Qué datos aparecen impresos en la TTP Personal?", opts: ["Saldo disponible", "Dirección y firma", "Tipo de billete cargado", "Nombre, número de identificación y fotografía"], a: "Nombre, número de identificación y fotografía" },
+        { q: "¿De qué material está hecha la tarjeta física?", opts: ["Plástico", "Metal", "Cartón", "Silicona"], a: "Plástico" },
+        { q: "¿Qué tipo de tarjeta es intransferible?", opts: ["TTP Multi", "TTP Personal", "Tarjeta Virtual", "Tarjeta Turística"], a: "TTP Personal" },
+        { q: "¿En qué red NO es válido el Billete Turístico?", opts: ["Cercanías", "EMT", "Metro", "Servicios Regionales de RENFE"], a: "Servicios Regionales de RENFE" },
+        { q: "¿Cómo se puede solicitar la Tarjeta Infantil?", opts: ["Solo por correo", "Por web y Oficinas de Gestión", "Solo en estancos", "En máquinas automáticas"], a: "Por web y Oficinas de Gestión" },
+        { q: "¿Cuál puede ser la duración del Billete Turístico?", opts: ["30 días", "Entre 1 y 7 días", "Solo 1 día", "7 y 14 días"], a: "Entre 1 y 7 días" },
+        { q: "¿Qué tecnología utilizan las tarjetas de transporte para validar billetes?", opts: ["Conexión Bluetooth", "Banda magnética", "Tecnología sin contacto", "Código QR"], a: "Tecnología sin contacto" },
+        { q: "¿A partir de qué edad es la opción estándar la TTP Personal?", opts: ["14 años", "4 años", "6 años", "Más de 7 años"], a: "Más de 7 años" },
+        { q: "¿Cuántos trayectos permite un billete sencillo?", opts: ["Tres", "Dos", "Ilimitados", "Uno"], a: "Uno" },
+        { q: "¿Para qué sirven el chip y la antena de la tarjeta física?", opts: ["Para recargar saldo automáticamente", "Para cargar billetes y validarlos al viajar", "Para identificar al usuario visualmente", "Para almacenar datos personales visibles"], a: "Para cargar billetes y validarlos al viajar" },
+        { q: "¿Qué función tienen las tarjetas de transporte?", opts: ["Comprar servicios comerciales", "Identificar al usuario en estaciones", "Servir como soporte para cargar billetes de transporte público", "Sustituir al documento de identidad"], a: "Servir como soporte para cargar billetes de transporte público" },
+        { q: "¿Qué formatos de tarjetas de transporte existen?", opts: ["Personales y familiares", "Temporales y permanentes", "Físicas y virtuales", "Magnéticas y digitales"], a: "Físicas y virtuales" },
+        { q: "¿En qué tarjeta se carga el Abono Infantil?", opts: ["Tarjeta Personal", "Tarjeta Virtual", "Tarjeta Multi", "Tarjeta de Transporte Público Infantil"], a: "Tarjeta de Transporte Público Infantil" },
+        { q: "¿Qué información se personaliza en el chip de la TTP Personal?", opts: ["Franja de edad y descuentos", "Medio de pago", "Zona de residencia", "Historial de viajes"], a: "Franja de edad y descuentos" },
+        { q: "¿Qué modalidades existen del Billete Turístico?", opts: ["Personal y Infantil", "Solo Multi", "Personal y Virtual", "Tarjeta Multi y Tarjeta Virtual"], a: "Tarjeta Multi y Tarjeta Virtual" },
+        { q: "¿Cuál es el precio del Abono Infantil?", opts: ["5 €", "1,50 €", "Gratuito", "10 €"], a: "Gratuito" },
+        { q: "¿Qué tipo de viajes permite el Billete Turístico?", opts: ["Solo un trayecto", "Ilimitados", "10 viajes", "Limitados"], a: "Ilimitados" },
+        { q: "¿Qué elementos contiene la tarjeta física en su interior?", opts: ["Un sensor y una batería", "Una memoria externa", "Un chip y una antena", "Un código de barras"], a: "Un chip y una antena" }
+    ],
+
+    // Cuestionario "Sistema de tarifas CRTM 10"
+    10: [
+        { q: "¿Dónde se adquiere el billete sencillo de autobús?", opts: ["En estancos", "En la app", "En máquinas", "A bordo del autobús"], a: "A bordo del autobús" },
+        { q: "¿Qué reducción se aplica al Abono Joven de 30 días?", opts: ["50%", "40%", "60%", "30%"], a: "50%" },
+        { q: "¿Qué descuento tienen las Familias Numerosas Generales?", opts: ["30%", "10%", "20%", "50%"], a: "20%" },
+        { q: "¿Qué títulos quedan excluidos de estas bonificaciones?", opts: ["Abono Joven", "Billetes de 10 viajes", "Abonos mensuales", "Billetes sencillos y turísticos"], a: "Billetes sencillos y turísticos" },
+        { q: "¿Cuál es el coste total del TransBUS?", opts: ["2,00 €", "1,80 €", "1,50 €", "3,00 €"], a: "1,80 €" },
+        { q: "¿Dónde se adquiere el billete sencillo EMT?", opts: ["En máquinas", "En oficinas", "En estancos", "A bordo del autobús"], a: "A bordo del autobús" },
+        { q: "¿Qué permite el billete TransBUS?", opts: ["Un viaje único", "Viajes ilimitados todo el día", "Transbordos durante 60 minutos", "Acceso al aeropuerto"], a: "Transbordos durante 60 minutos" },
+        { q: "¿Cuántos usos permite el Suplemento Aeropuerto?", opts: ["Dos", "Diez", "Ilimitados", "Un solo uso"], a: "Un solo uso" },
+        { q: "¿Dónde se aplica el descuento al cargar billetes?", opts: ["En el billete", "En el chip de la tarjeta", "En la máquina", "En la app bancaria"], a: "En el chip de la tarjeta" },
+        { q: "¿Cuál es el precio del Suplemento Aeropuerto?", opts: ["3,00 €", "1,50 €", "2,00 €", "5,00 €"], a: "3,00 €" },
+        { q: "¿Qué reducción se aplica a los billetes de 10 viajes?", opts: ["50%", "40%", "30%", "20%"], a: "40%" },
+        { q: "¿En qué soporte se cargan los billetes de 10 viajes?", opts: ["Papel", "Móvil obligatorio", "Solo Tarjeta Virtual", "Tarjeta Transporte Público"], a: "Tarjeta Transporte Público" },
+        { q: "¿Hasta qué fecha se mantienen las bonificaciones extraordinarias?", opts: ["Diciembre de 2025", "Junio de 2026", "31 de diciembre de 2026", "Enero de 2027"], a: "31 de diciembre de 2026" },
+        { q: "¿Es el Suplemento Aeropuerto un billete válido por sí solo?", opts: ["No", "Solo con Cercanías", "Solo con Metro", "Sí"], a: "No" },
+        { q: "¿Los billetes de 10 viajes son multipersonales?", opts: ["No", "Solo algunos", "Sí", "Solo fines de semana"], a: "Sí" },
+        { q: "¿Qué descuento tienen las Familias Numerosas Especiales?", opts: ["65%", "33%", "75%", "50%"], a: "50%" },
+        { q: "¿Qué usuarios mantienen la gratuidad total?", opts: ["Familias numerosas", "Usuarios de 7 a 14 años", "Mayores de 26 años", "Turistas"], a: "Usuarios de 7 a 14 años" },
+        { q: "¿Qué descuento se aplica a personas con discapacidad ≥ 65 %?", opts: ["10%", "40%", "20%", "50%"], a: "20%" },
+        { q: "¿Qué tarjeta es necesaria para aplicar descuentos personales?", opts: ["Tarjeta Infantil", "Tarjeta de Transporte Público Personal", "Tarjeta Virtual", "Tarjeta Multi"], a: "Tarjeta de Transporte Público Personal" },
+        { q: "¿Qué colectivos pueden recibir descuentos generales?", opts: ["Usuarios ocasionales", "Turistas", "Discapacidad y Familias Numerosas", "Estudiantes"], a: "Discapacidad y Familias Numerosas" }
+    ]
+};
+
+let currentBlock = [], currentIdx = 0, hits = 0, mistakes = [];
+
+function startTest(num) {
+    if(!db[num]) { alert("Bloque no disponible"); return; }
+    currentBlock = db[num];
+    currentIdx = 0; hits = 0; mistakes = [];
+    document.getElementById('selector').classList.add('hidden');
+    document.getElementById('quiz-area').classList.remove('hidden');
+    document.getElementById('btn-volver-menu').classList.add('hidden');
+    document.getElementById('btn-salir-test').classList.remove('hidden');
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = currentBlock[currentIdx];
+    document.getElementById('progreso').innerText = `Pregunta ${currentIdx + 1}/${currentBlock.length}`;
+    document.getElementById('score').innerText = hits;
+    document.getElementById('q-text').innerText = q.q;
+    document.getElementById('next-btn').style.display = 'none';
+    const container = document.getElementById('q-options');
+    container.innerHTML = '';
+    
+    q.opts.forEach(optText => {
+        const btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerText = optText;
+        btn.onclick = () => check(btn, optText, q.a);
+        container.appendChild(btn);
+    });
+}
+
+function check(btn, selected, correct) {
+    const buttons = document.querySelectorAll('.opt');
+    buttons.forEach(b => b.disabled = true);
+    
+    if(selected === correct) {
+        btn.classList.add('correct');
+        hits++;
+        setTimeout(nextQuestion, 600);
+    } else {
+        btn.classList.add('wrong');
+        mistakes.push({q: currentBlock[currentIdx].q, a: correct});
+        buttons.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+        document.getElementById('next-btn').style.display = 'block';
+    }
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if(currentIdx < currentBlock.length) showQuestion();
+    else showResults();
+}
+
+function showResults() {
+    document.getElementById('quiz-area').classList.add('hidden');
+    document.getElementById('results').classList.remove('hidden');
+    const pct = Math.round((hits/currentBlock.length)*100);
+    document.getElementById('final-score').innerText = `${pct}% (${hits}/${currentBlock.length})`;
+    const list = document.getElementById('failed-list');
+    
+    if(mistakes.length > 0) {
+        list.innerHTML = '<strong>Repasa tus errores:</strong><br><br>' + 
+            mistakes.map(m => `• ${m.q}<br><span style="color:var(--correct)">✔ Correcta: ${m.a}</span>`).join('<br><br>');
+    } else { 
+        list.innerHTML = '¡Enhorabuena! Has clavado todas las preguntas de Tarifas.'; 
+    }
+}
+</script>
+</body>
+</html>
