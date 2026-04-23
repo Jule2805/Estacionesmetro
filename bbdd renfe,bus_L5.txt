@@ -1,0 +1,141 @@
+const serviciosL5 = [
+    // --- CORRESPONDENCIAS ---
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen correspondencia con la LÍNEA 6?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de León", "Oporto"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 2?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ventas", "Ópera"],
+        type: "multiple"
+    },
+      {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 7?",
+        options: [...estacionesL5].sort(),
+        answer: ["Pueblo Nuevo"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 3?",
+        options: [...estacionesL5].sort(),
+        answer: ["Callao", "Acacias"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con el RAMAL?",
+        options: [...estacionesL5].sort(),
+        answer: ["Opera"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 4?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de Leon", "Alosno Martinez"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿En qué estaciones de la L5 hay conexión con CERCANÍAS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Gran Vía", "Pirámides", "Aluche"],
+        type: "multiple"
+    },
+
+    // --- ACCESIBILIDAD (Solo las marcadas con X) ---
+    {
+        category: "linea5",
+        question: "Selecciona las estaciones de la L5 que SÍ son ACCESIBLES según la tabla:",
+        options: [...estacionesL5].sort(),
+        answer: [
+            "Alameda de Osuna", "El Capricho", "Pueblo Nuevo", 
+            "Gran Vía", "Callao", "Ópera", "Pirámides", 
+            "Eugenia de Montijo", "Aluche", "Empalme", "Casa de Campo"
+        ],
+        type: "multiple"
+    },
+
+    // --- TRANSBORDOS ---
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen marcado un TRANSBORDO LARGO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de León", "Núñez de Balboa", "Acacias"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿A qué estación se realiza el transbordo largo desde ACACIAS?",
+        options: ["Embajadores", "Pirámides", "Puerta de Toledo", "La Latina"],
+        answer: ["Embajadores"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Pueblo Nuevo", "Ventas", "Alonso Martínez", "Gran Vía", "Callao", "Ópera", "Oporto"],
+        type: "multiple"
+    },
+
+    // --- OTROS SERVICIOS ---
+    {
+        category: "linea5",
+        question: "¿En qué estación de la L5 hay terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Alonso Martínez"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Canillejas", "Ciudad Lineal", "Oporto", "Aluche"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones disponen de ATENCIÓN AL CLIENTE?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+     {
+        category: "linea5",
+        question: "¿Qué estaciones disponen de PRODUCTOS OFICIALES?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿En qué estación de la L5 hay METROTECA?",
+        options: [...estacionesL5].sort(),
+        answer: ["Suanzes"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación está marcada como ESPACIO HISTÓRICO en la L5?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera", "Gran Vía"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen APARCAMIENTO DISUASORIO GRATUITO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Canillejas", "Aluche"],
+        type: "multiple"
+    }
+];
+
+tarifasDB.push(...serviciosL5);

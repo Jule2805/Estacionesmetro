@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeTodito - Modo Estudio</title>
+    <style>
+        :root {
+            --metro-red: #646969cf; 
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --border-color: #333;
+            --correct-green: #009543;
+            --metro-blue: #0055a4;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--metro-red);
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 900px;
+            margin: 20px auto;
+        }
+
+        .back-btn { 
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.3); 
+            border: 1px solid white; 
+            color: white; 
+            cursor: pointer; 
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .card:hover { border-color: white; background: #252525; }
+
+        .l1 { border-bottom: 4px solid #00a0dc; } .l2 { border-bottom: 4px solid #ee3224; }
+        .l3 { border-bottom: 4px solid #ffcc00; } .l4 { border-bottom: 4px solid #a6552a; }
+        .l5 { border-bottom: 4px solid #a1be1f; } .l6 { border-bottom: 4px solid #9e9e9e; }
+        .l7 { border-bottom: 4px solid #f37021; } .l8 { border-bottom: 4px solid #f38abb; }
+        .l9 { border-bottom: 4px solid #92278f; } .l10 { border-bottom: 4px solid #003399; }
+        .l11 { border-bottom: 4px solid #009543; } .l12 { border-bottom: 4px solid #b29700; }
+        .lr { border-bottom: 4px solid #fff; } .r-renfe { border-bottom: 4px solid #004282; }
+
+        #pantalla-juego {
+            display: none;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-sizing: border-box;
+        }
+
+        .opciones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .btn-opcion {
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .btn-opcion.selected { background: var(--metro-blue); border-color: white; }
+
+        #mensaje-resultado {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .correcto { background: var(--correct-green); }
+        .incorrecto { background: var(--metro-red); }
+
+        .btn-accion {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            color: white;
+        }
+
+        .btn-check { background: var(--metro-blue); }
+        .btn-next { background: var(--correct-green); display: none; }        
+        .back-menu-btn { background: #444; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+
+  
+        @media (max-width: 480px) {
+            .opciones-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+        <button class="back-menu-btn" onclick="window.location.href='index.html'">VOLVER AL MENÚ</button>
+    <h1>🚇 DE TODITO</h1>
+</header>
+
+<div class="container">
+    <div id="menu-principal">
+        <div class="card" style="background: #2c0000; border: 1px solid red; margin-bottom: 15px;" onclick="iniciarExamen('todos')">🚀 EXAMEN TOTAL</div>
+        <div class="grid-menu">
+            <div class="card l1" onclick="iniciarExamen('linea1')">L1</div>
+            <div class="card l2" onclick="iniciarExamen('linea2')">L2</div>
+            <div class="card l3" onclick="iniciarExamen('linea3')">L3</div>
+            <div class="card l4" onclick="iniciarExamen('linea4')">L4</div>
+            <div class="card l5" onclick="iniciarExamen('linea5')">L5</div>
+            <div class="card l6" onclick="iniciarExamen('linea6')">L6</div>
+            <div class="card l7" onclick="iniciarExamen('linea7')">L7</div>
+            <div class="card l8" onclick="iniciarExamen('linea8')">L8</div>
+            <div class="card l9" onclick="iniciarExamen('linea9')">L9</div>
+            <div class="card l10" onclick="iniciarExamen('linea10')">L10</div>
+            <div class="card l11" onclick="iniciarExamen('linea11')">L11</div>
+            <div class="card l12" onclick="iniciarExamen('linea12')">L12</div>
+            <div class="card lr" onclick="iniciarExamen('ramal')">R</div>
+            <div class="card r-renfe" onclick="iniciarExamen('renfe')">RENFE</div>
+        </div>
+    </div>
+
+    <div id="pantalla-juego">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div id="progreso"></div>
+            <button onclick="irAlMenu()" style="background:none; border:1px solid #666; color:#ccc; cursor:pointer; padding:5px;">✕ Salir</button>
+        </div>
+        <h2 id="pregunta-texto"></h2>
+        <p id="indicador-tipo" style="color: #00fffb; font-weight: bold; font-size: 0.9em;"></p>
+        <div id="opciones-container" class="opciones-grid"></div>
+        <div id="mensaje-resultado"></div>
+        <button id="btn-comprobar" class="btn-accion btn-check" onclick="verificarSeleccion()">Comprobar</button>
+        <button id="btn-siguiente" class="btn-accion btn-next" onclick="proximaPregunta()">Siguiente Pregunta</button>
+    </div>
+</div>
+
+<script>
+    let tarifasDB = [];
+
+    const estacionesL1 = [
+    "Pinar de Chamartín", "Bambú", "Chamartín", "Plaza de Castilla", "Valdeacederas", 
+    "Tetuán", "Estrecho", "Alvarado", "Cuatro Caminos", "Ríos Rosas", "Iglesia", 
+    "Bilbao", "Tribunal", "Gran Vía", "Sol", "Tirso de Molina", "Antón Martín", 
+    "Estación del Arte", "Atocha", "Menéndez Pelayo", "Pacífico", "Puente de Vallecas", 
+    "Nueva Numancia", "Portazgo", "Buenos Aires", "Alto del Arenal", "Miguel Hernández", 
+    "Sierra de Guadalupe", "Villa de Vallecas", "Congosto", "La Gavia", "Las Suertes", "Valdecarros"
+];
+
+const serviciosL1 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    { 
+        category: "linea1", 
+        question: "De las siguientes, ¿cuáles son estaciones de correspondencia con la LÍNEA 2?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Cuatro Caminos", "Sol"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 tienen correspondencia con la LÍNEA 4?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Pinar de Chamartín", "Bilbao"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 tienen correspondencia con la LÍNEA 5?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Gran Vía"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estaciones de la L1 se cruza la LÍNEA 3?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Sol"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Cuáles de estas estaciones tienen conexión con la LÍNEA 9?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 tienen conexión directa con CERCANÍAS RENFE?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Sol", "Atocha","Gran Via", "Sierra de Guadalupe"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estación de la L1 se puede transbordar al METRO LIGERO (ML1)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Pinar de Chamartín"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "Estaciones con terminal de AUTOBUSES INTERURBANOS o largo recorrido:", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla", "Chamartín"], 
+        type: "multiple" 
+    },
+
+    // --- SERVICIOS AL CLIENTE Y GESTIÓN ---
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones tienen Oficina de GESTIÓN DE TARJETA TRANSPORTE PÚBLICO (TTP)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla", "Sol", "Atocha"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estación de la L1 se encuentra la oficina central de OBJETOS PERDIDOS de Metro?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Plaza de Castilla"], 
+        type: "single" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones disponen de tienda de PRODUCTOS OFICIALES de Metro (Metro de Madrid Shop)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Sol", "Plaza de Castilla"], 
+        type: "multiple" 
+    },
+
+    // --- CULTURA Y OCIO ---
+    { 
+        category: "linea1", 
+        question: "¿En qué estaciones de la L1 hay servicio de BIBLIOMETRO?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Sierra de Guadalupe"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones cuentan con el servicio de METROTECA?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Tetuán", "Puente de Vallecas", "Miguel Hernández"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "Selecciona las estaciones consideradas ESPACIO HISTÓRICO o con museos:", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Iglesia", "Tirso de Molina", "Pacífico"], 
+        type: "multiple" 
+    },
+
+    // --- APARCAMIENTO Y BICICLETAS ---
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones tienen APARCAMIENTO DISUASORIO (incluye gratuitos y de pago)?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Plaza de Castilla", "Atocha", "Miguel Hernández", "Sierra de Guadalupe"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿Qué estaciones de la L1 disponen de APARCAMIENTO DISUASORIO DE PAGO?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín", "Plaza de Castilla", "Atocha", "Miguel Hernández"], 
+        type: "multiple" 
+    },
+    { 
+        category: "linea1", 
+        question: "¿En qué estaciones hay áreas específicas de ESTACIONAMIENTO DE BICICLETAS?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Chamartín"], 
+        type: "single" 
+    },
+
+    // --- SEGURIDAD Y VALIDACIÓN ---
+    { 
+        category: "linea1", 
+        question: "¿Qué estación requiere VALIDACIÓN DE SALIDA?", 
+        options: [...estacionesL1].sort(), 
+        answer: ["Pinar de Chamartín"], 
+        type: "single" 
+    },
+    // --- TRANSBORDOS Y ACCESIBILIDAD ---
+{ 
+    category: "linea1", 
+    question: "¿Qué estaciones de la L1 cuentan con TRANSBORDO CORTO?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Pinar de Chamartín", "Chamartín", "Plaza de Castilla", "Cuatro Caminos", "Bilbao", "Tribunal", "Gran Vía", "Sol", "Pacífico"], 
+    type: "multiple" 
+},
+{ 
+    category: "linea1", 
+    question: "De las siguientes estaciones de la L1, ¿cuáles SÍ son ACCESIBLES (tienen ascensor/símbolo de discapacidad)?",
+    options: [...estacionesL1].sort(), 
+    answer: [
+        "Pinar de Chamartín", "Bambú", "Chamartín", "Plaza de Castilla", 
+        "Cuatro Caminos", "Iglesia", "Bilbao", "Tribunal", 
+        "Gran Vía", "Sol", "Atocha", "Menéndez Pelayo", 
+        "Pacífico", "Portazgo", "Alto del Arenal", "Miguel Hernández", 
+        "Sierra de Guadalupe", "Villa de Vallecas", "Congosto", "La Gavia", 
+        "Las Suertes", "Valdecarros"
+    ], 
+    type: "multiple" 
+},
+// --- AEROPUERTO Y TREN ---
+{ 
+    category: "linea1", 
+    question: "¿En qué estación de la L1 se puede tomar el AUTOBÚS EXPRÉS AEROPUERTO?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Atocha"], 
+    type: "single" 
+},
+{ 
+    category: "linea1", 
+    question: "¿Qué estaciones están catalogadas específicamente como ESTACIÓN DE TREN en el esquema?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Chamartín", "Atocha"], 
+    type: "multiple" 
+},
+
+// --- ATENCIÓN AL CLIENTE ---
+{ 
+    category: "linea1", 
+    question: "¿Qué estaciones de la L1 disponen de puestos de ATENCIÓN AL CLIENTE?", 
+    options: [...estacionesL1].sort(), 
+    answer: ["Plaza de Castilla", "Sol"], 
+    type: "multiple" 
+}
+];
+
+    tarifasDB.push(...serviciosL1);
+const estacionesL2 = [
+    "Las Rosas", "Avenida de Guadalajara", "Alsacia", "La Almudena", "La Elipa",
+    "Ventas", "Manuel Becerra", "Goya", "Príncipe de Vergara", "Retiro",
+    "Banco de España", "Sevilla", "Sol", "Ópera", "Santo Domingo",
+    "Noviciado", "San Bernardo", "Quevedo", "Canal", "Cuatro Caminos"
+];
+
+const serviciosL2 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    {
+        category: "linea2",
+        question: "¿Qué estaciones de la L2 tienen correspondencia con la LÍNEA 1?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol", "Cuatro Caminos"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estaciones de la L2 conectan con la LÍNEA 4?",
+        options: [...estacionesL2].sort(),
+        answer: ["Goya", "San Bernardo"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Con qué línea hay correspondencia en la estación de VENTAS?",
+        options: ["L4", "L5", "L6", "L9"],
+        answer: ["L5"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 conecta con el RAMAL (R)?",
+        options: [...estacionesL2].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿En qué estación de la L2 hay conexión con CERCANÍAS?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+{
+        category: "linea2",
+        question: "¿En qué estación de la L2 hay conexión con la Linea 9?",
+        options: [...estacionesL2].sort(),
+        answer: ["Príncipe de Vergara"],
+        type: "single"
+    },
+    // --- CARACTERÍSTICAS DE ESTACIÓN (Transbordos y Accesibilidad) ---
+    {
+        category: "linea2",
+        question: "¿Qué estaciones de la L2 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL2].sort(),
+        answer: ["Ventas", "Manuel Becerra", "Goya", "Príncipe de Vergara", "Sol", "Ópera", "San Bernardo", "Canal", "Cuatro Caminos"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 tiene un TRANSBORDO LARGO (en este caso, hacia Plaza de España)?",
+        options: [...estacionesL2].sort(),
+        answer: ["Noviciado"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "Según la tabla, ¿qué estaciones de la L2 SÍ son ACCESIBLES?",
+        options: [...estacionesL2].sort(),
+        answer: ["Las Rosas", "Avenida de Guadalajara", "Alsacia", "La Almudena", "La Elipa", "Goya", "Príncipe de Vergara", "Sevilla", "Sol", "Ópera", "Canal", "Cuatro Caminos"],
+        type: "multiple"
+    },
+
+    // --- AUTOBUSES Y TRANSPORTE EXTERNO ---
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 tiene conexión con AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL2].sort(),
+        answer: ["Alsacia"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿En qué estaciones de la L2 hay parada de terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL2].sort(),
+        answer: ["Banco de España"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 tiene parada de AUTOBÚS EXPRÉS AEROPUERTO?",
+        options: [...estacionesL2].sort(),
+        answer: ["Banco de España"],
+        type: "single"
+    },
+
+    // --- SERVICIOS AL CLIENTE ---
+    {
+        category: "linea2",
+        question: "¿Qué estaciones cuentan con puestos de ATENCIÓN AL CLIENTE?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol", "Ópera"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estaciones cuentan con puestos de Tienda de PRODUCTOS OFICIALES?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol", "Ópera"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿En qué estación de la L2 hay Oficina de Gestión de TARJETA TRANSPORTE PÚBLICO (TTP)?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+
+    // --- CULTURA Y OCIO ---
+    {
+        category: "linea2",
+        question: "¿En qué estación de la L2 se encuentra la METROTECA?",
+        options: [...estacionesL2].sort(),
+        answer: ["Príncipe de Vergara"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación está marcada como ESPACIO HISTÓRICO DE METRO?",
+        options: [...estacionesL2].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    }
+];
+
+// Para que funcione, no olvides añadir esto al final de tu script o donde cargues los datos:
+tarifasDB.push(...serviciosL2);
+
+const estacionesL3 = [
+    "El Casar", "Villaverde Alto", "San Cristóbal", "Villaverde Bajo-Cruce", 
+    "Ciudad de los Ángeles", "San Fermín-Orcasur", "Hospital 12 de Octubre", 
+    "Almendrales", "Legazpi", "Delicias", "Palos de la Frontera", 
+    "Embajadores", "Lavapiés", "Sol", "Callao", "Plaza de España", 
+    "Ventura Rodríguez", "Argüelles", "Moncloa"
+];
+
+const serviciosL3 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    {
+        category: "linea3",
+        question: "¿Qué estación de la L3 tiene correspondencia con la LÍNEA 12 (Metrosur)?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar"],
+        type: "single"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen conexión con CERCANÍAS?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar", "Villaverde Alto", "Embajadores", "Sol"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 6?",
+        options: [...estacionesL3].sort(),
+        answer: ["Legazpi", "Argüelles", "Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 1?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+     {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 2?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol", "Plaza de España"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estaciones de la L3 se cruza la LÍNEA 5?",
+        options: [...estacionesL3].sort(),
+        answer: ["Embajadores", "Callao"],
+        type: "multiple"
+    },
+
+    // --- CARACTERÍSTICAS DE ESTACIÓN (Transbordos y Accesibilidad) ---
+   { 
+    category: "linea3", 
+    question: "¿Qué estaciones de la L3 tienen el icono de ACCESIBILIDAD (silla de ruedas) en el esquema?", 
+    options: [
+        ...estacionesL3, 
+        "Todas las estaciones de la L3 son ACCESIBLES"
+    ].sort(), 
+    answer: ["Todas las estaciones de la L3 son ACCESIBLES"], 
+    type: "single" 
+},
+    {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen TRANSBORDO LARGO?",
+        options: [...estacionesL3].sort(),
+        answer: ["Embajadores", "Plaza de España"],
+        type: "multiple"
+    },
+      {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL3].sort(),
+        answer: ["Legazpi", "sol","Callao", "Plaza España","Argüelles","Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿A qué estaciones se realiza el transbordo largo desde Embajadores y Plaza de España respectivamente?",
+        options: ["Acacias y Noviciado", "Noviciado y Callao", "Acacias y Ópera", "Noviciado y Sol"],
+        answer: ["Acacias y Noviciado"],
+        type: "single"
+    },
+
+    // --- AUTOBUSES Y VALIDACIÓN ---
+    {
+        category: "linea3",
+        question: "¿Qué estación de la L3 requiere VALIDACIÓN A LA SALIDA?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar"],
+        type: "single"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estaciones de la L3 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL3].sort(),
+        answer: ["Villaverde Bajo-Cruce", "Legazpi", "Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estación de la L3 hay terminal de AUTOBUSES DE LARGO RECORRIDO?",
+        options: [...estacionesL3].sort(),
+        answer: ["Moncloa"],
+        type: "single"
+    },
+
+    // --- SERVICIOS AL CLIENTE Y CULTURA ---
+    {
+        category: "linea3",
+        question: "¿Qué estación cuenta con Atención al Cliente?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estación cuenta con Productos Oficiales?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+    
+    {
+        category: "linea3",
+        question: "¿En qué estación de la L3 hay Oficina de Gestión de TARJETA TRANSPORTE PÚBLICO (TTP)?",
+        options: [...estacionesL3].sort(),
+        answer: ["Sol","Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿Qué estación de la L3 dispone de METROTECA?",
+        options: [...estacionesL3].sort(),
+        answer: ["Delicias"],
+        type: "single"
+    },
+
+    // --- APARCAMIENTO Y BICICLETAS ---
+    {
+        category: "linea3",
+        question: "¿Qué estaciones tienen APARCAMIENTO DISUASORIO GRATUITO?",
+        options: [...estacionesL3].sort(),
+        answer: ["El Casar", "Villaverde Alto"],
+        type: "multiple"
+    },
+    {
+        category: "linea3",
+        question: "¿En qué estación de la L3 hay ESTACIONAMIENTO DE BICICLETAS?",
+        options: [...estacionesL3].sort(),
+        answer: ["Moncloa"],
+        type: "single"
+    }
+];
+
+// Añadir a la base de datos general
+tarifasDB.push(...serviciosL3);
+
+const estacionesL4 = [
+    "Argüelles", "San Bernardo", "Bilbao", "Alonso Martínez", "Colón", "Serrano", 
+    "Velázquez", "Goya", "Lista", "Diego de León", "Avenida de América", 
+    "Prosperidad", "Alfonso XIII", "Avenida de la Paz", "Arturo Soria", 
+    "Esperanza", "Canillas", "Mar de Cristal", "San Lorenzo", 
+    "Parque de Santa María", "Hortaleza", "Manoteras", "Pinar de Chamartín"
+];
+
+const serviciosL4 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    {
+        category: "linea4",
+        question: "¿Qué estaciones de la L4 conectan con la LÍNEA 6?",
+        options: [...estacionesL4].sort(),
+        answer: ["Argüelles", "Diego de León", "Avenida de América"],
+        type: "multiple"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 8?",
+        options: [...estacionesL4].sort(),
+        answer: ["Mar de Cristal"],
+        type: "single"
+    },
+      {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 1?",
+        options: [...estacionesL4].sort(),
+        answer: ["Bilbao", "Pinar de Chamartin"],
+        type: "multiple"
+    },
+      {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 5?",
+        options: [...estacionesL4].sort(),
+        answer: ["Alonso Martinez", "Diego de Leon"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 se puede transbordar al METRO LIGERO (ML1)?",
+        options: [...estacionesL4].sort(),
+        answer: ["Pinar de Chamartín"],
+        type: "single"
+    },
+
+    // --- CARACTERÍSTICAS DE ESTACIÓN (Transbordos y Accesibilidad) ---
+    {
+        category: "linea4",
+        question: "¿Qué estaciones de la L4 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL4].sort(), 
+        answer: ["Argüelles", "San Bernardo", "Bilbao", "Alonso Martínez", "Goya", "Avenida de América", "Mar de Cristal", "Pinar de Chamartín"],
+        type: "multiple"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 está marcada con un TRANSBORDO LARGO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Diego de León"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "De las siguientes estaciones de la L4, ¿cuáles tienen el icono de ACCESIBILIDAD?",
+        options: [...estacionesL4].sort(),
+        answer: ["Argüelles","Bilbao","Goya", "Avenida de América","Canillas","Mar de Cristal","San Lorenzo","Parque de Santa Maria","Hortaleza","Manoteras","Pinar de Chamartin"],
+        type: "multiple"
+    },
+
+    // --- SERVICIOS Y AUTOBUSES ---
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 hay parada de terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL4].sort(),
+        answer: ["Alonso Martínez"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene conexión con AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+     {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene conexión LARGO RECORRIDO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación requiere VALIDACIÓN A LA SALIDA en la L4?",
+        options: [...estacionesL4].sort(),
+        answer: ["Pinar de Chamartín"],
+        type: "single"
+    },
+
+    // --- GESTIÓN Y CULTURA ---
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 hay Oficina de Gestión de TTP?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 cuenta con BIBLIOMETRO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Mar de Cristal"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 se encuentra la METROTECA?",
+        options: [...estacionesL4].sort(),
+        answer: ["Prosperidad"],
+        type: "single"
+    },
+
+    // --- APARCAMIENTO ---
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 dispone de APARCAMIENTO DISUASORIO DE PAGO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    }
+];
+
+// No olvides el push para que se carguen en el examen
+tarifasDB.push(...serviciosL4);
+const estacionesL5 = [
+    "Alameda de Osuna", "El Capricho", "Canillejas", "Torre Arias", "Suanzes", 
+    "Ciudad Lineal", "Pueblo Nuevo", "Quintana", "El Carmen", "Ventas", 
+    "Diego de León", "Núñez de Balboa", "Rubén Darío", "Alonso Martínez", 
+    "Chueca", "Gran Vía", "Callao", "Ópera", "La Latina", "Puerta de Toledo", 
+    "Acacias", "Pirámides", "Marqués de Vadillo", "Urgel", "Oporto", 
+    "Vista Alegre", "Carabanchel", "Eugenia de Montijo", "Aluche", 
+    "Empalme", "Campamento", "Casa de Campo"
+];
+
+const serviciosL5 = [
+    // --- CORRESPONDENCIAS ---
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen correspondencia con la LÍNEA 6?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de León", "Oporto"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 2?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ventas", "Ópera"],
+        type: "multiple"
+    },
+      {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 7?",
+        options: [...estacionesL5].sort(),
+        answer: ["Pueblo Nuevo"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 3?",
+        options: [...estacionesL5].sort(),
+        answer: ["Callao", "Acacias"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con el RAMAL?",
+        options: [...estacionesL5].sort(),
+        answer: ["Opera"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación de la L5 conecta con la LÍNEA 4?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de Leon", "Alosno Martinez"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿En qué estaciones de la L5 hay conexión con CERCANÍAS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Gran Vía", "Pirámides", "Aluche"],
+        type: "multiple"
+    },
+
+    // --- ACCESIBILIDAD (Solo las marcadas con X) ---
+    {
+        category: "linea5",
+        question: "Selecciona las estaciones de la L5 que SÍ son ACCESIBLES según la tabla:",
+        options: [...estacionesL5].sort(),
+        answer: [
+            "Alameda de Osuna", "El Capricho", "Pueblo Nuevo", 
+            "Gran Vía", "Callao", "Ópera", "Pirámides", 
+            "Eugenia de Montijo", "Aluche", "Empalme", "Casa de Campo"
+        ],
+        type: "multiple"
+    },
+
+    // --- TRANSBORDOS ---
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen marcado un TRANSBORDO LARGO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Diego de León", "Núñez de Balboa", "Acacias"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿A qué estación se realiza el transbordo largo desde ACACIAS?",
+        options: ["Embajadores", "Pirámides", "Puerta de Toledo", "La Latina"],
+        answer: ["Embajadores"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Pueblo Nuevo", "Ventas", "Alonso Martínez", "Gran Vía", "Callao", "Ópera", "Oporto"],
+        type: "multiple"
+    },
+
+    // --- OTROS SERVICIOS ---
+    {
+        category: "linea5",
+        question: "¿En qué estación de la L5 hay terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Alonso Martínez"],
+        type: "single"
+    },
+
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL5].sort(),
+        answer: ["Canillejas", "Ciudad Lineal", "Oporto", "Aluche"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones disponen de ATENCIÓN AL CLIENTE?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+     {
+        category: "linea5",
+        question: "¿Qué estaciones disponen de PRODUCTOS OFICIALES?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿En qué estación de la L5 hay METROTECA?",
+        options: [...estacionesL5].sort(),
+        answer: ["Suanzes"],
+        type: "single"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estación está marcada como ESPACIO HISTÓRICO en la L5?",
+        options: [...estacionesL5].sort(),
+        answer: ["Ópera", "Gran Vía"],
+        type: "multiple"
+    },
+    {
+        category: "linea5",
+        question: "¿Qué estaciones de la L5 tienen APARCAMIENTO DISUASORIO GRATUITO?",
+        options: [...estacionesL5].sort(),
+        answer: ["Canillejas", "Aluche"],
+        type: "multiple"
+    }
+];
+
+tarifasDB.push(...serviciosL5);
+
+const estacionesL6 = [
+    "Ciudad Universitaria", "Vicente Aleixandre", "Guzmán el Bueno", "Cuatro Caminos",
+    "Nuevos Ministerios", "República Argentina", "Avenida de América", "Diego de León",
+    "Manuel Becerra", "O'Donnell", "Sainz de Baranda", "Conde de Casal", "Pacífico",
+    "Méndez Álvaro", "Arganzuela-Planetario", "Legazpi", "Usera", "Plaza Elíptica",
+    "Opañel", "Oporto", "Carpetana", "Laguna", "Lucero", "Alto de Extremadura",
+    "Puerta del Ángel", "Príncipe Pío", "Argüelles", "Moncloa"
+];
+
+const serviciosL6 = [
+    // --- CORRESPONDENCIAS ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 conectan con la LÍNEA 10?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Príncipe Pío"],
+        type: "multiple"
+    },
+       {
+    category: "linea6",
+    question: "Selecciona TODAS las estaciones de la L6 que tienen terminal de AUTOBUSES DE LARGO RECORRIDO:",
+    options: [...estacionesL6].sort(),
+    answer: ["Avenida de América", "Méndez Álvaro", "Plaza Elíptica", "Príncipe Pío", "Moncloa"],
+    type: "multiple"
+},
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 11?",
+        options: [...estacionesL6].sort(),
+        answer: ["Plaza Elíptica"],
+        type: "single"
+    },
+     {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 3?",
+        options: [...estacionesL6].sort(),
+        answer: ["Legazpi", "Argüelles"],
+        type: "multiple"
+    },
+     {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 4?",
+        options: [...estacionesL6].sort(),
+        answer: ["Avenida de America", "Diego de Leon","Argüelles"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 7?",
+        options: [...estacionesL6].sort(),
+        answer: ["Avenida de América", "Guzman el Bueno"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 tienen conexión con CERCANÍAS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Méndez Álvaro", "Laguna", "Príncipe Pío"],
+        type: "multiple"
+    },
+
+    // --- TRANSBORDOS (Cortos y Largos) ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 están marcadas con TRANSBORDO LARGO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Diego de León"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "Selecciona las estaciones de la L6 que tienen TRANSBORDO CORTO:",
+        options: [...estacionesL6].sort(),
+        answer: ["Cuatro Caminos", "Avenida de América", "Manuel Becerra", "Sainz de Baranda", "Legazpi", "Plaza Elíptica", "Oporto", "Príncipe Pío", "Argüelles", "Moncloa"],
+        type: "multiple"
+    },
+
+    // --- ACCESIBILIDAD ---
+    {
+        category: "linea6",
+        question: "De las siguientes estaciones de la L6, ¿cuáles SÍ son ACCESIBLES?",
+        options: [...estacionesL6].sort(),
+        answer: [
+            "Ciudad Universitaria", "Guzmán el Bueno", "Cuatro Caminos", "Nuevos Ministerios", 
+            "Avenida de América", "Sainz de Baranda", "Conde de Casal", "Pacífico", "Arganzuela-Planetario", "Legazpi", "Usera", 
+            "Plaza Elíptica", "Carpetana", "Laguna", "Lucero", "Príncipe Pío", 
+            "Argüelles", "Moncloa"
+        ],
+        type: "multiple"
+    },
+
+    // --- AUTOBUSES Y GESTIÓN ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Avenida de América", "Conde de Casal", "Méndez Álvaro", "Legazpi", "Plaza Elíptica", "Oporto", "Príncipe Pío", "Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estaciones de la L6 hay parada de AUTOBÚS EXPRÉS AEROPUERTO?",
+        options: [...estacionesL6].sort(),
+        answer: ["O'Donnell"],
+        type: "single"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estaciones disponen de Oficina de Gestión de TTP?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Avenida de América", "Méndez Álvaro", "Príncipe Pío", "Moncloa"],
+        type: "multiple"
+    },
+
+    // --- CULTURA Y OTROS ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 están marcadas como ESPACIO HISTÓRICO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Pacífico", "Carpetana"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se encuentra la METROTECA?",
+        options: [...estacionesL6].sort(),
+        answer: ["Laguna"],
+        type: "single"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estación de la L6 dispone de APARCAMIENTO DISUASORIO DE PAGO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Ciudad Universitaria","Nuevos Ministerios","Avenida de América"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 hay ESTACIONAMIENTO DE BICICLETAS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Arganzuela-Planetario", "Moncloa"],
+        type: "multiple"
+    }
+];
+
+tarifasDB.push(...serviciosL6);
+
+    let filtradas = [];
+    let actual = 0;
+    let seleccionados = [];
+    let preguntasFalladas = [];
+
+    function iniciarExamen(modo) {
+        filtradas = modo === 'todos' ? [...tarifasDB] : tarifasDB.filter(p => p.category === modo);
+        if (filtradas.length === 0) return alert("Todavía no hay preguntas en este bloque.");
+        
+        filtradas.sort(() => Math.random() - 0.5);
+        actual = 0;
+        preguntasFalladas = [];
+        document.getElementById('menu-principal').style.display = 'none';
+        document.getElementById('pantalla-juego').style.display = 'block';
+        mostrarPregunta();
+    }
+
+    function mostrarPregunta() {
+        const p = filtradas[actual];
+        seleccionados = [];
+        document.getElementById('progreso').innerText = `PREGUNTA ${actual + 1} / ${filtradas.length}`;
+        document.getElementById('pregunta-texto').innerText = p.question;
+        document.getElementById('indicador-tipo').innerText = p.type === "multiple" ? "⚠️ SELECCIÓN MÚLTIPLE" : "☝️ SELECCIÓN ÚNICA";
+        
+        document.getElementById('mensaje-resultado').style.display = 'none';
+        document.getElementById('btn-comprobar').style.display = 'block';
+        document.getElementById('btn-siguiente').style.display = 'none';
+        
+        const container = document.getElementById('opciones-container');
+        container.innerHTML = "";
+
+        p.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-opcion';
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (p.type === "single") {
+                    document.querySelectorAll('.btn-opcion').forEach(b => b.classList.remove('selected'));
+                    seleccionados = [opt];
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.toggle('selected');
+                    if (btn.classList.contains('selected')) {
+                        seleccionados.push(opt);
+                    } else {
+                        seleccionados = seleccionados.filter(i => i !== opt);
+                    }
+                }
+            };
+            container.appendChild(btn);
+        });
+    }
+function verificarSeleccion() {
+    if (seleccionados.length === 0) return alert("Selecciona algo, ¡no te la juegues en blanco!");
+
+    const p = filtradas[actual];
+    const correctas = [...p.answer].sort();
+    const marcadas = [...seleccionados].sort();
+    
+    const esCorrecto = marcadas.length === correctas.length && 
+                       marcadas.every((val, index) => val === correctas[index]);
+
+    const msgDiv = document.getElementById('mensaje-resultado');
+    msgDiv.style.display = 'block';
+    
+    if (esCorrecto) {
+        msgDiv.className = 'correcto';
+        msgDiv.innerHTML = "✅ ¡ASÍ SE HACE!";
+    } else {
+        msgDiv.className = 'incorrecto';
+        msgDiv.innerHTML = `❌ ERROR<br><small>Eran: ${p.answer.join(", ")}</small>`;
+        
+        // --- CONEXIÓN CON EL CENTRO DE ERRORES ---
+        // Aquí enviamos el fallo al localStorage común
+        guardarFallo(
+            p.question,        // La pregunta
+            p.options,         // Todas las opciones posibles
+            p.answer.join(", "), // La respuesta correcta (como texto)
+            "Tarifas"          // Aquí pon el nombre del tema (ej: "Ley CRTM", "Tarifas", etc)
+        );
+        // -----------------------------------------
+
+        preguntasFalladas.push({
+            pregunta: p.question,
+            tuRespuesta: seleccionados.join(", "),
+            respuestaCorrecta: p.answer.join(", ")
+        });
+    }
+
+    document.getElementById('btn-comprobar').style.display = 'none';
+    document.getElementById('btn-siguiente').style.display = 'block';
+}
+
+    function proximaPregunta() {
+        actual++;
+        if (actual < filtradas.length) {
+            mostrarPregunta();
+        } else {
+            finalizarTest();
+        }
+    }
+
+   function finalizarTest() {
+        const pantallaJuego = document.getElementById('pantalla-juego');
+        const total = filtradas.length;
+        const aciertos = total - preguntasFalladas.length;
+        const porcentaje = Math.round((aciertos / total) * 100);
+        
+        // Creamos una estructura limpia para los resultados
+        let htmlFinal = `
+            <div id="resultados-finales" style="text-align:center;">
+                <h2 style="margin-top:0;">¡Test Finalizado!</h2>
+                <div style="font-size: 1.2em; margin-bottom: 20px;">
+                    Puntuación: <span style="color:${porcentaje >= 50 ? 'var(--correct-green)' : 'var(--metro-red)'}">${porcentaje}%</span><br>
+                    <small>(${aciertos} aciertos de ${total} preguntas)</small>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #444; margin: 20px 0;">
+        `;
+        
+        if (preguntasFalladas.length === 0) {
+            htmlFinal += `
+                <div style="padding: 20px;">
+                    <p style="color:var(--correct-green); font-weight:bold; font-size: 1.1em;">
+                        🥇 ¡PERFECTO! <br> No has fallado ninguna estación.
+                    </p>
+                </div>
+            `;
+        } else {
+            htmlFinal += `
+                <p style="color:#aaa; font-size: 0.9em; text-align:left;">Repaso de errores (${preguntasFalladas.length}):</p>
+                <div style="max-height: 300px; overflow-y: auto; margin-bottom: 20px; padding-right: 10px;">
+            `;
+            
+            preguntasFalladas.forEach((f, index) => {
+                htmlFinal += `
+                    <div style="background:#2a2a2a; padding:12px; margin-bottom:12px; border-radius:8px; border-left:4px solid var(--metro-red); text-align:left; font-size:0.85em;">
+                        <strong style="color:#fff; display:block; margin-bottom:5px;">${index + 1}. ${f.pregunta}</strong>
+                        <div style="color:#ff8888; margin-bottom:3px;">❌ Marcaste: ${f.tuRespuesta}</div>
+                        <div style="color:#88ff88;">✅ Correcta: ${f.respuestaCorrecta}</div>
+                    </div>`;
+            });
+            htmlFinal += `</div>`;
+        }
+        
+        // Botones de acción final
+        htmlFinal += `
+                <button class="btn-accion btn-check" onclick="location.reload()">🔄 REINTENTAR TODO</button>
+                <button class="btn-accion" style="background:#444; margin-top:10px;" onclick="irAlMenu()">🏠 VOLVER AL MENÚ</button>
+            </div>
+        `;
+        
+        pantallaJuego.innerHTML = htmlFinal;
+    }
+
+    function irAlMenu() {
+    document.getElementById('menu-principal').style.display = 'block';
+    document.getElementById('pantalla-juego').style.display = 'none';
+    // Opcional: limpiar el contenido de pantalla-juego para la próxima vez
+    document.getElementById('pantalla-juego').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div id="progreso"></div>
+            <button onclick="irAlMenu()" style="background:none; border:1px solid #666; color:#ccc; cursor:pointer; padding:5px;">✕ Salir</button>
+        </div>
+        <h2 id="pregunta-texto"></h2>
+        <p id="indicador-tipo" style="color: #00fffb; font-weight: bold; font-size: 0.9em;"></p>
+        <div id="opciones-container" class="opciones-grid"></div>
+        <div id="mensaje-resultado"></div>
+        <button id="btn-comprobar" class="btn-accion btn-check" onclick="verificarSeleccion()">Comprobar</button>
+        <button id="btn-siguiente" class="btn-accion btn-next" onclick="proximaPregunta()">Siguiente Pregunta</button>
+    `;
+}
+function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+    let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+
+    const nuevoFallo = {
+        id: Date.now(),
+        modulo: modulo,
+        q: pregunta,
+        opts: opciones,
+        a: respuestaCorrecta
+    };
+
+    // Evitamos duplicados
+    if (!listaFallos.find(f => f.q === pregunta)) {
+        listaFallos.push(nuevoFallo);
+        localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
+    }
+}
+</script>
+</body>
+</html>

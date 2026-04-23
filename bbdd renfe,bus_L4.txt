@@ -1,0 +1,134 @@
+const estacionesL4 = [
+    "Argüelles", "San Bernardo", "Bilbao", "Alonso Martínez", "Colón", "Serrano", 
+    "Velázquez", "Goya", "Lista", "Diego de León", "Avenida de América", 
+    "Prosperidad", "Alfonso XIII", "Avenida de la Paz", "Arturo Soria", 
+    "Esperanza", "Canillas", "Mar de Cristal", "San Lorenzo", 
+    "Parque de Santa María", "Hortaleza", "Manoteras", "Pinar de Chamartín"
+];
+
+const serviciosL4 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    {
+        category: "linea4",
+        question: "¿Qué estaciones de la L4 conectan con la LÍNEA 6?",
+        options: [...estacionesL4].sort(),
+        answer: ["Argüelles", "Diego de León", "Avenida de América"],
+        type: "multiple"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 8?",
+        options: [...estacionesL4].sort(),
+        answer: ["Mar de Cristal"],
+        type: "single"
+    },
+      {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 1?",
+        options: [...estacionesL4].sort(),
+        answer: ["Bilbao", "Pinar de Chamartin"],
+        type: "multiple"
+    },
+      {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene correspondencia con la LÍNEA 5?",
+        options: [...estacionesL4].sort(),
+        answer: ["Alonso Martinez", "Diego de Leon"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 se puede transbordar al METRO LIGERO (ML1)?",
+        options: [...estacionesL4].sort(),
+        answer: ["Pinar de Chamartín"],
+        type: "single"
+    },
+
+    // --- CARACTERÍSTICAS DE ESTACIÓN (Transbordos y Accesibilidad) ---
+    {
+        category: "linea4",
+        question: "¿Qué estaciones de la L4 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL4].sort(), 
+        answer: ["Argüelles", "San Bernardo", "Bilbao", "Alonso Martínez", "Goya", "Avenida de América", "Mar de Cristal", "Pinar de Chamartín"],
+        type: "multiple"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 está marcada con un TRANSBORDO LARGO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Diego de León"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "De las siguientes estaciones de la L4, ¿cuáles tienen el icono de ACCESIBILIDAD?",
+        options: [...estacionesL4].sort(),
+        answer: ["Argüelles","Bilbao","Goya", "Avenida de America","Canillas","Mar de Cristal","San Lorenzo","Parque de Santa Maria","Hortaleza","Manoteras","Pinar de Chamartin"],
+        type: "multiple"
+    },
+
+    // --- SERVICIOS Y AUTOBUSES ---
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 hay parada de terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL4].sort(),
+        answer: ["Alonso Martínez"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene conexión con AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+     {
+        category: "linea4",
+        question: "¿Qué estación de la L4 tiene conexión LARGO RECORRIDO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación requiere VALIDACIÓN A LA SALIDA en la L4?",
+        options: [...estacionesL4].sort(),
+        answer: ["Pinar de Chamartín"],
+        type: "single"
+    },
+
+    // --- GESTIÓN Y CULTURA ---
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 hay Oficina de Gestión de TTP?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 cuenta con BIBLIOMETRO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Mar de Cristal"],
+        type: "single"
+    },
+    {
+        category: "linea4",
+        question: "¿En qué estación de la L4 se encuentra la METROTECA?",
+        options: [...estacionesL4].sort(),
+        answer: ["Prosperidad"],
+        type: "single"
+    },
+
+    // --- APARCAMIENTO ---
+    {
+        category: "linea4",
+        question: "¿Qué estación de la L4 dispone de APARCAMIENTO DISUASORIO DE PAGO?",
+        options: [...estacionesL4].sort(),
+        answer: ["Avenida de América"],
+        type: "single"
+    }
+];
+
+// No olvides el push para que se carguen en el examen
+tarifasDB.push(...serviciosL4);

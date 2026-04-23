@@ -1,0 +1,139 @@
+const estacionesL6 = [
+    "Ciudad Universitaria", "Vicente Aleixandre", "Guzmán el Bueno", "Cuatro Caminos",
+    "Nuevos Ministerios", "República Argentina", "Avenida de América", "Diego de León",
+    "Manuel Becerra", "O'Donnell", "Sainz de Baranda", "Conde de Casal", "Pacífico",
+    "Méndez Álvaro", "Arganzuela-Planetario", "Legazpi", "Usera", "Plaza Elíptica",
+    "Opañel", "Oporto", "Carpetana", "Laguna", "Lucero", "Alto de Extremadura",
+    "Puerta del Ángel", "Príncipe Pío", "Argüelles", "Moncloa"
+];
+
+const serviciosL6 = [
+    // --- CORRESPONDENCIAS ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 conectan con la LÍNEA 10?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Príncipe Pío"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 11?",
+        options: [...estacionesL6].sort(),
+        answer: ["Plaza Elíptica"],
+        type: "single"
+    },
+     {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 3?",
+        options: [...estacionesL6].sort(),
+        answer: ["Legazpi", "Argüelles"],
+        type: "multiple"
+    },
+     {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 4?",
+        options: [...estacionesL6].sort(),
+        answer: ["Av de America", "Diego de Leon","Argüelles"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se puede transbordar a la LÍNEA 7?",
+        options: [...estacionesL6].sort(),
+        answer: ["Av de America", "Guzman el Bueno"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 tienen conexión con CERCANÍAS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Méndez Álvaro", "Laguna", "Príncipe Pío"],
+        type: "multiple"
+    },
+
+    // --- TRANSBORDOS (Cortos y Largos) ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 están marcadas con TRANSBORDO LARGO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Diego de León"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "Selecciona las estaciones de la L6 que tienen TRANSBORDO CORTO:",
+        options: [...estacionesL6].sort(),
+        answer: ["Cuatro Caminos", "Avenida de América", "Manuel Becerra", "Sainz de Baranda", "Legazpi", "Plaza Elíptica", "Oporto", "Príncipe Pío", "Argüelles", "Moncloa"],
+        type: "multiple"
+    },
+
+    // --- ACCESIBILIDAD ---
+    {
+        category: "linea6",
+        question: "De las siguientes estaciones de la L6, ¿cuáles SÍ son ACCESIBLES?",
+        options: [...estacionesL6].sort(),
+        answer: [
+            "Ciudad Universitaria", "Guzmán el Bueno", "Cuatro Caminos", "Nuevos Ministerios", 
+            "Avenida de América", "Sainz de Baranda", "Conde de Casal", "Pacífico", "Arganzuela-Planetario", "Legazpi", "Usera", 
+            "Plaza Elíptica", "Carpetana", "Laguna", "Lucero", "Príncipe Pío", 
+            "Argüelles", "Moncloa"
+        ],
+        type: "multiple"
+    },
+
+    // --- AUTOBUSES Y GESTIÓN ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 tienen terminal de AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Avenida de América", "Conde de Casal", "Méndez Álvaro", "Legazpi", "Plaza Elíptica", "Oporto", "Príncipe Pío", "Moncloa"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estaciones de la L6 hay parada de AUTOBÚS EXPRÉS AEROPUERTO?",
+        options: [...estacionesL6].sort(),
+        answer: ["O'Donnell"],
+        type: "single"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estaciones disponen de Oficina de Gestión de TTP?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Avenida de América", "Méndez Álvaro", "Príncipe Pío", "Moncloa"],
+        type: "multiple"
+    },
+
+    // --- CULTURA Y OTROS ---
+    {
+        category: "linea6",
+        question: "¿Qué estaciones de la L6 están marcadas como ESPACIO HISTÓRICO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Pacífico", "Carpetana"],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 se encuentra la METROTECA?",
+        options: [...estacionesL6].sort(),
+        answer: ["Laguna"],
+        type: "single"
+    },
+    {
+        category: "linea6",
+        question: "¿Qué estación de la L6 dispone de APARCAMIENTO DISUASORIO DE PAGO?",
+        options: [...estacionesL6].sort(),
+        answer: ["Ciudad Universitaria","Nuevos Ministerios","Avenida America",""],
+        type: "multiple"
+    },
+    {
+        category: "linea6",
+        question: "¿En qué estación de la L6 hay ESTACIONAMIENTO DE BICICLETAS?",
+        options: [...estacionesL6].sort(),
+        answer: ["Nuevos Ministerios", "Arganzuela-Planetario", "Moncloa"],
+        type: "multiple"
+    }
+];
+
+tarifasDB.push(...serviciosL6);

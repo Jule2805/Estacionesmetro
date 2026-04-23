@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ley CRTM - Academia</title>
+    <style>
+        :root {
+            --bg: #121212; --card: #1e1e1e; --accent: #007bff;
+            --correct: #28a745; --wrong: #dc3545;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-test { background: #2a2a2a; border: 1px solid #444; color: white; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-test:hover { border-color: var(--accent); background: #333; }
+        .btn-test b { display: block; font-size: 20px; }
+        .hidden { display: none; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #aaa; }
+        .question { font-size: 18px; font-weight: bold; margin-bottom: 20px; min-height: 60px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt { background: #333; border: 1px solid #444; color: white; padding: 15px; border-radius: 12px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 15px; width: 100%; }
+        .correct { background: var(--correct) !important; border-color: var(--correct); }
+        .wrong { background: var(--wrong) !important; border-color: var(--wrong); }
+        #next-btn { width: 100%; padding: 15px; margin-top: 20px; background: var(--accent); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: none; }
+        .back-btn { background: none; border: none; color: #888; cursor: pointer; margin-bottom: 15px; align-self: flex-start; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" id="btn-volver-menu" onclick="location.href='detodo.html'">← Volver a Normativa</button>
+    <button class="back-btn hidden" id="btn-salir-test" onclick="location.reload()">← Salir del Test</button>
+
+    <div class="container">
+        <div id="selector">
+            <h2 style="text-align:center">Ley CRTM</h2>
+            <div class="menu-grid">
+                <button class="btn-test" onclick="startTest(1)"><b>1</b><span>Test 1</span></button>
+                <button class="btn-test" onclick="startTest(2)"><b>2</b><span>Test 2</span></button>
+                <button class="btn-test" onclick="startTest(3)"><b>3</b><span>Test 3</span></button>
+                <button class="btn-test" onclick="startTest(4)"><b>4</b><span>Test 4</span></button>
+                <button class="btn-test" onclick="startTest(5)"><b>5</b><span>Test 5</span></button>
+                <button class="btn-test" onclick="startTest(6)"><b>6</b><span>Test 6</span></button>
+            </div>
+        </div>
+
+        <div id="quiz-area" class="hidden">
+            <div class="stats">
+                <span id="progreso">Pregunta 1/30</span>
+                <span>Aciertos: <b id="score" style="color:var(--correct)">0</b></span>
+            </div>
+            <div class="question" id="q-text"></div>
+            <div class="options" id="q-options"></div>
+            <button id="next-btn" onclick="nextQuestion()">SIGUIENTE PREGUNTA</button>
+        </div>
+
+        <div id="results" class="hidden">
+            <h2 style="text-align:center">Test Finalizado</h2>
+            <div id="final-score" style="font-size: 40px; text-align:center; margin: 20px 0;"></div>
+            <div id="failed-list" style="font-size:13px; color:#ccc; background:#000; padding:15px; border-radius:10px; max-height:250px; overflow-y:auto; margin-bottom:20px"></div>
+            <button class="btn-test" style="width:100%" onclick="location.reload()">Repetir o irme pa otro menol</button>
+        </div>
+    </div>
+
+<script>
+const db = {
+    1: [ // Cuestionario "Ley CRTM 1"
+        { q: "¿Qué fecha de publicación en el BOCAM tiene la Ley 5/1985?", opts: ["16 de mayo de 1985", "26 de mayo de 1985", "27 de mayo de 1985", "5 de junio de 1985"], a: "27 de mayo de 1985" },
+        { q: "¿Dónde se publica la Ley 5/1985?", opts: ["Boletín Oficial de la Comunidad de Madrid", "BOE", "Diario Oficial de la UE", "Gaceta Municipal"], a: "Boletín Oficial de la Comunidad de Madrid" },
+        { q: "¿Qué ámbito territorial gestiona integralmente el CRTM?", opts: ["Municipios adheridos voluntariamente únicamente", "Territorio de la Comunidad de Madrid excepto el área metropolitana", "La totalidad de los ayuntamientos de la región", "Solo el municipio de Madrid"], a: "La totalidad de los ayuntamientos de la región" },
+        { q: "¿Qué tipo de transporte se menciona como objetivo futuro de incorporación?", opts: ["Transporte turístico", "Transporte sanitario", "Transporte escolar", "Transporte discrecional de viajeros con reiteración de itinerario"], a: "Transporte discrecional de viajeros con reiteración de itinerario" },
+        { q: "¿Qué naturaleza tiene el CRTM?", opts: ["Empresa pública estatal", "Entidad privada concesionaria", "Sociedad mercantil autonómica", "Organismo Autónomo de la Comunidad de Madrid"], a: "Organismo Autónomo de la Comunidad de Madrid" },
+        { q: "¿Para qué ejercicio se menciona expresamente el presupuesto del CRTM?", opts: ["1984", "1985", "1983", "1986"], a: "1985" },
+        { q: "¿Qué establece el CRTM respecto a la financiación?", opts: ["Marco estable de financiación", "Modelo variable anual", "Fondo estatal único", "Sistema privado"], a: "Marco estable de financiación" },
+        { q: "El sistema tarifario definido por el CRTM debe ser:", opts: ["Integrado", "Flexible", "Municipal", "Experimental"], a: "Integrado" },
+        { q: "¿Qué número de boletín publica la ley?", opts: ["124", "125", "27", "85"], a: "124" },
+        { q: "¿A qué comisión debe remitirse la comunicación tras la aprobación del presupuesto?", opts: ["Comisión de Hacienda", "Comisión de Transportes", "Comisión de Urbanismo, Vivienda y Obras Públicas de la Asamblea", "Comisión de Economía"], a: "Comisión de Urbanismo, Vivienda y Obras Públicas de la Asamblea" },
+        { q: "El CRTM aglutina competencias en materia de:", opts: ["Transporte de mercancías", "Transporte aéreo regional", "Transporte público regular de viajeros", "Infraestructuras viarias"], a: "Transporte público regular de viajeros" },
+        { q: "¿En qué fecha se firma la Ley?", opts: ["16 de mayo de 1985", "15 de mayo de 1985", "17 de mayo de 1985", "16 de abril de 1985"], a: "16 de mayo de 1985" },
+        { q: "¿Qué institución aprueba la Ley 5/1985?", opts: ["Asamblea de Madrid", "Congreso de los Diputados", "Consejo de Gobierno", "Senado"], a: "Asamblea de Madrid" },
+        { q: "¿Cuándo entra en vigor la Ley?", opts: ["El mismo día de su publicación en el BOCAM", "A los 20 días de su publicación", "Tras su aprobación parlamentaria", "Al día siguiente de su publicación"], a: "El mismo día de su publicación en el BOCAM" },
+        { q: "La creación de una imagen global del sistema busca unificar:", opts: ["Contratos programa", "Relaciones externas con los usuarios", "Tarifas técnicas", "Infraestructuras físicas"], a: "Relaciones externas con los usuarios" },
+        { q: "¿Qué superposición se menciona expresamente?", opts: ["Bicicleta y tren", "Taxi y metro", "Líneas de autobuses con metro o ferrocarril", "Tranvía y avión"], a: "Líneas de autobuses con metro o ferrocarril" },
+        { q: "¿Qué función prioritaria incluye la integración modal?", opts: ["Planificación de infraestructuras", "Imagen corporativa", "Marco financiero", "Control económico"], a: "Planificación de infraestructuras" },
+        { q: "¿Qué norma crea el CRTM?", opts: ["Ley Orgánica 5/1985", "Ley 5/1985, de 16 de mayo", "Ley 7/1983", "Decreto 5/1985"], a: "Ley 5/1985, de 16 de mayo" },
+        { q: "¿En qué ciudad se firma el texto?", opts: ["Madrid", "Barcelona", "Toledo", "Valencia"], a: "Madrid" },
+        { q: "¿Quién firma como Presidente de la Comunidad de Madrid?", opts: ["Alberto Ruiz-Gallardón", "Joaquín Leguina Herrán", "Enrique Tierno Galván", "Felipe González"], a: "Joaquín Leguina Herrán" },
+        { q: "El marco legislativo vigente crea una separación entre:", opts: ["Ferroviario y aéreo", "Estatal y autonómico", "Transportes interiores urbanos y los que superan ese ámbito", "Transporte público y privado"], a: "Transportes interiores urbanos y los que superan ese ámbito" },
+        { q: "¿Sobre qué realiza control y seguimiento el CRTM?", opts: ["Usuarios", "Gestión económica de los operadores", "Infraestructuras ferroviarias", "Contratos laborales"], a: "Gestión económica de los operadores" },
+        { q: "¿Quién promulga la Ley en nombre del Rey?", opts: ["Ministro de Transportes", "Alcalde de Madrid", "Presidente de la Comunidad de Madrid", "Presidente del Gobierno"], a: "Presidente de la Comunidad de Madrid" },
+        { q: "La complejidad de la red obliga a muchos viajeros a usar:", opts: ["Un solo título", "Transporte privado", "Servicios especiales", "Más de un medio de transporte"], a: "Más de un medio de transporte" },
+        { q: "¿Dónde debe publicarse la Ley según la disposición final segunda?", opts: ["Solo en el BOE", "En diarios oficiales europeos", "Solo en boletines municipales", "BOCAM y también en el BOE"], a: "BOCAM y también en el BOE" },
+        { q: "¿Quién queda autorizado para aprobar disposiciones para el desarrollo y ejecución de la Ley?", opts: ["El Consorcio", "La Asamblea", "El Consejo de Gobierno", "El Presidente"], a: "El Consejo de Gobierno" },
+        { q: "Los planes de explotación no han considerado:", opts: ["La globalidad de los usuarios y el conjunto de medios", "La tecnología", "Las inversiones estatales", "Las subvenciones"], a: "La globalidad de los usuarios y el conjunto de medios" },
+        { q: "¿Quiénes deben guardarla y hacerla guardar, además de cumplirla?", opts: ["Las fuerzas de seguridad", "Los Tribunales y autoridades que corresponda", "Los Ayuntamientos exclusivamente", "El Gobierno central"], a: "Los Tribunales y autoridades que corresponda" },
+        { q: "¿A quién se ordena cumplir la Ley?", opts: ["Solo a los funcionarios", "Solo a los tribunales", "Solo a las Administraciones Públicas", "A todos los ciudadanos a los que sea de aplicación"], a: "A todos los ciudadanos a los que sea de aplicación" },
+        { q: "¿Qué función se refiere a todos los modos de transporte?", opts: ["Control económico", "Imagen global", "Marco de financiación", "Planificación de servicios y coordinación"], a: "Planificación de servicios y coordinación" }
+    ],
+    2: [
+        { q: "¿Con qué Administración puede negociar también el Consorcio según el punto 2 de la Disposición transitoria única?", opts: ["Unión Europea", "Administración del Estado", "Ministerios sectoriales", "Diputaciones Provinciales"], a: "Administración del Estado" },
+        { q: "Los efectos recaen primero sobre:", opts: ["Los viajeros", "Los ayuntamientos", "El Estado", "Las empresas"], a: "Los viajeros" },
+        { q: "El sistema presenta irracionalidad económica que afecta a:", opts: ["Ayuntamientos", "Costes globales", "Empresas privadas", "Tarifas técnicas"], a: "Costes globales" },
+        { q: "¿Qué objeto pueden tener los convenios con los Ayuntamientos?", opts: ["Transferencia de acciones representativas de capital social de empresas de transporte", "Gestión de infraestructuras", "Cesión de personal", "Transferencia de bienes inmuebles"], a: "Transferencia de acciones representativas de capital social de empresas de transporte" },
+        { q: "La retirada municipal debe aprobarse en:", opts: ["Junta de Gobierno", "Acuerdo plenario", "Consejo de Administración", "Referéndum"], a: "Acuerdo plenario" },
+        { q: "Frente a la situación precedente La Comunidad aporta capacidad:", opts: ["Empresarial", "Financiera", "Técnica", "Legislativa"], a: "Legislativa" },
+        { q: "¿Qué norma se menciona expresamente como referencia para la integración del personal del Consorcio?", opts: ["Ley 1/1984", "Ley 7/1985", "Estatuto Básico del Empleado Público", "Ley 30/1984"], a: "Ley 1/1984" },
+        { q: "Además, la disolución debe aprobarse por:", opts: ["Senado", "Ley de la Asamblea de Madrid", "Consejo de Gobierno", "Congreso"], a: "Ley de la Asamblea de Madrid" },
+        { q: "El interés de la colectividad demanda:", opts: ["Reducción de líneas", "Ordenación técnica, administrativa y reglamentaria", "Liberalización", "Privatización"], a: "Ordenación técnica, administrativa y reglamentaria" },
+        { q: "No basta con la voluntad de coordinación de:", opts: ["Solo administraciones", "Usuarios", "Solo empresas", "Empresas explotadoras y administraciones implicadas"], a: "Empresas explotadoras y administraciones implicadas" },
+        { q: "¿De qué compañía se habla respecto a la transferencia de acciones en el punto 2 de la Disposición transitoria única?", opts: ["Compañía Metropolitano de Madrid", "Metro Ligero Oeste", "RENFE", "Empresa Municipal de Transportes"], a: "Compañía Metropolitano de Madrid" },
+        { q: "Las infraestructuras ferroviarias citadas son de titularidad de:", opts: ["Empresas públicas", "El Estado", "La Comunidad de Madrid", "Los Ayuntamientos"], a: "La Comunidad de Madrid" },
+        { q: "El órgano de dirección colegiada del Consorcio es el:", opts: ["Consejo Asesor", "Director Gerente", "Consejo de Administración", "Comité Técnico"], a: "Consejo de Administración" },
+        { q: "¿Qué tipo de obras se mencionan en la disposición adicional segunda?", opts: ["Obras de reparación, conservación, mejora o demolición", "Obras de nueva construcción, conservación, mejora o ampliación", "Obras de reparación, conservación, mejora o ampliación", "Obras de urbanización, conservación, mejora o ampliación"], a: "Obras de nueva construcción, conservación, mejora o ampliación" },
+        { q: "¿A qué trámite no estarán sujetas las obras mencionadas en la Disposición Adicional Segunda?", opts: ["Licencia municipal", "Aprobación estatal", "Autorización autonómica", "Evaluación ambiental"], a: "Licencia municipal" },
+        { q: "¿De qué tipo son las empresas de transporte mencionadas en la Disposición transitoria única?", opts: ["Estatales", "Mixtas", "Privadas", "De propiedad municipal"], a: "De propiedad municipal" },
+        { q: "Además del personal previsto en la Ley 1/1984, ¿qué otro personal puede integrar el Consorcio?", opts: ["Funcionarios del Estado en comisión de servicio", "Personal laboral de la Comunidad de Madrid", "Empleados de empresas concesionarias", "Funcionarios de Ayuntamientos adheridos en comisión de servicios"], a: "Funcionarios de Ayuntamientos adheridos en comisión de servicios" },
+        { q: "El fundamento estatutario citado es el artículo:", opts: ["25.6", "28.3", "27.1", "26.5"], a: "26.5" },
+        { q: "¿Qué entidad es autorizada para negociar convenios con los Ayuntamientos?", opts: ["El Consorcio", "El Ayuntamiento de Madrid", "El Consejo de Gobierno", "La Asamblea"], a: "El Consorcio" },
+        { q: "¿Qué órgano es autorizado para aprobar el Presupuesto del Consorcio Regional de Transportes para 1985?", opts: ["El Consorcio", "La Asamblea de Madrid", "El Consejo de Gobierno", "El Ministerio de Hacienda"], a: "El Consejo de Gobierno" },
+        { q: "La denominación \"Consorcio\" resalta la idea de:", opts: ["Autonomía municipal", "Competencia", "Cooperación entre Administraciones", "Centralización"], a: "Cooperación entre Administraciones" },
+        { q: "¿Quién debe aprobar los convenios mencionados en la Disposición transitoria única?", opts: ["Solo el Consorcio", "El Ministerio de Transportes", "Solo la Asamblea", "El Consejo de Gobierno de la Comunidad y órganos competentes de las otras Administraciones Públicas"], a: "El Consejo de Gobierno de la Comunidad y órganos competentes de las otras Administraciones Públicas" },
+        { q: "Antes del inicio de las obras, ¿qué debe hacerse?", opts: ["Aprobarlo en Pleno municipal", "Solicitar autorización al Ministerio", "Ponerlo en conocimiento de los ayuntamientos afectados", "Publicar anuncio en prensa"], a: "Ponerlo en conocimiento de los ayuntamientos afectados" },
+        { q: "¿En qué plazo debe remitirse una comunicación tras la aprobación del presupuesto?", opts: ["60 días", "30 días", "90 días", "15 días"], a: "30 días" },
+        { q: "Las empresas públicas actúan como ejecutores del servicio en régimen de:", opts: ["Concesión", "Indirecto", "Gestión directa", "Mixto"], a: "Gestión directa" },
+        { q: "Para retirarse, un Ayuntamiento debe llevar al menos:", opts: ["5 años", "7 años", "6 años", "10 años"], a: "7 años" },
+        { q: "¿La transferencia puede afectar a qué parte de las acciones?", opts: ["Solo a la totalidad", "Solo a la mitad", "Solo a una minoría", "A la totalidad o parte"], a: "A la totalidad o parte" },
+        { q: "¿Qué carácter tienen las infraestructuras ferroviarias a efectos de la licencia municipal?", opts: ["Infraestructuras supramunicipales de interés público", "Servicios locales", "Infraestructuras privadas de uso público", "Bienes patrimoniales"], a: "Infraestructuras supramunicipales de interés público" },
+        { q: "El órgano debe fijar un marco de tarifas:", opts: ["Común", "Municipal", "Experimental", "Variable"], a: "Común" },
+        { q: "El Consorcio se constituye como:", opts: ["Organismo Autónomo", "Fundación pública", "Empresa mixta", "Sociedad estatal"], a: "Organismo Autónomo" }
+    ],
+    3: [
+        { q: "El Consorcio definirá el grado de:", opts: ["Inversión", "Cobertura", "Fiscalidad", "Coordinación"], a: "Cobertura" },
+        { q: "El Comité Técnico es un órgano de:", opts: ["Inspección", "Gestión directa", "Control financiero", "Concertación y apoyo"], a: "Concertación y apoyo" },
+        { q: "La disolución del Consorcio requiere propuesta de al menos:", opts: ["Todos", "La mitad de los miembros del Consejo", "Un tercio", "Dos tercios"], a: "La mitad de los miembros del Consejo" },
+        { q: "La Ley abre posibilidades para definir módulos de reparto de aportaciones de:", opts: ["Entes representados en el Consorcio", "Sindicatos", "Empresas", "Usuarios"], a: "Entes representados en el Consorcio" },
+        { q: "El Consorcio atiende compensaciones por uso de:", opts: ["Líneas interurbanas", "Títulos multimodales", "Subvenciones", "Infraestructuras"], a: "Títulos multimodales" },
+        { q: "También son recursos del Consorcio los derivados de:", opts: ["Impuesto de circulación", "Tasas judiciales", "Donaciones particulares", "Publicidad y patrocinio"], a: "Publicidad y patrocinio" },
+        { q: "El Consorcio respeta de las empresas su:", opts: ["Política salarial", "Régimen laboral", "Patrimonio, personalidad jurídica y autonomía de gestión", "Capital social"], a: "Patrimonio, personalidad jurídica y autonomía de gestión" },
+        { q: "Los usuarios tenían costes diferenciados según:", opts: ["Tipo de billete", "Frecuencia", "Localización y medio disponible", "Edad"], a: "Localización y medio disponible" },
+        { q: "Los convenios con Renfe y concesionarias privadas obligan a adecuarse a:", opts: ["Planes de servicios y marco tarifario del Consorcio", "Planes municipales", "Estatutos laborales", "Reglamentos estatales"], a: "Planes de servicios y marco tarifario del Consorcio" },
+        { q: "El Director Gerente actúa bajo la autoridad del:", opts: ["Ministerio", "Comité Técnico", "Presidente regional", "Consejo de Administración"], a: "Consejo de Administración" },
+        { q: "Con empresas públicas incorporadas, la relación es de:", opts: ["Convenio especial", "Dependencia", "Colaboración voluntaria", "Contrato programa"], a: "Dependencia" },
+        { q: "El plazo para que el Ayuntamiento acredite el pago tras retención es de:", opts: ["30 días", "15 días", "60 días", "20 días"], a: "30 días" },
+        { q: "La distribución de aportaciones municipales la realiza:", opts: ["Presidente", "Ministerio", "Consejo de Administración", "Comunidad"], a: "Consejo de Administración" },
+        { q: "El Estado puede incorporarse por ser titular de los ferrocarriles que explota:", opts: ["FEVE", "Metro", "Renfe", "ADIF"], a: "Renfe" },
+        { q: "Las tarifas no deben cubrir:", opts: ["La totalidad de los costes", "Costes variables", "Inversiones", "Subvenciones"], a: "La totalidad de los costes" },
+        { q: "Además de ingresos tarifarios, también requerirá:", opts: ["Ingresos publicitarios", "Subvenciones presupuestarias", "Créditos bancarios", "Multas"], a: "Subvenciones presupuestarias" },
+        { q: "En el Comité Técnico participan representantes de:", opts: ["Administraciones, empresas públicas y privadas y trabajadores del sector", "Administraciones, empresas públicas y privadas y usuarios", "Usuarios, empresas públicas y privadas y trabajadores del sector", "Administraciones, empresas públicas y trabajadores del sector"], a: "Administraciones, empresas públicas y privadas y trabajadores del sector" },
+        { q: "Con Renfe y concesionarias privadas, la relación se instrumenta mediante:", opts: ["Acuerdos y contratos programa", "Subvenciones directas", "Licencias", "Órdenes ministeriales"], a: "Acuerdos y contratos programa" },
+        { q: "La red anterior presentaba desequilibrio espacial y temporal en:", opts: ["Usuarios", "Infraestructuras", "Tarifas", "Capacidad ofertada"], a: "Capacidad ofertada" },
+        { q: "El Consorcio solo financiará abonos de usuarios residentes en:", opts: ["Unión Europea", "España", "Provincia", "Comunidad de Madrid y otras con convenio"], a: "Comunidad de Madrid y otras con convenio" },
+        { q: "Según el principio de que los beneficiarios del sistema no son únicamente:", opts: ["Estado", "Empresas", "Usuarios", "Ayuntamientos"], a: "Usuarios" },
+        { q: "Las aportaciones de Ayuntamientos se fijan en:", opts: ["Consejería", "Presupuesto del Consorcio", "Asamblea", "Senado"], a: "Presupuesto del Consorcio" },
+        { q: "La estructura del Consorcio responde a líneas directrices de la Ley reguladora de la Administración:", opts: ["General del Estado", "Financiera", "Institucional de la Comunidad", "Local"], a: "Institucional de la Comunidad" },
+        { q: "Los compromisos del Consorcio se basan en:", opts: ["Costes históricos", "Decisiones políticas", "Módulos objetivos de valoración", "Tarifas medias"], a: "Módulos objetivos de valoración" },
+        { q: "El incumplimiento municipal permite al Consorcio:", opts: ["Suspender servicios", "Impugnar presupuestos municipales", "Intervenir el Ayuntamiento", "Solicitar la retención de las transferencias del Estado"], a: "Impugnar presupuestos municipales" },
+        { q: "El Consorcio concentra competencias sobre transporte de viajeros de:", opts: ["Solo Comunidad", "Comunidad y Ayuntamientos adheridos", "Solo Ayuntamientos", "Estado"], a: "Comunidad y Ayuntamientos adheridos" },
+        { q: "El Director Gerente es responsable de la:", opts: ["Planificación legislativa", "Relación con el Estado", "Dirección inmediata del Consorcio", "Política tarifaria"], a: "Dirección inmediata del Consorcio" },
+        { q: "El acuerdo de disolución exige mayoría de:", opts: ["Simple", "Tres quintos", "Absoluta", "Dos tercios"], a: "Dos tercios" },
+        { q: "El Consorcio ordena y regula pero mantiene la autonomía de gestión de:", opts: ["Solo ferroviarias", "Solo privadas", "Solo públicas", "Empresas públicas y privadas"], a: "Empresas públicas y privadas" },
+        { q: "Son recursos del Consorcio los ingresos por:", opts: ["Multas de tráfico", "Peajes", "Impuestos", "Venta de títulos multimodales"], a: "Venta de títulos multimodales" }
+    ],
+    4: [
+        { q: "¿Qué está prohibido cubrir con subvenciones?", opts: ["Costes energéticos", "Tarifas sociales", "Inversiones iniciales", "Déficits por inadecuada gestión empresarial"], a: "Déficits por inadecuada gestión empresarial" },
+        { q: "Las relaciones con RENFE se regulan mediante:", opts: ["Orden ministerial", "Convenio", "Contrato-programa", "Decreto"], a: "Contrato-programa" },
+        { q: "El contrato-programa con RENFE regula al menos:", opts: ["Oferta de transporte", "Infraestructuras", "Convenios laborales", "Plantillas"], a: "Oferta de transporte" },
+        { q: "La Comisión Mixta de transferencias está integrada por:", opts: ["6 miembros", "8 miembros", "4 miembros", "2 miembros"], a: "4 miembros" },
+        { q: "¿A qué Consejería está adscrito el Consorcio?", opts: ["Obras Públicas y Transportes", "Medio Ambiente", "Economía", "Presidencia"], a: "Obras Públicas y Transportes" },
+        { q: "¿Quién puede prestar el servicio según el artículo 1.2?", opts: ["Solo empresas privadas concesionarias estatales", "Solo empresas públicas autonómicas", "Solo empresas municipales", "Empresas públicas y privadas"], a: "Empresas públicas y privadas" },
+        { q: "Las relaciones con RENFE se regulan mediante:", opts: ["Seguridad", "Servicios de interés común", "Formación", "Inversiones propias"], a: "Servicios de interés común" },
+        { q: "¿Cuál NO es función del artículo 2?", opts: ["Gestión directa de carreteras", "Planificación de servicios", "La tramitación y resolución de las autorizaciones y concesiones", "Inspección y sanción"], a: "Gestión directa de carreteras" },
+        { q: "¿Cuál es el ámbito territorial de actuación?", opts: ["Comunidad de Madrid", "Área metropolitana", "España", "Municipio de Madrid"], a: "Comunidad de Madrid" },
+        { q: "Las empresas deben hacer aportaciones económicas para:", opts: ["Servicios de interés común", "Inversiones propias", "Formación", "Seguridad"], a: "Servicios de interés común" },
+        { q: "La entrega de bienes se formaliza mediante:", opts: ["Acta de entrega y recepción", "Decreto", "Escritura", "Convenio"], a: "Acta de entrega y recepción" },
+        { q: "El servicio de Metro de Madrid se considera:", opts: ["Estatal", "Interurbano", "Municipal", "Supramunicipal"], a: "Supramunicipal" },
+        { q: "¿La compensación económica especial puede hacerse en función de qué?", opts: ["Beneficios empresariales", "Número de empleados", "Antigüedad de la empresa", "Demanda o kilómetros realizados"], a: "Demanda o kilómetros realizados" },
+        { q: "¿Qué condición orgánica tiene el Consorcio según el artículo 1.3?", opts: ["Empresa pública", "Ente público empresarial estatal", "Organismo Autónomo de la Comunidad de Madrid", "Sociedad anónima pública"], a: "Organismo Autónomo de la Comunidad de Madrid" },
+        { q: "Las resoluciones frente a empresas privadas pueden recurrirse ante:", opts: ["Consejería de Obras Públicas y Transportes", "Defensor del Pueblo", "Tribunal Supremo", "Ministerio"], a: "Consejería de Obras Públicas y Transportes" },
+        { q: "La competencia sobre Metro corresponde a:", opts: ["Consorcio", "Estado", "Comunidad de Madrid", "Ayuntamiento"], a: "Comunidad de Madrid" },
+        { q: "La titularidad de las acciones de empresas dependientes corresponde a:", opts: ["Estado", "Solo Ayuntamientos", "Solo Comunidad", "Comunidad y Ayuntamientos"], a: "Comunidad y Ayuntamientos" },
+        { q: "Metro de Madrid está obligada a:", opts: ["Financiar otras empresas", "Ampliar red", "Conservar la parte de red que explota", "Fijar tarifas"], a: "Conservar la parte de red que explota" },
+        { q: "La financiación de empresas públicas se basa en:", opts: ["Fondos europeos", "Tarifas libres", "Presupuesto estatal", "Sistema de compensación del art. 2.2.h)"], a: "Sistema de compensación del art. 2.2.h)" },
+        { q: "¿Qué Administraciones articulan su cooperación a través del Consorcio?", opts: ["Comunidad de Madrid y Estado exclusivamente", "Diputaciones y Ayuntamientos", "Comunidad de Madrid y Ayuntamientos de la misma", "Estado y Comunidad de Madrid"], a: "Comunidad de Madrid y Ayuntamientos de la misma" },
+        { q: "El proyecto de contrato-programa lo elabora:", opts: ["Consejería", "Consejo de Administración del Consorcio", "Presidente", "Asamblea"], a: "Consejo de Administración del Consorcio" },
+        { q: "El contrato-programa lo firma:", opts: ["Presidente del Consorcio", "Delegado del Gobierno", "Alcalde", "Consejero"], a: "Presidente del Consorcio" },
+        { q: "El Consorcio puede imponer a empresas privadas:", opts: ["Subvenciones", "Convenios laborales", "Tarifas combinadas", "Plantillas mínimas"], a: "Tarifas combinadas" },
+        { q: "La Comisión Mixta tiene representación:", opts: ["Estatal-municipal", "Paritaria Comunidad–Ayuntamiento", "Tripartita", "Estatal-autonómica"], a: "Paritaria Comunidad–Ayuntamiento" },
+        { q: "Las empresas públicas tienen personalidad jurídica:", opts: ["Estatal", "Independiente", "Delegada", "Dependiente"], a: "Independiente" },
+        { q: "El Consorcio puede adquirir participaciones previo acuerdo con:", opts: ["Ministerio", "Comunidad", "Ente titular de las mismas", "Tribunal de Cuentas"], a: "Ente titular de las mismas" },
+        { q: "Las modificaciones que alteren el equilibrio económico se compensan con:", opts: ["Créditos bancarios", "Reducción de servicios", "Subvención estatal", "Modificaciones de signo opuesto y nuevas tarifas"], a: "Modificaciones de signo opuesto y nuevas tarifas" },
+        { q: "El Comité será informado de propuestas de:", opts: ["Sanciones", "Tarifas", "Nombramientos", "Convenios"], a: "Sanciones" },
+        { q: "¿Sobre qué servicio recae la gestión conjunta?", opts: ["Transporte discrecional", "Transporte escolar", "Transporte de mercancías", "Transporte público regular de viajeros"], a: "Transporte público regular de viajeros" },
+        { q: "El Consejo de Administración puede nombrar en las empresas un:", opts: ["Delegado", "Comisario", "Consejero delegado", "Interventor"], a: "Delegado" },
+        { q: "¿Qué naturaleza tiene el Consorcio según el artículo 1.1?", opts: ["Entidad con personalidad jurídica y patrimonio propios", "Fundación pública", "Órgano desconcentrado", "Sociedad mercantil pública"], a: "Entidad con personalidad jurídica y patrimonio propios" }
+    ],
+    5: [
+        { q: "¿Qué controla el Consorcio según el art. 2.2.i)?", opts: ["Impuestos autonómicos", "Plantillas municipales", "Precios de carburantes", "Ingresos y costes de las empresas"], a: "Ingresos y costes de las empresas" },
+        { q: "¿Cuántos vocales representan a la Comunidad de Madrid?", opts: ["Seis", "Cinco", "Ocho", "Siete"], a: "Siete" },
+        { q: "Las quejas de usuarios tratadas por el Comité cuando afecten a:", opts: ["Una línea concreta", "Solo transporte urbano", "Una empresa concreta", "El conjunto del sistema de transportes"], a: "El conjunto del sistema de transportes" },
+        { q: "El Comité aborda la distribución de:", opts: ["Inversiones", "Ingresos y compensaciones a las Empresas", "Sanciones", "Subvenciones"], a: "Ingresos y compensaciones a las Empresas" },
+        { q: "Los representantes de trabajadores del sector transportes son:", opts: ["Cuatro por sorteo", "Designados por el Consorcio", "Dos y determinados reglamentariamente", "Elegidos por sindicatos mayoritarios"], a: "Dos y determinados reglamentariamente" },
+        { q: "Entre las cuestiones técnicas se incluyen los planes:", opts: ["Estratégicos quinquenales", "De infraestructuras nacionales", "Presupuestarios estatales", "Anuales de actuación del Consorcio"], a: "Anuales de actuación del Consorcio" },
+        { q: "¿Qué es el Comité Técnico?", opts: ["Órgano de concertación y apoyo", "Órgano decisorio superior", "Órgano sancionador", "Órgano presupuestario"], a: "Órgano de concertación y apoyo" },
+        { q: "¿Qué cargo del Consorcio está expresamente incluido en el Comité Técnico?", opts: ["Interventor", "Secretario general", "Director financiero", "Director gerente del Consorcio"], a: "Director gerente del Consorcio" },
+        { q: "¿Cuántos vocales representan a los Ayuntamientos?", opts: ["Siete", "Seis", "Cinco", "Tres"], a: "Seis" },
+        { q: "Las aportaciones de empresas para servicios de interés común se relacionan con el artículo:", opts: ["11.5", "14.1", "10", "12.2"], a: "11.5" },
+        { q: "¿Qué entidad empresarial tiene representación en el Comité Técnico?", opts: ["Cámara Oficial de Comercio e Industria de Madrid", "CEIM", "CEOE", "Cámara de Comercio de España"], a: "Cámara Oficial de Comercio e Industria de Madrid" },
+        { q: "¿Quién nombra al Vicepresidente?", opts: ["Consejo de Gobierno", "Presidente", "Asamblea", "Consejo de Administración"], a: "Consejo de Administración" },
+        { q: "El Comité Técnico puede tratar programas de:", opts: ["Seguridad ciudadana", "Medio ambiente", "Coordinación de servicios", "Protección civil"], a: "Coordinación de servicios" },
+        { q: "El representante de la Administración del Estado se designa a través de:", opts: ["Presidencia del Gobierno", "Senado", "Ministerio de Transportes", "Delegado del Gobierno de la Comunidad"], a: "Delegado del Gobierno de la Comunidad" },
+        { q: "¿Cuántos representantes de organizaciones de consumidores y asociaciones vecinales hay?", opts: ["Dos", "Cuatro", "Tres", "Cinco"], a: "Tres" },
+        { q: "El Comité Técnico deberá informar preceptivamente sobre cuestiones:", opts: ["Económicas", "Disciplinarias", "Jurídicas", "De carácter técnico"], a: "De carácter técnico" },
+        { q: "¿Quién puede proponer representantes por la Administración del Estado?", opts: ["Senado", "Presidente del Gobierno", "Ministro de Transportes", "Delegado del Gobierno en la Comunidad"], a: "Delegado del Gobierno en la Comunidad" },
+        { q: "¿Cuántos de los vocales municipales son del Ayuntamiento de Madrid?", opts: ["Dos", "Tres", "Uno", "Cuatro"], a: "Tres" },
+        { q: "Las medidas generales de ordenación del transporte son elaboradas por:", opts: ["Ayuntamientos", "Órganos del Consorcio", "Comunidad", "Estado"], a: "Órganos del Consorcio" },
+        { q: "¿Quién forma parte del Comité Técnico según el artículo 9?", opts: ["El Alcalde de Madrid", "El Presidente", "El Consejero de Transportes", "El Delegado del Gobierno"], a: "El Presidente" },
+        { q: "¿Cuántos miembros tiene la Comisión Delegada?", opts: ["A ocho", "Seis", "Siete", "Cinco"], a: "Seis" },
+        { q: "¿Qué empresa puede integrarse a iniciativa propia en el Comité Técnico?", opts: ["RENFE", "EMT", "Metro Ligero", "ADIF"], a: "RENFE" },
+        { q: "¿Quién nombra al Presidente del Consorcio?", opts: ["Consejo de Gobierno", "Consejo de Administración", "Asamblea de Madrid", "Delegado del Gobierno"], a: "Consejo de Gobierno" },
+        { q: "El Comité trata sobre:", opts: ["Subvenciones estatales", "Estructuras tarifarias", "Salarios", "Impuestos municipales"], a: "Estructuras tarifarias" },
+        { q: "¿Cuántos representantes de los Ayuntamientos hay en el Comité Técnico?", opts: ["Uno", "Cuatro", "Dos", "Tres"], a: "Dos" },
+        { q: "¿Qué órgano ejerce la dirección colegiada?", opts: ["Director Gerente", "Comité Técnico", "Presidente", "Consejo de Administración"], a: "Consejo de Administración" },
+        { q: "¿De qué entidades proceden los Directores-Gerentes mencionados en el Comité Técnico?", opts: ["Empresa Municipal de Transportes de Madrid y Compañía Metropolitano de Madrid", "Comunidad y Estado", "Ministerio de Transportes y Metro Ligero", "RENFE y ADIF"], a: "Empresa Municipal de Transportes de Madrid y Compañía Metropolitano de Madrid" },
+        { q: "Uno de los representantes municipales del Comité Técnico debe pertenecer a:", opts: ["Móstoles", "Alcalá de Henares", "Ayuntamiento de Madrid", "Getafe"], a: "Ayuntamiento de Madrid" },
+        { q: "¿Cuántos representantes de empresas privadas concesionarias hay?", opts: ["Cuatro", "Tres", "Dos", "Uno"], a: "Dos" },
+        { q: "El Comité interviene en la creación o supresión de:", opts: ["Estaciones", "Tarifas", "Líneas y servicios", "Contratos laborales"], a: "Líneas y servicios" }
+    ],
+    6: [
+        { q: "¿Quién aprueba la estructura tarifaria?", opts: ["Comité Técnico", "Comunidad de Madrid", "Presidente", "Consejo de Administración"], a: "Consejo de Administración" },
+        { q: "¿Quién redacta el Proyecto de Estatutos?", opts: ["Director Gerente", "Presidente", "Consejo de Administración", "Asamblea"], a: "Consejo de Administración" },
+        { q: "¿Quién aprueba el Anteproyecto de Presupuestos del Consorcio?", opts: ["Director Gerente", "Consejo de Administración", "Presidente", "Consejo de Gobierno"], a: "Consejo de Administración" },
+        { q: "¿Quién aprueba la plantilla del personal del Consorcio?", opts: ["Consejo de Administración", "Director Gerente", "Consejería", "Presidente"], a: "Consejo de Administración" },
+        { q: "¿Qué queda excluido del plan general?", opts: ["Metro", "Autobuses", "Ferrocarriles", "Carreteras"], a: "Carreteras" },
+        { q: "¿Ante qué órgano comparece el Presidente para informar?", opts: ["Senado", "Consejo de Gobierno", "Congreso", "Asamblea de Madrid"], a: "Asamblea de Madrid" },
+        { q: "¿Quién representa legalmente al Consorcio?", opts: ["Director Gerente", "Vicepresidente", "Consejo de Administración", "Presidente"], a: "Presidente" },
+        { q: "¿Quién aprueba definitivamente el plan general de infraestructuras?", opts: ["Consejo de Administración", "Presidente", "Consejo de Gobierno", "Asamblea"], a: "Consejo de Gobierno" },
+        { q: "¿Quién sustituye al Presidente en caso de fallecimiento?", opts: ["Delegado del Gobierno", "Vocal más antiguo", "Vicepresidente", "Director Gerente"], a: "Vicepresidente" },
+        { q: "¿Qué no puede delegarse a la Comisión Delegada?", opts: ["Recaudación", "Inspección", "Publicidad", "Funciones de determinados apartados del art. 5"], a: "Funciones de determinados apartados del art. 5" },
+        { q: "¿Quién nombra al Director Gerente?", opts: ["Asamblea", "Consejo de Gobierno", "Consejo de Administración a propuesta del Presidente", "Presidente directamente"], a: "Consejo de Administración a propuesta del Presidente" },
+        { q: "¿Quién elabora los contratos-programa?", opts: ["Presidente", "Director Gerente", "Consejo de Administración", "Consejería"], a: "Consejo de Administración" },
+        { q: "¿Con qué periodicidad el Director Gerente informa sobre expedientes sancionadores?", opts: ["Semestral", "Mensual", "Anual", "Trimestral"], a: "Semestral" },
+        { q: "¿Quién ejerce la facultad sancionadora directa?", opts: ["Presidente", "Consejo de Administración", "Comité Técnico", "Director Gerente"], a: "Director Gerente" },
+        { q: "¿Quién ejerce la dirección inmediata del personal?", opts: ["Vicepresidente", "Presidente", "Director Gerente", "Consejo"], a: "Director Gerente" },
+        { q: "¿De quién depende el Director Gerente?", opts: ["Presidente exclusivamente", "Consejería", "Consejo de Administración", "Asamblea"], a: "Consejo de Administración" },
+        { q: "¿Quién decide los empates con voto de calidad?", opts: ["Vicepresidente", "Vocal más antiguo", "Director Gerente", "Presidente"], a: "Presidente" },
+        { q: "¿Cómo asiste el Director Gerente al Consejo?", opts: ["Asamblea", "Director Gerente", "Con voto", "Voz pero sin voto"], a: "Director Gerente" },
+        { q: "¿Quién convoca las reuniones del Consejo de Administración?", opts: ["Secretario", "Director Gerente", "Presidente", "Vicepresidente"], a: "Presidente" },
+        { q: "¿Quién elabora propuestas de convenios con otras CCAA?", opts: ["Presidente", "Consejo de Gobierno", "Asamblea", "Consorcio"], a: "Consorcio" }
+    ]
+};
+let currentBlock = [], currentIdx = 0, hits = 0, mistakes = [];
+
+function startTest(num) {
+    if(!db[num]) { alert("Bloque no disponible"); return; }
+    currentBlock = db[num];
+    currentIdx = 0; hits = 0; mistakes = [];
+    document.getElementById('selector').classList.add('hidden');
+    document.getElementById('quiz-area').classList.remove('hidden');
+    document.getElementById('btn-volver-menu').classList.add('hidden');
+    document.getElementById('btn-salir-test').classList.remove('hidden');
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = currentBlock[currentIdx];
+    document.getElementById('progreso').innerText = `Pregunta ${currentIdx + 1}/${currentBlock.length}`;
+    document.getElementById('score').innerText = hits;
+    document.getElementById('q-text').innerText = q.q;
+    document.getElementById('next-btn').style.display = 'none';
+    const container = document.getElementById('q-options');
+    container.innerHTML = '';
+    
+    q.opts.forEach(optText => {
+        const btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerText = optText;
+        btn.onclick = () => check(btn, optText, q.a);
+        container.appendChild(btn);
+    });
+}
+
+function check(btn, selected, correct) {
+    const buttons = document.querySelectorAll('.opt');
+    buttons.forEach(b => b.disabled = true);
+    
+    const qActual = currentBlock[currentIdx]; // Obtenemos la pregunta actual
+
+    if(selected === correct) {
+        btn.classList.add('correct');
+        hits++;
+        setTimeout(nextQuestion, 600);
+    } else {
+        btn.classList.add('wrong');
+        
+        // --- AQUÍ CONECTAMOS CON EL CENTRO DE ERRORES ---
+        guardarFallo(
+            qActual.q,        // La pregunta
+            qActual.opts,     // Las opciones
+            correct,          // La respuesta correcta
+            "Ley CRTM"        // La etiqueta del tema
+        );
+        // -----------------------------------------------
+
+        mistakes.push({q: qActual.q, a: correct});
+        buttons.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+        document.getElementById('next-btn').style.display = 'block';
+    }
+}
+function nextQuestion() {
+    currentIdx++;
+    if(currentIdx < currentBlock.length) showQuestion();
+    else showResults();
+}
+
+function showResults() {
+    document.getElementById('quiz-area').classList.add('hidden');
+    document.getElementById('results').classList.remove('hidden');
+    const pct = Math.round((hits/currentBlock.length)*100);
+    document.getElementById('final-score').innerText = `${pct}% (${hits}/${currentBlock.length})`;
+    const list = document.getElementById('failed-list');
+    
+    if(mistakes.length > 0) {
+        list.innerHTML = '<strong>Repasa tus errores:</strong><br><br>' + 
+            mistakes.map(m => `• ${m.q}<br><span style="color:var(--correct)">✔ Correcta: ${m.a}</span>`).join('<br><br>');
+    } else { 
+        list.innerHTML = '¡Enhorabuena! Has clavado todas las preguntas de la Ley.'; 
+    }
+}
+function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+    // 1. Recuperamos lo que ya hay guardado o creamos una lista vacía
+    let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+
+    // 2. Creamos el objeto del fallo
+    const nuevoFallo = {
+        id: Date.now(), // Para que cada fallo sea único
+        modulo: modulo, // Ej: "Ley CRTM" o "Tarifas"
+        q: pregunta,
+        opts: opciones,
+        a: respuestaCorrecta
+    };
+
+    // 3. Solo lo añadimos si no estaba ya repetido
+    if (!listaFallos.find(f => f.q === pregunta)) {
+        listaFallos.push(nuevoFallo);
+        localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
+    }
+}
+</script>
+</body>
+</html>

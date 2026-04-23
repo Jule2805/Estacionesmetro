@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Errores - CRTM</title>
+    <style>
+        :root { --bg: #121212; --card: #1e1e1e; --accent: #3498db; --danger: #e74c3c; --success: #2ecc71; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #e0e0e0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        #quiz-container { background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 700px; width: 100%; border: 1px solid #333; }
+        .estadisticas { background: #252525; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .estadisticas b { color: var(--accent); font-size: 1.2em; }
+        .btn-main { background: var(--accent); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; margin: 5px; text-decoration: none; display: inline-block; }
+        .btn-main:hover { opacity: 0.8; transform: translateY(-2px); }
+        .btn-index { background: #555; }
+        .card-fallo { background: #252525; margin: 15px 0; padding: 18px; border-radius: 10px; border-left: 6px solid var(--danger); position: relative; }
+        .modulo-tag { font-size: 0.75em; background: #e67e22; color: white; padding: 4px 10px; border-radius: 5px; text-transform: uppercase; }
+        .borrar-btn { position: absolute; top: 15px; right: 15px; background: var(--danger); color: white; border: none; width: 30px; height: 30px; cursor: pointer; border-radius: 50%; }
+        
+        /* Estilos para el Test de Errores */
+        .test-box { background: #000; padding: 20px; border-radius: 15px; margin-top: 20px; text-align: left; border: 1px solid var(--accent); }
+        .opt-test { display: block; width: 100%; padding: 12px; margin: 8px 0; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 10px; cursor: pointer; text-align: left; }
+        .opt-test:hover { background: #333; }
+        .correct { background: var(--success) !important; border-color: var(--success); }
+        .wrong { background: var(--danger) !important; border-color: var(--danger); }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>📉 Mi Centro de Errores</h1>
+    
+    <div id="quiz-container">
+        <div id="main-view">
+            <div class="estadisticas">
+                Tienes <b id="total-fallos">0</b> preguntas pendientes de aprender.
+            </div>
+
+            <div style="text-align: center;">
+                <a href="index.html" class="btn-main btn-index">🏠 Menú Principal</a>
+                <button onclick="iniciarTest()" class="btn-main">🔥 Empezar Test de Fallos</button>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+
+            <div id="lista-visual-fallos"></div>
+        </div>
+
+        <div id="test-view" class="hidden">
+            <div class="modulo-tag" id="test-modulo"></div>
+            <h3 id="test-pregunta" style="margin: 15px 0;"></h3>
+            <div id="test-opciones"></div>
+            <button id="btn-siguiente" class="btn-main hidden" style="width:100%; margin-top:15px;">Siguiente Pregunta →</button>
+            <button onclick="cancelarTest()" class="btn-main btn-index" style="width:100%; margin-top:10px;">Abandonar Repaso</button>
+        </div>
+    </div>
+
+<script>
+    let fallos = [];
+    let indiceActual = 0;
+
+    function cargarErrores() {
+        fallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+        document.getElementById('total-fallos').innerText = fallos.length;
+        
+        const contenedor = document.getElementById('lista-visual-fallos');
+        contenedor.innerHTML = "";
+
+        if (fallos.length === 0) {
+            contenedor.innerHTML = "<div style='text-align:center; padding:40px; color:#777;'>¡Increíble! No tienes fallos acumulados.</div>";
+            return;
+        }
+
+        fallos.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'card-fallo';
+            div.innerHTML = `
+                <button class="borrar-btn" onclick="eliminarFallo('${f.id}')">×</button>
+                <span class="modulo-tag">${f.modulo || 'General'}</span>
+                <p><b>${f.q}</b></p>
+                `;
+            contenedor.appendChild(div);
+        });
+    }
+
+    // LÓGICA DEL TEST INTERACTIVO
+    function iniciarTest() {
+        if (fallos.length === 0) return alert("No hay nada que repasar.");
+        indiceActual = 0;
+        fallos.sort(() => Math.random() - 0.5); // Mezclar
+        
+        document.getElementById('main-view').classList.add('hidden');
+        document.getElementById('test-view').classList.remove('hidden');
+        mostrarPreguntaTest();
+    }
+
+    function mostrarPreguntaTest() {
+        const qData = fallos[indiceActual];
+        if (!qData) {
+            alert("¡Repaso completado!");
+            cancelarTest();
+            return;
+        }
+
+        document.getElementById('test-modulo').innerText = qData.modulo;
+        document.getElementById('test-pregunta').innerText = qData.q;
+        document.getElementById('btn-siguiente').classList.add('hidden');
+        
+        const optsDiv = document.getElementById('test-opciones');
+        optsDiv.innerHTML = "";
+
+        qData.opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-test';
+            btn.innerText = opt;
+            btn.onclick = () => validarRespuesta(btn, opt, qData.a, qData.id);
+            optsDiv.appendChild(btn);
+        });
+    }
+
+    function validarRespuesta(btn, seleccionada, correcta, idFallo) {
+        const botones = document.querySelectorAll('.opt-test');
+        botones.forEach(b => b.disabled = true); // Bloquear para no pinchar varias veces
+
+        if (seleccionada === correcta) {
+            btn.classList.add('correct');
+            // Si la acierta, la quitamos del localStorage
+            eliminarFalloSilencioso(idFallo);
+        } else {
+            btn.classList.add('wrong');
+            // Marcamos la correcta para que aprenda
+            botones.forEach(b => { if(b.innerText === correcta) b.classList.add('correct'); });
+        }
+
+        document.getElementById('btn-siguiente').classList.remove('hidden');
+        document.getElementById('btn-siguiente').onclick = () => {
+            indiceActual++;
+            mostrarPreguntaTest();
+        };
+    }
+
+    function cancelarTest() {
+        document.getElementById('main-view').classList.remove('hidden');
+        document.getElementById('test-view').classList.add('hidden');
+        cargarErrores(); // Refrescar lista por si ha borrado algunos
+    }
+
+    function eliminarFalloSilencioso(id) {
+        let temp = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+        temp = temp.filter(f => f.id != id);
+        localStorage.setItem('mis_fallos', JSON.stringify(temp));
+    }
+
+    function eliminarFallo(id) {
+        if(confirm("¿Borrar esta pregunta de la lista?")) {
+            eliminarFalloSilencioso(id);
+            cargarErrores();
+        }
+    }
+
+    window.onload = cargarErrores;
+</script>
+</body>
+</html>

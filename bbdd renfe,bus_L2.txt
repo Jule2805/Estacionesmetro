@@ -1,0 +1,132 @@
+const serviciosL2 = [
+    // --- CORRESPONDENCIAS Y CONEXIONES ---
+    {
+        category: "linea2",
+        question: "¿Qué estaciones de la L2 tienen correspondencia con la LÍNEA 1?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol", "Cuatro Caminos"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estaciones de la L2 conectan con la LÍNEA 4?",
+        options: [...estacionesL2].sort(),
+        answer: ["Goya", "San Bernardo"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Con qué línea hay correspondencia en la estación de VENTAS?",
+        options: ["L4", "L5", "L6", "L9"],
+        answer: ["L5"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 conecta con el RAMAL (R)?",
+        options: [...estacionesL2].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿En qué estación de la L2 hay conexión con CERCANÍAS?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+{
+        category: "linea2",
+        question: "¿En qué estación de la L2 hay conexión con la Linea 9?",
+        options: [...estacionesL2].sort(),
+        answer: ["Príncipe de Vergara"],
+        type: "single"
+    },
+    // --- CARACTERÍSTICAS DE ESTACIÓN (Transbordos y Accesibilidad) ---
+    {
+        category: "linea2",
+        question: "¿Qué estaciones de la L2 tienen TRANSBORDO CORTO?",
+        options: [...estacionesL2].sort(),
+        answer: ["Ventas", "Manuel Becerra", "Goya", "Príncipe de Vergara", "Sol", "Ópera", "San Bernardo", "Canal", "Cuatro Caminos"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 tiene un TRANSBORDO LARGO (en este caso, hacia Plaza de España)?",
+        options: [...estacionesL2].sort(),
+        answer: ["Noviciado"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "Según la tabla, ¿qué estaciones de la L2 SÍ son ACCESIBLES?",
+        options: [...estacionesL2].sort(),
+        answer: ["Las Rosas", "Avenida de Guadalajara", "Alsacia", "La Almudena", "La Elipa", "Goya", "Príncipe de Vergara", "Sevilla", "Sol", "Ópera", "Canal", "Cuatro Caminos"],
+        type: "multiple"
+    },
+
+    // --- AUTOBUSES Y TRANSPORTE EXTERNO ---
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 tiene conexión con AUTOBUSES INTERURBANOS?",
+        options: [...estacionesL2].sort(),
+        answer: ["Alsacia"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿En qué estaciones de la L2 hay parada de terminal de AUTOBUSES NOCTURNOS?",
+        options: [...estacionesL2].sort(),
+        answer: ["Banco de España"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación de la L2 tiene parada de AUTOBÚS EXPRÉS AEROPUERTO?",
+        options: [...estacionesL2].sort(),
+        answer: ["Banco de España"],
+        type: "single"
+    },
+
+    // --- SERVICIOS AL CLIENTE ---
+    {
+        category: "linea2",
+        question: "¿Qué estaciones cuentan con puestos de ATENCIÓN AL CLIENTE?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol", "Ópera"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estaciones cuentan con puestos de Tienda de PRODUCTOS OFICIALES?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol", "Ópera"],
+        type: "multiple"
+    },
+    {
+        category: "linea2",
+        question: "¿En qué estación de la L2 hay Oficina de Gestión de TARJETA TRANSPORTE PÚBLICO (TTP)?",
+        options: [...estacionesL2].sort(),
+        answer: ["Sol"],
+        type: "single"
+    },
+
+    // --- CULTURA Y OCIO ---
+    {
+        category: "linea2",
+        question: "¿En qué estación de la L2 se encuentra la METROTECA?",
+        options: [...estacionesL2].sort(),
+        answer: ["Príncipe de Vergara"],
+        type: "single"
+    },
+    {
+        category: "linea2",
+        question: "¿Qué estación está marcada como ESPACIO HISTÓRICO DE METRO?",
+        options: [...estacionesL2].sort(),
+        answer: ["Ópera"],
+        type: "single"
+    }
+];
+
+// Para que funcione, no olvides añadir esto al final de tu script o donde cargues los datos:
+tarifasDB.push(...serviciosL2);

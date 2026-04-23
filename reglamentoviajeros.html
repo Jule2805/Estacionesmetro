@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reglamento de Viajeros - Academia</title>
+    <style>
+        :root {
+            --bg: #121212; --card: #1e1e1e; --accent: #007bff;
+            --correct: #28a745; --wrong: #dc3545;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-test { background: #2a2a2a; border: 1px solid #444; color: white; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-test:hover { border-color: var(--accent); background: #333; }
+        .btn-test b { display: block; font-size: 20px; }
+        .hidden { display: none; }
+        .stats { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #aaa; }
+        .question { font-size: 18px; font-weight: bold; margin-bottom: 20px; min-height: 60px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .opt { background: #333; border: 1px solid #444; color: white; padding: 15px; border-radius: 12px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 15px; width: 100%; }
+        .correct { background: var(--correct) !important; border-color: var(--correct); }
+        .wrong { background: var(--wrong) !important; border-color: var(--wrong); }
+        #next-btn { width: 100%; padding: 15px; margin-top: 20px; background: var(--accent); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; display: none; }
+        .back-btn { background: none; border: none; color: #888; cursor: pointer; margin-bottom: 15px; align-self: flex-start; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <button class="back-btn" id="btn-volver-menu" onclick="location.href='detodo.html'">← Volver a Normativa</button>
+    <button class="back-btn hidden" id="btn-salir-test" onclick="location.reload()">← Salir del Test</button>
+
+    <div class="container">
+        <div id="selector">
+            <h2 style="text-align:center">Reglamento de Viajeros</h2>
+            <div class="menu-grid">
+                <button class="btn-test" onclick="startTest(1)"><b>1</b><span>Test 1</span></button>
+                <button class="btn-test" onclick="startTest(2)"><b>2</b><span>Test 2</span></button>
+                <button class="btn-test" onclick="startTest(3)"><b>3</b><span>Test 3</span></button>
+                <button class="btn-test" onclick="startTest(4)"><b>4</b><span>Test 4</span></button>
+            </div>
+        </div>
+
+        <div id="quiz-area" class="hidden">
+            <div class="stats">
+                <span id="progreso">Pregunta 1/30</span>
+                <span>Aciertos: <b id="score" style="color:var(--correct)">0</b></span>
+            </div>
+            <div class="question" id="q-text"></div>
+            <div class="options" id="q-options"></div>
+            <button id="next-btn" onclick="nextQuestion()">SIGUIENTE PREGUNTA</button>
+        </div>
+
+        <div id="results" class="hidden">
+            <h2 style="text-align:center">Test Finalizado</h2>
+            <div id="final-score" style="font-size: 40px; text-align:center; margin: 20px 0;"></div>
+            <div id="failed-list" style="font-size:13px; color:#ccc; background:#000; padding:15px; border-radius:10px; max-height:250px; overflow-y:auto; margin-bottom:20px"></div>
+            <button class="btn-test" style="width:100%" onclick="location.reload()">REPETIR O OTRO BLOQUE</button>
+        </div>
+    </div>
+
+<script>
+const db = {
+    1: [
+        { q: "¿Cuántas bicicletas como máximo pueden situarse en el coche de cabeza?", opts: ["3", "2", "1", "4"], a: "2" },
+        { q: "¿Cómo se consideran las bicicletas plegadas?", opts: ["Equipaje especial", "Objetos prohibidos", "Vehículos personales", "Bultos de mano"], a: "Bultos de mano" },
+        { q: "¿En qué artículo se regula el acceso con bicicletas?", opts: ["Artículo 2 bis", "Artículo 2 ter", "Artículo 3", "Artículo 30"], a: "Artículo 2 bis" },
+        { q: "La sanción por fumar no sigue la Ley 16/1987 sino el artículo 20 de la Ley:", opts: ["28/2005", "1211/1990", "40/2015", "39/2015"], a: "28/2005" },
+        { q: "¿Quién es responsable de los daños causados por la bicicleta?", opts: ["El viajero portador", "Seguro obligatorio", "Consorcio", "Metro"], a: "El viajero portador" },
+        { q: "El Decreto 56/2017 fue publicado en el BOCM nº:", opts: ["115", "292", "124", "159"], a: "124" },
+        { q: "¿Dónde deben figurar precios y condiciones de los títulos de transporte?", opts: ["En el BOE", "En la web de Metro", "En carteles de estación", "En los Cuadros de Tarifas aprobados"], a: "En los Cuadros de Tarifas aprobados" },
+        { q: "El artículo 31 remite para sanciones al artículo 143.1.a) de la Ley:", opts: ["39/2015", "28/2005", "40/2015", "16/1987"], a: "16/1987" },
+        { q: "¿Dónde se publican las resoluciones sobre acceso con bicicletas?", opts: ["BOE", "Web municipal", "Boletín Oficial de la Comunidad de Madrid", "Tablones de estación"], a: "Boletín Oficial de la Comunidad de Madrid" },
+        { q: "Las líneas de Metro Ligero se incluyeron por el Decreto:", opts: ["57/2006", "72/2016", "115/1993", "56/2017"], a: "57/2006" },
+        { q: "¿Qué derecho tienen los viajeros en caso de accidente?", opts: ["Transporte alternativo", "Viaje gratuito anual", "Indemnización según póliza de seguros", "Asistencia jurídica gratuita"], a: "Indemnización según póliza de seguros" },
+        { q: "¿Qué artículo establece limitaciones sobre bultos de mano?", opts: ["Artículo 12", "Artículo 4", "Artículo 30", "Artículo 2"], a: "Artículo 30" },
+        { q: "¿Quién suscribe la póliza de seguros mencionada?", opts: ["Metro de Madrid", "Comunidad de Madrid", "Ministerio", "Consorcio"], a: "Metro de Madrid" },
+        { q: "¿Dónde se regula la devolución del importe por incidencias?", opts: ["Art. 2 y 3", "Art. 30", "Art. 12 y 14", "Art. 5"], a: "Art. 12 y 14" },
+        { q: "¿Dónde puede solicitarse el libro de reclamaciones?", opts: ["Solo en oficinas centrales", "En cualquier estación", "En trenes", "En estaciones señalizadas para tal fin"], a: "En estaciones señalizadas para tal fin" },
+        { q: "¿A través de quién pueden ser informados los usuarios además del propio Organismo?", opts: ["ADIF", "Metro de Madrid", "EMT", "La Consejería de Transportes"], a: "Metro de Madrid" },
+        { q: "¿Qué deben hacer los usuarios con bicicletas plegables antes de acceder al tren?", opts: ["Sujetarlas con correa", "Identificarlas", "Cubrirlas", "Plegarlas"], a: "Plegarlas" },
+        { q: "El Decreto 17/1999 extendió la aplicación del Reglamento a la línea entre Madrid y:", opts: ["Alcobendas y San Sebastián de los Reyes", "Getafe y Leganés", "Móstoles y Fuenlabrada", "Rivas-Vaciamadrid y Arganda del Rey"], a: "Rivas-Vaciamadrid y Arganda del Rey" },
+        { q: "La habilitación para modificar la cuantía del recargo figura en la:", opts: ["Disposición adicional única", "Disposición final", "Disposición derogatoria", "Sección tercera"], a: "Disposición adicional única" },
+        { q: "¿Quién debe velar para que los usuarios estén informados sobre la prestación del servicio?", opts: ["La Consejería de Transportes", "El Ministerio de Fomento", "Metro de Madrid exclusivamente", "El Consorcio Regional de Transportes"], a: "El Consorcio Regional de Transportes" },
+        { q: "¿Qué condición deben cumplir los objetos de mano?", opts: ["Que estén etiquetados", "Que no supongan molestias o peligro", "Que vayan embalados", "Que pesen menos de 10 kg"], a: "Que no supongan molestias o peligro" },
+        { q: "Quedan derogadas disposiciones de igual o menor rango que:", opts: ["No estén publicadas", "Sean anteriores a 1990", "Regulen tarifas", "Se opongan a la Norma"], a: "Se opongan a la Norma" },
+        { q: "El Decreto 72/2016 fue aprobado por el:", opts: ["Ministerio", "Ayuntamiento", "Parlamento", "Consejo de Gobierno de la Comunidad de Madrid"], a: "Consejo de Gobierno de la Comunidad de Madrid" },
+        { q: "¿Quién debe contestar las reclamaciones?", opts: ["Defensor del Pueblo", "Consorcio Regional de Transportes", "Metro de Madrid", "Comunidad de Madrid"], a: "Consorcio Regional de Transportes" },
+        { q: "¿En qué plazo máximo debe contestarse una reclamación?", opts: ["15 días", "Menos de un mes", "2 meses", "45 días"], a: "Menos de un mes" },
+        { q: "¿Cuántas bicicletas como máximo puede llevar un viajero?", opts: ["3", "2", "1", "Ilimitadas"], a: "1" },
+        { q: "¿Cómo deben tratar los agentes a los viajeros?", opts: ["Con seguridad", "Con autoridad", "Correctamente", "Con rapidez"], a: "Correctamente" },
+        { q: "El Decreto 115/1993 corresponde a una:", opts: ["Derogación", "Suspensión", "Aprobación inicial", "Modificación"], a: "Modificación" },
+        { q: "¿Cuántas disposiciones finales hay?", opts: ["2", "3", "4", "1"], a: "2" },
+        { q: "¿Qué derecho tiene el viajero ante una incidencia del servicio?", opts: ["Cambiar de línea sin billete", "Viajar en cabina", "Renunciar a seguir viaje y obtener devolución", "Exigir taxi gratuito"], a: "Renunciar a seguir viaje y obtener devolución" }
+    ],
+    2: [
+        { q: "Si se comprueba uso incorrecto de un título, este podrá ser retirado por:", opts: ["Solo jefes de estación", "Agentes de Metro o Inspección del Consorcio", "Cualquier empleado", "Personal de limpieza"], a: "Agentes de Metro o Inspección del Consorcio" },
+        { q: "Los títulos en vigor son los aprobados por:", opts: ["Ministerio de Transportes", "Metro de Madrid", "Comunidad de Madrid", "Consorcio Regional de Transportes de Madrid"], a: "Consorcio Regional de Transportes de Madrid" },
+        { q: "Las infracciones prescribirán según el art. 30 de la Ley:", opts: ["16/1987", "28/2005", "39/2015", "40/2015"], a: "40/2015" },
+        { q: "Quien compra tras ser informado de una incidencia no tiene derecho a devolución según el artículo:", opts: ["12", "14", "15", "13"], a: "12" },
+        { q: "¿Qué longitud máxima puede tener la correa del perro?", opts: ["75 cm", "30 cm", "50 cm", "1 m"], a: "50 cm" },
+        { q: "El recargo extraordinario si se paga inmediatamente o en 15 días hábiles, se reduce a:", opts: ["30 €", "20 €", "La mitad", "Un tercio"], a: "La mitad" },
+        { q: "¿Cuántas bicicletas pueden situarse como máximo en el coche de cola?", opts: ["4", "1", "2", "3"], a: "2" },
+        { q: "Los títulos válidos son de utilización:", opts: ["Transferible", "Familiar", "Colectiva", "Personal"], a: "Personal" },
+        { q: "Los títulos con viajes limitados permiten permanecer en la red tras validación durante:", opts: ["2 horas", "1 hora", "3 horas", "4 horas"], a: "3 horas" },
+        { q: "El personal de Inspección del Consorcio debe portar un:", opts: ["Documento notarial", "Distintivo acreditativo", "Uniforme obligatorio", "Silbato"], a: "Distintivo acreditativo" },
+        { q: "Al comprar el título, el viajero debe asegurarse de que es adecuado al:", opts: ["Trayecto", "Horario", "Tipo de tren", "Andén"], a: "Trayecto" },
+        { q: "¿Cómo deben estar identificados los perros en general?", opts: ["Con collar rojo", "Con placa", "Mediante chip", "Con pasaporte"], a: "Mediante chip" },
+        { q: "¿Cuántos perros por viajero se permiten?", opts: ["3", "2", "Ilimitados", "1"], a: "1" },
+        { q: "Las obligaciones y prohibiciones de los viajeros se aplican en el artículo 142.14 de la Ley:", opts: ["39/2015", "40/2015", "28/2005", "16/1987"], a: "28/2005" },
+        { q: "Las autoridades de inspección deben identificarse mediante:", opts: ["DNI", "La acreditación correspondiente", "Carné profesional", "Número de empleado"], a: "La acreditación correspondiente" },
+        { q: "Constituyen infracciones las conductas tipificadas en la Ley 16/1987, art:", opts: ["33", "30", "142.14", "143.1.a)"], a: "142.14" },
+        { q: "¿Quién puede limitar el acceso con bicicletas por incidencias?", opts: ["El revisor", "Comunidad", "Policía", "El operador"], a: "El operador" },
+        { q: "El personal de Inspección del Consorcio tiene consideración de:", opts: ["Agente auxiliar", "Autoridad", "Funcionario municipal", "Empleado público"], a: "Autoridad" },
+        { q: "El recargo extraordinario por no tener título válido es de:", opts: ["60 €", "50 €", "100 €", "80 €"], a: "80 €" },
+        { q: "¿Cómo se asigna el estacionamiento de bicis en estaciones habilitadas?", opts: ["Por orden de llegada", "Por sorteo", "Con reserva previa", "Con tarjeta especial"], a: "Por orden de llegada" },
+        { q: "El órgano competente para incoar y resolver procedimientos sancionadores es el:", opts: ["Director Gerente del Consorcio Regional de Transportes", "Alcalde", "Jefe de Estación", "Consejero de Transportes"], a: "Director Gerente del Consorcio Regional de Transportes" },
+        { q: "Fumar en espacios del Metro se sanciona según la Ley:", opts: ["40/2015", "28/2005", "39/2015", "16/1987"], a: "28/2005" },
+        { q: "¿Dónde se permite acceso sin limitación horaria a bicicletas?", opts: ["Solo en Metrosur", "Solo en fines de semana", "Líneas que conectan con localidades exteriores a la M-40 o que salvan vías peligrosas", "En toda la red"], a: "Líneas que conectan con localidades exteriores a la M-40 o que salvan vías peligrosas" },
+        { q: "¿Se puede transportar la bicicleta en escaleras mecánicas?", opts: ["Solo en domingos", "Sí, si la ocupación lo permite y sin molestar", "Solo con funda", "Nunca"], a: "Sí, si la ocupación lo permite y sin molestar" },
+        { q: "Si el título o cambio no es correcto, debe comunicarlo:", opts: ["Al finalizar el viaje", "En 24 h", "Por reclamación escrita", "En el mismo momento"], a: "En el mismo momento" },
+        { q: "¿Qué perros pueden acceder siempre según Ley 2/2015?", opts: ["Perros guía solo", "Perros con bozal", "Perros pequeños", "Perros de asistencia y en formación"], a: "Perros de asistencia y en formación" },
+        { q: "Si no se paga el recargo, tras 30 días se cursará:", opts: ["Suspensión", "Recargo adicional", "Aviso", "Denuncia para procedimiento sancionador"], a: "Denuncia para procedimiento sancionador" },
+        { q: "El procedimiento sancionador se iniciará siempre:", opts: ["Por orden judicial", "Tras aviso público", "A petición del viajero", "De oficio"], a: "De oficio" },
+        { q: "Las obligaciones y prohibiciones incluyen lo dispuesto en la Ley 16/1987, art:", opts: ["142.14", "30", "143", "19"], a: "142.14" },
+        { q: "¿Está permitido conducir la bicicleta en pasillos?", opts: ["Solo en horas valle", "No", "Sí", "Con casco"], a: "No" }
+    ],
+    3: [
+        { q: "¿Qué deben cumplir siempre los perros?", opts: ["Normas de tráfico", "Legislación de protección animal y salud pública", "Normativa municipal", "Seguro obligatorio"], a: "Legislación de protección animal y salud pública" },
+        { q: "El libro de reclamaciones está visado por:", opts: ["Ministerio de Fomento", "Consorcio Regional de Transportes", "Ayuntamiento", "Metro de Madrid"], a: "Consorcio Regional de Transportes" },
+        { q: "¿Qué no debe hacer el viajero en la franja de seguridad del andén?", opts: ["Permanecer", "Correr", "Caminar", "Mirar al tren"], a: "Permanecer" },
+        { q: "¿Pueden usar ascensores los viajeros con perro?", opts: ["No", "Solo con bozal retirado", "Sí, si no obstaculizan y no molestan", "Solo solos"], a: "Sí, si no obstaculizan y no molestan" },
+        { q: "¿Pueden usar escaleras mecánicas con perros?", opts: ["Solo cachorros", "No", "Sí", "Con permiso"], a: "No" },
+        { q: "¿Cómo deben mantenerse trenes e instalaciones?", opts: ["Climatización obligatoria", "En condiciones de comodidad, iluminación, higiene, orden y seguridad", "Solo limpios", "Con vigilancia"], a: "En condiciones de comodidad, iluminación, higiene, orden y seguridad" },
+        { q: "¿A qué debe adaptarse Metro de Madrid al cumplir el Reglamento?", opts: ["A decisiones sindicales", "A normas internacionales", "A los medios técnicos y estructura organizativa existentes", "A criterios políticos"], a: "A los medios técnicos y estructura organizativa existentes" },
+        { q: "¿Pueden los perros ocupar asientos?", opts: ["Sí, con manta", "Sí, en horas valle", "Solo pequeños", "No"], a: "No" },
+        { q: "¿Qué frecuencia mínima de limpieza se establece?", opts: ["Cada 48 horas", "Mensual", "Semanal", "Diaria"], a: "Diaria" },
+        { q: "El título debe conservarse hasta:", opts: ["Las barreras de salida de la estacion de destino", "Llegar al vestíbulo", "Salir del tren", "Abandonar la red"], a: "Las barreras de salida de la estacion de destino" },
+        { q: "¿Qué sistema de información debe existir en todas las estaciones?", opts: ["Pantallas táctiles", "WiFi", "Carteles electrónicos", "Megafonía"], a: "Megafonía" },
+        { q: "¿Dónde deben colocarse los certificados sanitarios?", opts: ["En trenes solo", "En lugar visible", "En taquillas", "En oficinas"], a: "En lugar visible" },
+        { q: "¿Cuándo puede limitarse el acceso con perros?", opts: ["Aglomeraciones o razones de seguridad", "Lluvia", "Horario nocturno", "Obras"], a: "Aglomeraciones o razones de seguridad" },
+        { q: "El viajero debe tener título válido antes de:", opts: ["Entrar al vestíbulo", "Llegar al andén", "Subir al tren", "Iniciar su viaje"], a: "Iniciar su viaje" },
+        { q: "En todas las estaciones habrá información del:", opts: ["Reglamento de Viajeros", "Reglamento de Circulación", "Código Civil", "Estatuto del Consorcio"], a: "Reglamento de Viajeros" },
+        { q: "Si hay obras en horas de servicio, ¿qué debe hacerse?", opts: ["Poner un cordón de seguridad en dichas obras", "Adoptar medidas de seguridad,tales como de iluminación y señalización", "Adoptar disposiciones para que las molestias sean mínimas", "Cerrar estaciones"], a: "Adoptar disposiciones para que las molestias sean mínimas" },
+        { q: "¿Deben llevar bozal los perros?", opts: ["Desde el acceso hasta la salida", "Solo grandes", "Solo en tren", "No"], a: "Desde el acceso hasta la salida" },
+        { q: "Además de limpieza, ¿qué otras actuaciones sanitarias se realizan?", opts: ["Desinsectación", "Desratización", "Desinfección", "Todas son correctas"], a: "Todas son correctas" },
+        { q: "¿Qué deben tener trenes e instalaciones para emergencias?", opts: ["Generadores externos", "Sistema de alumbrado alternativo", "Extintores dobles", "Señales acústicas"], a: "Sistema de alumbrado alternativo" },
+        { q: "El título será inválido si no ha sido:", opts: ["Impreso", "Sellado", "Validado y cancelado", "Firmado"], a: "Validado y cancelado" },
+        { q: "Tras suspensión imprevista, los avisos se exponen como máximo:", opts: ["15 minutos después", "10 minutos después", "30 minutos después", "5 minutos después"], a: "15 minutos después" },
+        { q: "¿Qué empresa explota el Ferrocarril Metropolitano y Metrosur?", opts: ["Comunidad", "Metro de Madrid, S.A.", "ADIF", "Consorcio"], a: "Metro de Madrid, S.A." },
+        { q: "Para reclamar en el libro oficial, el viajero muestra:", opts: ["Tarjeta bancaria", "Solo título", "Solo DNI", "Título válido y DNI o Pasaporte"], a: "Título válido y DNI o Pasaporte" },
+        { q: "¿Qué se señaliza en el borde del andén?", opts: ["Zona de embarque", "Zona de prioridad", "Zona de espera", "Franja de seguridad"], a: "Franja de seguridad" },
+        { q: "¿En qué coche viajan los perros?", opts: ["Primero", "Cabina", "Cualquiera", "Último coche"], a: "Último coche" },
+        { q: "Exceptuados de título los menores de:", opts: ["4 años", "5 años", "3 años", "6 años"], a: "4 años" },
+        { q: "Ley de perros de asistencia de personas con discapacidad:", opts: ["Ley 2/2013, de 10 mayo", "Ley 2/2015, de 10 marzo", "Ley 2/2015, de 10 mayo", "Ley 2/2013, de 10 marzo"], a: "Ley 2/2015, de 10 marzo" },
+        { q: "¿Cómo deben transportarse pequeños animales domésticos?", opts: ["Sueltos con correa", "En receptáculos idóneos", "Sueltos con bozal", "Cogidos por el dueño"], a: "En receptáculos idóneos" },
+        { q: "Modificaciones de información del art. 21 se anunciarán:", opts: ["Tras entrar en vigor", "En 24 horas", "Con suficiente antelación", "Solo por megafonía"], a: "Con suficiente antelación" },
+        { q: "Los avisos se colocarán antes de:", opts: ["Los ascensores", "Los tornos de salida", "Los puntos de control de entrada", "Las taquillas"], a: "Los puntos de control de entrada" }
+    ],
+    4: [
+        { q: "Una medida posible es el canje de títulos válidos no agotados antes de:", opts: ["Su validación", "Su compra", "La entrada en vigor de la nueva tarifa", "30 días posteriores"], a: "La entrada en vigor de la nueva tarifa" },
+        { q: "¿Qué otra información incluyen los Cuadros Horarios?", opts: ["Normas de seguridad", "Correspondencia entre líneas", "Obras previstas", "Tarifas reducidas"], a: "Correspondencia entre líneas" },
+        { q: "¿Cómo deben atender los agentes las peticiones de ayuda?", opts: ["Con amabilidad", "Formalmente", "Con educación", "Por escrito"], a: "Con amabilidad" },
+        { q: "¿Días detallados específicamente para intervalos ≥ 7 min 30 s?", opts: ["Domingos", "Laborables de lunes a viernes", "Festivos", "Sábados"], a: "Laborables de lunes a viernes" },
+        { q: "La nota que acredita la circunstancia del art. 12 la extienden:", opts: ["Los Jefes de Estación", "Los interventores", "Los maquinistas", "El personal de taquilla"], a: "Los Jefes de Estación" },
+        { q: "En caso de suspensión del servicio, los pasos a vestíbulos o andenes pueden cerrarse:", opts: ["Inmediatamente después de la anomalía", "Máximo una hora", "El tiempo que sea preciso", "Solo 15 minutos"], a: "El tiempo que sea preciso" },
+        { q: "También podrá permitirse usar títulos antiguos durante al menos:", opts: ["7 días", "10 días", "15 días", "1 mes"], a: "15 días" },
+        { q: "¿Para qué intervalo deben indicarse minutos de paso (< 7 min 30 s)?", opts: ["Solo horas punta", "Para cada época del año", "Solo verano", "Solo fines de semana"], a: "Para cada época del año" },
+        { q: "Ante un cambio de tarifas, se informará a los usuarios:", opts: ["Plazo de 30 días", "Solo tras aplicarse", "Oportunamente", "Solo por web"], a: "Oportunamente" },
+        { q: "¿Qué intervalo da derecho a devolución si el previsto era ≥ 7 min 30 s?", opts: ["Más de 25 min", "15 min", "18 min", "Más de 20 min"], a: "Más de 20 min" },
+        { q: "El derecho del art. 13 se refiere a viajeros que:", opts: ["Renuncien a seguir viaje", "Lleguen con retraso", "Cambien de itinerario", "Pierdan su título"], a: "Renuncien a seguir viaje" },
+        { q: "El toque de silbato del tren indica:", opts: ["Llegada a la estación", "Inminente cierre de puertas y prohibición de entrada/salida", "Avería técnica", "Salida inmediata"], a: "Inminente cierre de puertas y prohibición de entrada/salida" },
+        { q: "¿Qué trenes deben figurar con su horario de paso individual?", opts: ["Los nocturnos", "Solo los exprés", "Primer y último tren del día", "Los de mantenimiento"], a: "Primer y último tren del día" },
+        { q: "La información sobre red e itinerarios debe permitir:", opts: ["Descuentos", "Horarios bus", "Comprar online", "Conocimiento suficiente del conjunto de la red"], a: "Conocimiento suficiente del conjunto de la red" },
+        { q: "No dan derecho a devolución los títulos que permitan:", opts: ["Ida y vuelta", "Varias zonas", "Número ilimitado de viajes o libre circulación", "Transbordos"], a: "Número ilimitado de viajes o libre circulación" },
+        { q: "¿Qué definen los Cuadros Horarios de Servicio?", opts: ["Plantillas", "Normas internas", "Intervalos y horarios de paso de trenes", "Tarifas"], a: "Intervalos y horarios de paso de trenes" },
+        { q: "¿Desde qué intervalo deben reflejarse horarios en laborables?", opts: ["Desde 10 minutos", "Desde 5 minutos", "Desde 15 minutos", "A partir de 7 minutos y 30 segundos"], a: "A partir de 7 minutos y 30 segundos" },
+        { q: "La devolución debe solicitarse:", opts: ["Estación de destino", "En la estación, inmediatamente tras la anomalía", "En 24 horas", "Cualquier estación"], a: "En la estación, inmediatamente tras la anomalía" },
+        { q: "Otra condición para exponer horarios en accesos es que estén a más de:", opts: ["40 m en planta", "25 m en planta", "50 m en planta", "100 m en planta"], a: "50 m en planta" },
+        { q: "Tienen preferencia de paso:", opts: ["Viajeros con abono", "Los que salen de los trenes", "Los que entran al tren", "Personas con equipaje"], a: "Los que salen de los trenes" },
+        { q: "¿Qué intervalo da derecho a devolución si el previsto era < 7 min 30 s?", opts: ["12 min", "Más de 15 min", "10 min", "Más de 20 min"], a: "Más de 15 min" },
+        { q: "En las circunstancias señaladas en el artículo 13, el viajero recibirá un título equivalente al utilizado que permita:", opts: ["Un viaje de mayor recorrido", "Un viaje de cualquier tipo", "Un viaje igual al interrumpido", "Dos viajes sencillos"], a: "Un viaje igual al interrumpido" },
+        { q: "Alternativamente, el viajero puede optar (según art. 14) por:", opts: ["Recibir en metálico el importe del viaje no finalizado", "Un vale descuento", "Un título con viajes ilimitados", "Un abono mensual"], a: "Recibir en metálico el importe del viaje no finalizado" },
+        { q: "Para ejercer el derecho a devolución, el viajero que renuncie a continuar el viaje debe presentar un título de transporte cuya devolución esté prevista en:", opts: ["El plano de la red", "El Cuadro de Tarifas", "El Cuadro Horario", "El Reglamento de Viajeros"], a: "El Cuadro de Tarifas" },
+        { q: "¿Qué deben distinguir los Cuadros Horarios?", opts: ["Períodos del día y días de la semana", "Tipos de tren", "Velocidad", "Conductores"], a: "Períodos del día y días de la semana" },
+        { q: "La nota que acredita la circunstancia del artículo 12 debe solicitarse:", opts: ["Inmediatamente después de la anomalía", "Antes del viaje", "Al día siguiente", "Tras presentar la reclamación"], a: "Inmediatamente después de la anomalía" },
+        { q: "El Cuadro de Tarifas completo se expondrá en:", opts: ["Solo andenes", "Vestíbulos y andenes", "Taquillas", "Solo vestíbulos"], a: "Vestíbulos y andenes" },
+        { q: "También se expondrá en accesos cuyos vestíbulos tengan más de:", opts: ["30 metros de longitud", "Más de dos tramos de escaleras de profundidad", "Un tramo de escaleras", "Tres ascensores"], a: "Más de dos tramos de escaleras de profundidad" },
+        { q: "El horario de apertura y cierre se expondrá en:", opts: ["Solo andenes", "Trenes", "Cabinas", "Vestíbulos de todas las estaciones"], a: "Vestíbulos de todas las estaciones" },
+        { q: "Cuando se prevean retrasos superiores a los del art. 12, se informa por:", opts: ["Personal estación", "SMS", "Pantallas", "Megafonía"], a: "Megafonía" }
+    ]
+};
+
+let currentBlock = [], currentIdx = 0, hits = 0, mistakes = [];
+
+function startTest(num) {
+    currentBlock = db[num];
+    currentIdx = 0; hits = 0; mistakes = [];
+    document.getElementById('selector').classList.add('hidden');
+    document.getElementById('quiz-area').classList.remove('hidden');
+    document.getElementById('btn-volver-menu').classList.add('hidden');
+    document.getElementById('btn-salir-test').classList.remove('hidden');
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = currentBlock[currentIdx];
+    document.getElementById('progreso').innerText = `Pregunta ${currentIdx + 1}/${currentBlock.length}`;
+    document.getElementById('score').innerText = hits;
+    document.getElementById('q-text').innerText = q.q;
+    document.getElementById('next-btn').style.display = 'none';
+    const container = document.getElementById('q-options');
+    container.innerHTML = '';
+    q.opts.forEach(optText => {
+        const btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerText = optText;
+        btn.onclick = () => check(btn, optText, q.a);
+        container.appendChild(btn);
+    });
+}
+
+function check(btn, selected, correct) {
+    const buttons = document.querySelectorAll('.opt');
+    buttons.forEach(b => b.disabled = true);
+    
+    const qActual = currentBlock[currentIdx]; // Obtenemos la pregunta actual
+
+    if(selected === correct) {
+        btn.classList.add('correct');
+        hits++;
+        setTimeout(nextQuestion, 600);
+    } else {
+        btn.classList.add('wrong');
+        
+        // --- AQUÍ CONECTAMOS CON EL CENTRO DE ERRORES ---
+        guardarFallo(
+            qActual.q,        // La pregunta
+            qActual.opts,     // Las opciones
+            correct,          // La respuesta correcta
+            "Ley CRTM"        // La etiqueta del tema
+        );
+        // -----------------------------------------------
+
+        mistakes.push({q: qActual.q, a: correct});
+        buttons.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+        document.getElementById('next-btn').style.display = 'block';
+    }
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if(currentIdx < currentBlock.length) showQuestion();
+    else showResults();
+}
+
+function showResults() {
+    document.getElementById('quiz-area').classList.add('hidden');
+    document.getElementById('results').classList.remove('hidden');
+    const pct = Math.round((hits/currentBlock.length)*100);
+    document.getElementById('final-score').innerText = `${pct}% (${hits}/${currentBlock.length})`;
+    const list = document.getElementById('failed-list');
+    if(mistakes.length > 0) {
+        list.innerHTML = '<strong>Repasa tus errores:</strong><br><br>' + 
+            mistakes.map(m => `• ${m.q}<br><span style="color:var(--correct)">✔ Correcta: ${m.a}</span>`).join('<br><br>');
+    } else { list.innerHTML = '¡Enhorabuena! Has clavado todas las preguntas.'; }
+}
+function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+    // 1. Recuperamos lo que ya hay guardado o creamos una lista vacía
+    let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+
+    // 2. Creamos el objeto del fallo
+    const nuevoFallo = {
+        id: Date.now(), // Para que cada fallo sea único
+        modulo: modulo, // Ej: "Ley CRTM" o "Tarifas"
+        q: pregunta,
+        opts: opciones,
+        a: respuestaCorrecta
+    };
+
+    // 3. Solo lo añadimos si no estaba ya repetido
+    if (!listaFallos.find(f => f.q === pregunta)) {
+        listaFallos.push(nuevoFallo);
+        localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
+    }
+}
+</script>
+</body>
+</html>
