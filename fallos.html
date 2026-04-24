@@ -118,26 +118,28 @@
         });
     }
 
-    function validarRespuesta(btn, seleccionada, correcta, idFallo) {
-        const botones = document.querySelectorAll('.opt-test');
-        botones.forEach(b => b.disabled = true); // Bloquear para no pinchar varias veces
+   function validarRespuesta(btn, seleccionada, correcta, idFallo) {
+    const botones = document.querySelectorAll('.opt-test');
+    botones.forEach(b => b.disabled = true); // Bloquear para no pinchar varias veces
 
-        if (seleccionada === correcta) {
-            btn.classList.add('correct');
-            // Si la acierta, la quitamos del localStorage
-            eliminarFalloSilencioso(idFallo);
-        } else {
-            btn.classList.add('wrong');
-            // Marcamos la correcta para que aprenda
-            botones.forEach(b => { if(b.innerText === correcta) b.classList.add('correct'); });
-        }
-
-        document.getElementById('btn-siguiente').classList.remove('hidden');
-        document.getElementById('btn-siguiente').onclick = () => {
-            indiceActual++;
-            mostrarPreguntaTest();
-        };
+    if (seleccionada === correcta) {
+        btn.classList.add('correct');
+        // COMENTAMOS O BORRAMOS LA SIGUIENTE LÍNEA:
+        // eliminarFalloSilencioso(idFallo); 
+        
+        // Ahora, aunque aciertes, la pregunta NO se borrará del localStorage.
+    } else {
+        btn.classList.add('wrong');
+        // Marcamos la correcta para que aprendas
+        botones.forEach(b => { if(b.innerText === correcta) b.classList.add('correct'); });
     }
+
+    document.getElementById('btn-siguiente').classList.remove('hidden');
+    document.getElementById('btn-siguiente').onclick = () => {
+        indiceActual++;
+        mostrarPreguntaTest();
+    };
+}
 
     function cancelarTest() {
         document.getElementById('main-view').classList.remove('hidden');
