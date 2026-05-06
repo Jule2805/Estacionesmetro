@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test NIC - Definiciones</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --accent: #e67e22; 
+            --correct: #009543;
+            --wrong: #ff3b30;
+            --text: #ffffff;
+        }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh;
+        }
+        .container { width: 100%; max-width: 500px; padding: 20px; }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #progreso-texto { font-size: 14px; color: #888; }
+        .btn-salir {
+            background: none; border: 1px solid #444; color: #ccc;
+            padding: 5px 12px; border-radius: 5px; cursor: pointer;
+        }
+
+        .progress-bar {
+            width: 100%; height: 6px; background: #333;
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: var(--accent);
+            width: 0%; transition: width 0.3s;
+        }
+
+        .question-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        h2 { font-size: 1.1rem; line-height: 1.4; margin-bottom: 20px; min-height: 60px; }
+
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn {
+            background: #2a2a2a; border: 1px solid #333; color: white;
+            padding: 16px; border-radius: 12px; text-align: left;
+            font-size: 14px; cursor: pointer; transition: 0.2s;
+        }
+        .opt-btn.correct { background: var(--correct) !important; border-color: var(--correct); }
+        .opt-btn.wrong { background: var(--wrong) !important; border-color: var(--wrong); }
+
+        .btn-next {
+            width: 100%; background: var(--accent); color: white;
+            border: none; padding: 15px; border-radius: 10px;
+            font-weight: bold; margin-top: 20px; cursor: pointer;
+            display: none;
+        }
+
+        .results-list {
+            text-align: left; background: #000; padding: 15px;
+            border-radius: 10px; font-size: 13px; max-height: 300px;
+            overflow-y: auto; margin-top: 15px;
+        }
+        .result-item { margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-screen">
+        <div class="quiz-header">
+            <div id="progreso-texto">Pregunta 1/50</div>
+            <button class="btn-salir" onclick="window.location.href='nic.html'">✕ Salir</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        
+        <div class="question-card">
+            <h2 id="question-text">Cargando definición...</h2>
+            <div id="options-container" class="options-grid"></div>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE PREGUNTA</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="hidden">
+        <div class="question-card" style="text-align:center;">
+            <h1 id="score-percent">0%</h1>
+            <p id="score-text"></p>
+            <div id="failed-review" class="results-list"></div>
+            <button class="btn-next" style="display:block;" onclick="location.reload()">REPETIR TEST</button>
+            <button class="btn-next" style="display:block; background:#444;" onclick="window.location.href='nic.html'">MENU NIC</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const db = [
+        { q: "¿Qué es el acantonamiento?", a: "Un sistema de bloqueo para proteger la circulación de trenes ante un tren que no garantiza el correcto shuntado", opts: ["Un sistema de detección de obstáculos en las estaciones", "Un sistema de bloqueo para proteger la circulación de trenes ante un tren que no garantiza el correcto shuntado", "El proceso de limpieza y mantenimiento nocturno", "Un mecanismo para regular el alumbrado de túneles"] },
+        { q: "¿Qué uso adicional tiene el acantonamiento?", a: "Proteger movimientos hacia delante y hacia atrás o que ocupa indistintamente las dos vías", opts: ["Controlar la apertura de puertas en andenes", "Proteger movimientos hacia delante y hacia atrás o que ocupa indistintamente las dos vías", "Gestionar el corte de tensión en vías secundarias", "Facilitar el acceso a sacos de maniobras"] },
+        { q: "¿Dónde permanece el alumbrado del túnel encendido permanentemente?", a: "En los sacos de maniobras", opts: ["En toda la red principal", "En las estaciones con andenes centrales", "En los sacos de maniobras", "En los depósitos y naves de cocheras"] },
+        { q: "¿Qué es el andén?", a: "Superficie de la estación destinada al acceso de los viajeros a los trenes y su salida de estos", opts: ["Zona de espera para personal de mantenimiento", "Superficie de la estación destinada al acceso de los viajeros a los trenes y su salida de estos", "La zona de vías entre dos estaciones", "Espacio para el estacionamiento de trenes de reserva"] },
+        { q: "¿Qué define a los Aparatos de vía?", a: "Dispositivos que permiten la ramificación y el cruce de vías", opts: ["Sistemas de megafonía y teleindicadores", "Dispositivos que permiten la ramificación y el cruce de vías", "Cajas de señales ubicadas en el túnel", "Elementos de tracción de la catenaria"] },
+        { q: "¿Qué es el Auto-shunt?", a: "Maniobra que permite a un tren circular por un tramo de vía sin necesidad de señales externas", opts: ["Sistema de frenado automático de emergencia", "Maniobra que permite a un tren circular por un tramo de vía sin necesidad de señales externas", "Proceso de carga de baterías en depósito", "Desacoplo automático de unidades"] },
+        { q: "¿Qué es un Bloqueo?", a: "Sistema o conjunto de normas que tiene por objeto evitar la colisión entre trenes que circulan por la misma vía", opts: ["Cierre total de una línea por avería", "Corte del suministro eléctrico por seguridad", "Sistema o conjunto de normas que tiene por objeto evitar la colisión entre trenes que circulan por la misma vía", "Inmovilización de un tren en el túnel"] },
+        { q: "¿Cómo se define un Cantón?", a: "Tramo de vía en el que, en condiciones normales, no puede haber más de un tren", opts: ["Espacio entre la plataforma y el tren", "Tramo de vía en el que, en condiciones normales, no puede haber más de un tren", "El tiempo de espera entre dos trenes", "La cabina de conducción de un vehículo"] },
+        { q: "¿Qué es la Capacidad de una línea?", a: "El número máximo de trenes que pueden circular por ella en un tiempo determinado", opts: ["El número máximo de viajeros por vagón", "La potencia eléctrica máxima de la subestación", "El número máximo de trenes que pueden circular por ella en un tiempo determinado", "La longitud total de la línea en kilómetros"] },
+        { q: "¿Qué es la Catenaria?", a: "Línea aérea de contacto destinada a suministrar energía eléctrica a los trenes", opts: ["Raíl de seguridad en las curvas", "Línea aérea de contacto destinada a suministrar energía eléctrica a los trenes", "Cable de comunicaciones entre estaciones", "Sistema de ventilación del túnel"] },
+        { q: "¿Qué es un Circuito de vía?", a: "Dispositivo eléctrico que detecta la presencia de un tren en un tramo de vía", opts: ["El recorrido total de una línea", "Dispositivo eléctrico que detecta la presencia de un tren en un tramo de vía", "Sistema de alimentación de reserva", "Circuito cerrado de televisión del PCC"] },
+        { q: "¿Cómo se define la Circulación?", a: "Movimiento de los trenes por las vías de la red", opts: ["Venta de títulos de transporte", "Movimiento de los trenes por las vías de la red", "Flujo de aire en el interior de los túneles", "Desplazamiento de viajeros por los pasillos"] },
+        { q: "¿Qué es la Conducción manual?", a: "Modo en el que el conductor controla directamente la velocidad y el frenado del tren", opts: ["Llevar el tren mediante empuje físico", "Conducir sin usar el sistema de radio", "Modo en el que el conductor controla directamente la velocidad y el frenado del tren", "Movimiento de agujas con palanca"] },
+        { q: "¿Qué es la Conducción automática (ATO)?", a: "Sistema que regula la velocidad y el frenado de forma automática sin intervención directa del conductor", opts: ["Tren circular sin conductor a bordo", "Control total desde el PCC sin personal", "Sistema que regula la velocidad y el frenado de forma automática sin intervención directa del conductor", "Apertura de puertas controlada por sensores"] },
+        { q: "¿Qué es un Depósito?", a: "Instalación destinada al estacionamiento, mantenimiento y limpieza de los trenes", opts: ["Almacén de objetos perdidos", "Instalación destinada al estacionamiento, mantenimiento y limpieza de los trenes", "Tanque de agua para emergencias", "Zona de recaudación de taquillas"] },
+        { q: "¿Qué es una Estación?", a: "Instalación ferroviaria destinada a la subida y bajada de viajeros", opts: ["Cualquier punto con un teléfono de socorro", "Instalación ferroviaria destinada a la subida y bajada de viajeros", "Punto final de una línea", "Lugar donde reside el Jefe de Línea"] },
+        { q: "¿Qué es un Enclavamiento?", a: "Sistema que coordina la posición de las agujas y las señales para garantizar rutas seguras", opts: ["Bloqueo de las puertas por seguridad", "Sistema que coordina la posición de las agujas y las señales para garantizar rutas seguras", "Fijación del tren al carril en pendientes", "Conexión mecánica entre dos vagones"] },
+        { q: "¿Qué es el Gálibo?", a: "Dimensiones máximas de un vehículo o estructura para permitir el paso seguro", opts: ["Distancia entre las ruedas de un eje", "Dimensiones máximas de un vehículo o estructura para permitir el paso seguro", "Peso máximo autorizado por eje", "Velocidad máxima en curvas cerradas"] },
+        { q: "¿Qué es una Incidencia?", a: "Cualquier hecho que altere la explotación normal del servicio", opts: ["Retraso de menos de 1 minuto", "Cualquier hecho que altere la explotación normal del servicio", "Cambio de turno de un conductor", "Apertura de una nueva estación"] },
+        { q: "¿Qué es un Itinerario?", a: "Ruta establecida para el movimiento de un tren entre dos puntos", opts: ["Horario de paso por las estaciones", "Ruta establecida para el movimiento de un tren entre dos puntos", "Manual de instrucciones del tren", "Mapa de la red de Metro"] },
+        { q: "¿Qué es la Marcha a la vista?", a: "Conducción en la que el conductor debe poder detenerse ante cualquier obstáculo visible", opts: ["Circular con las luces de cabina apagadas", "Conducción en la que el conductor debe poder detenerse ante cualquier obstáculo visible", "Mirar fijamente el velocímetro", "Circular siguiendo las indicaciones del PCC exclusivamente"] },
+        { q: "¿Qué es el Modo de conducción?", a: "Diferentes configuraciones del sistema de control del tren (ATO, Manual, etc.)", opts: ["Sentido de la marcha", "Configuración de las luces de cabina", "Diferentes configuraciones del sistema de control del tren (ATO, Manual, etc.)", "Elección de vía por el conductor"] },
+        { q: "¿Qué es el Puesto de Control Central (PCC)?", a: "Centro desde donde se supervisa y controla toda la red de Metro", opts: ["Cabina del conductor", "Centro desde donde se supervisa y controla toda la red de Metro", "Oficina del Jefe de Estación", "Punto de venta de billetes"] },
+        { q: "¿Qué es una Señal?", a: "Dispositivo que transmite órdenes o informaciones al personal de conducción", opts: ["Letrero publicitario en el andén", "Dispositivo que transmite órdenes o informaciones al personal de conducción", "Marca en el suelo del túnel", "Pitido de aviso de cierre de puertas"] },
+        { q: "¿Qué es un Tren?", a: "Vehículo o conjunto de vehículos ferroviarios acoplados para el transporte", opts: ["Cualquier máquina con ruedas", "Vehículo o conjunto de vehículos ferroviarios acoplados para el transporte", "Solo las unidades de viajeros", "Un vagón aislado en vía secundaria"] },
+        { q: "¿Qué es una Vía?", a: "Camino formado por dos raíles sobre los que circulan los trenes", opts: ["Camino formado por dos raíles sobre los que circulan los trenes", "Pasillo de evacuación de emergencia", "Cable de alimentación eléctrica", "Túnel de ventilación"] },
+        { q: "¿Qué es una Vía de servicio?", a: "Vía destinada a movimientos que no son de transporte de viajeros", opts: ["Vía por donde pasan más trenes", "Vía destinada a movimientos que no son de transporte de viajeros", "Vía de acceso a las oficinas", "Vía con wifi para el personal"] },
+        { q: "¿Qué es el Shuntado?", a: "Conexión eléctrica de los dos raíles a través de las ruedas de un tren", opts: ["Limpieza de los raíles", "Conexión eléctrica de los dos raíles a través de las ruedas de un tren", "Acoplamiento de dos trenes", "Corte de corriente en catenaria"] },
+        { q: "¿Qué es una Bifurcación?", a: "Punto donde una vía se divide en dos o más", opts: ["Cruce de dos líneas diferentes", "Punto donde una vía se divide en dos o más", "Final de un túnel", "Cambio de conductor"] },
+        { q: "¿Qué es un Boggie?", a: "Conjunto de ruedas y ejes sobre el que descansa la caja del vehículo", opts: ["Tipo de freno de mano", "Conjunto de ruedas y ejes sobre el que descansa la caja del vehículo", "Puerta de acceso a la cabina", "Sistema de aire acondicionado"] },
+        { q: "¿Qué es el Enganche?", a: "Dispositivo que permite acoplar dos vehículos ferroviarios", opts: ["Freno de estacionamiento", "Dispositivo que permite acoplar dos vehículos ferroviarios", "Conector de radio", "Sujeción del pantógrafo"] },
+        { q: "¿Qué es el Pantógrafo?", a: "Dispositivo situado sobre el tren que toma la corriente de la catenaria", opts: ["Luz delantera del tren", "Dispositivo situado sobre el tren que toma la corriente de la catenaria", "Espejo retrovisor", "Pedal del hombre muerto"] },
+        { q: "¿Qué es la Plataforma de vía?", a: "Superficie sobre la que se asientan las vías", opts: ["Zona de espera de viajeros", "Superficie sobre la que se asientan las vías", "Techo del túnel", "Interior de los vagones"] },
+        { q: "¿Qué es un Saco de maniobras?", a: "Vía muerta destinada a invertir el sentido de la marcha o estacionar trenes", opts: ["Almacén de herramientas", "Vía muerta destinada a invertir el sentido de la marcha o estacionar trenes", "Bolsa de emergencia de cabina", "Zona de entrenamiento para conductores"] },
+        { q: "¿Qué es el ATP (Automatic Train Protection)?", a: "Sistema que supervisa la conducción y frena el tren si hay peligro", opts: ["Sistema de información al viajero", "Sistema que supervisa la conducción y frena el tren si hay peligro", "Protocolo de limpieza de trenes", "Aparato de telefonía pública"] },
+        { q: "¿Qué es una Aguja?", a: "Parte móvil de un aparato de vía que permite cambiar de dirección", opts: ["Reloj de la estación", "Parte móvil de un aparato de vía que permite cambiar de dirección", "Indicador de presión de freno", "Pieza que sujeta la catenaria"] },
+        { q: "¿Qué es la Banda de mantenimiento?", a: "Periodo nocturno sin servicio destinado a trabajos en la vía", opts: ["Cinta transportadora de maletas", "Periodo nocturno sin servicio destinado a trabajos en la vía", "Grupo de trabajadores de limpieza", "Zona amarilla del andén"] },
+        { q: "¿Qué es la Contravía?", a: "Circular por una vía en sentido contrario al habitual", opts: ["Vía de otra compañía", "Circular por una vía en sentido contrario al habitual", "Vía que está en obras", "Vía paralela a la principal"] },
+        { q: "¿Qué es un Desvío?", a: "Aparato de vía que permite el paso de una vía a otra", opts: ["Ruta alternativa por la calle", "Aparato de vía que permite el paso de una vía a otra", "Fallo en el sistema eléctrico", "Salida de emergencia"] },
+        { q: "¿Qué es el Hombre Muerto?", a: "Dispositivo de seguridad que frena el tren si el conductor pierde el conocimiento", opts: ["Camilla de rescate", "Dispositivo de seguridad que frena el tren si el conductor pierde el conocimiento", "Simulacro de accidente", "Señal de peligro extremo"] },
+        { q: "¿Qué es un Piquete de entrevías?", a: "Señal que indica el límite de seguridad en la convergencia de dos vías", opts: ["Herramienta para picar balasto", "Señal que indica el límite de seguridad en la convergencia de dos vías", "Personal que vigila el túnel", "Poste de la catenaria"] },
+        { q: "¿Qué es la Radio-tren?", a: "Sistema de comunicación entre el PCC y los conductores", opts: ["Emisora de música en estaciones", "Sistema de comunicación entre el PCC y los conductores", "Antena de televisión del tren", "Altavoz de los vagones"] },
+        { q: "¿Qué es el Retroceso?", a: "Movimiento de un tren en sentido contrario al de su marcha autorizada", opts: ["Volver a una versión anterior del manual", "Movimiento de un tren en sentido contrario al de su marcha autorizada", "Pérdida de velocidad en subida", "Cancelación de un examen"] },
+        { q: "¿Qué es una Vía banalizada?", a: "Vía con señales que permite circular en ambos sentidos indistintamente", opts: ["Vía sin importancia", "Vía con señales que permite circular en ambos sentidos indistintamente", "Vía exclusiva para trenes de carga", "Vía que ha perdido su uso"] },
+        { q: "¿Qué es la Vía I?", a: "Generalmente la vía por la que los trenes se alejan del origen de la línea", opts: ["La vía más rápida", "Generalmente la vía por la que los trenes se alejan del origen de la línea", "La vía de entrada al depósito", "La vía con el número más bajo"] },
+        { q: "¿Qué es la Vía II?", a: "Generalmente la vía por la que los trenes se acercan al origen de la línea", opts: ["La vía secundaria", "Generalmente la vía por la que los trenes se acercan al origen de la línea", "La vía de salida al exterior", "La vía de reserva"] },
+        { q: "¿Qué es un Vehículo bi-vial?", a: "Vehículo que puede circular por las vías y por carretera", opts: ["Tren con dos motores", "Vehículo que puede circular por las vías y por carretera", "Vagón con dos pisos", "Autobús que parece un tren"] },
+        { q: "¿Qué es la Velocidad de paso de hombre?", a: "Velocidad muy reducida, aproximadamente 5 km/h", opts: ["Velocidad máxima permitida", "Velocidad muy reducida, aproximadamente 5 km/h", "Velocidad de carrera", "Velocidad media de la línea"] },
+        { q: "¿Qué es el Aislador?", a: "Elemento que impide el paso de la corriente eléctrica a estructuras no deseadas", opts: ["Casco protector del personal", "Elemento que impide el paso de la corriente eléctrica a estructuras no deseadas", "Pared que separa el túnel", "Tapón para los oídos"] },
+        { q: "¿Qué es el Mando Local?", a: "Controlar las señales y agujas desde la propia estación y no desde el PCC", opts: ["Conducir desde el último vagón", "Controlar las señales y agujas desde la propia estación y no desde el PCC", "Vender billetes manualmente", "Encender las luces de la estación"] }
+    ];
+
+    let currentIdx = 0;
+    let hits = 0;
+    let fails = [];
+
+    function initQuiz() {
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = db[currentIdx];
+        document.getElementById('progreso-texto').innerText = `Definición ${currentIdx + 1}/${db.length}`;
+        document.getElementById('progress-fill').style.width = `${(currentIdx / db.length) * 100}%`;
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('btn-next').style.display = "none";
+
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+
+        const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, q.a);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, selected, correct) {
+        const buttons = document.querySelectorAll('.opt-btn');
+        buttons.forEach(b => b.disabled = true);
+
+        if (selected === correct) {
+            btn.classList.add('correct');
+            hits++;
+            setTimeout(nextQuestion, 800);
+        } else {
+            btn.classList.add('wrong');
+            fails.push({ q: db[currentIdx].q, a: correct });
+            guardarFallo(db[currentIdx].q, db[currentIdx].opts, correct, "NIC: Definiciones");
+
+            buttons.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
+            document.getElementById('btn-next').style.display = "block";
+        }
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < db.length) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.remove('hidden');
+        
+        const percent = Math.round((hits / db.length) * 100);
+        document.getElementById('score-percent').innerText = `${percent}%`;
+        document.getElementById('score-text').innerText = `Has acertado ${hits} de ${db.length} definiciones.`;
+
+        const review = document.getElementById('failed-review');
+        if (fails.length > 0) {
+            review.innerHTML = '<strong>Repasa tus errores:</strong><br><br>' + 
+                fails.map(f => `<div class="result-item">• ${f.q}<br><span style="color:var(--correct)">✔ ${f.a}</span></div>`).join('');
+        } else {
+            review.innerHTML = "¡Excelente! Conoces todas las definiciones.";
+        }
+    }
+
+    function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+        let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+        const nuevoFallo = {
+            id: Date.now(),
+            modulo: modulo,
+            q: pregunta,
+            opts: opciones,
+            a: respuestaCorrecta
+        };
+        if (!listaFallos.find(f => f.q === pregunta)) {
+            listaFallos.push(nuevoFallo);
+            localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
+        }
+    }
+
+    initQuiz();
+</script>
+
+</body>
+</html>

@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #007bff;
-            --metro: #f31431; --cercanias: #ff6600; --otros: #36cdf3;--sistema: #93117e; --fallo:#15ec44;
+            --metro: #f31431; --cercanias: #ff6600; --otros: #36cdf3;--sistema: #93117e; --fallo:#15ec44;--nic:#ec15a4;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
@@ -29,6 +29,7 @@
         .block-otros { background: var(--otros);}
         .block-sistema { background: var(--sistema) !important;}
         .block-fallo {background: var(--fallo);} 
+        .block-nic {background-color:var(--nic)};
         /* ESTILOS DEL JUEGO */
         .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
         #progress-fill { height: 100%; background: #28a745; width: 0%; transition: 0.3s; }
@@ -421,6 +422,9 @@ function showMainMenu() {
             </button>
             <button class="menu-block block-fallo" onclick="window.location.href='fallos.html'">
                 <span>❌</span> Fallos
+            </button>
+            <button class="menu-block block-nic" onclick="window.location.href='nic.html'">
+                <span>📐</span> NIC
             </button>
         </div>
     `;
