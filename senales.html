@@ -8,7 +8,7 @@
         :root {
             --bg: #121212;
             --card: #1e1e1e;
-            --accent: #e67e22; /* Naranja NIC */
+            --accent: #e67e22;
             --correct: #009543;
             --wrong: #ff3b30;
             --text: #ffffff;
@@ -24,7 +24,6 @@
         }
         .container { width: 100%; max-width: 500px; padding: 20px; }
         
-        /* Cabecera estilo imagen */
         .quiz-header {
             display: flex;
             justify-content: space-between;
@@ -37,7 +36,6 @@
             padding: 5px 12px; border-radius: 5px; cursor: pointer;
         }
 
-        /* Barra de progreso */
         .progress-bar {
             width: 100%; height: 6px; background: #333;
             border-radius: 10px; margin-bottom: 25px; overflow: hidden;
@@ -53,25 +51,56 @@
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        h2 { font-size: 1.2rem; line-height: 1.4; margin-bottom: 20px; }
+        .cat-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 99px;
+            margin-bottom: 12px;
+            background: #333;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .cat-fundamental { background: #3a1a1a; color: #ff6b6b; }
+        .cat-indicadora   { background: #1a2a3a; color: #6ab0ff; }
+        .cat-cartel       { background: #2a2a1a; color: #f0c040; }
+        .cat-manual       { background: #1a3a1a; color: #6fd88a; }
+
+        h2 { font-size: 1.1rem; line-height: 1.5; margin-bottom: 20px; margin-top: 0; }
 
         .options-grid { display: flex; flex-direction: column; gap: 12px; }
         .opt-btn {
             background: #2a2a2a; border: 1px solid #333; color: white;
-            padding: 18px; border-radius: 12px; text-align: left;
-            font-size: 15px; cursor: pointer; transition: 0.2s;
+            padding: 16px; border-radius: 12px; text-align: left;
+            font-size: 14px; cursor: pointer; transition: 0.2s; line-height: 1.4;
         }
+        .opt-btn:hover:not(:disabled) { background: #333; border-color: #555; }
         .opt-btn.correct { background: var(--correct) !important; border-color: var(--correct); }
-        .opt-btn.wrong { background: var(--wrong) !important; border-color: var(--wrong); }
+        .opt-btn.wrong   { background: var(--wrong)   !important; border-color: var(--wrong); }
+        .opt-btn.reveal  { background: #005a28 !important; border-color: var(--correct); opacity: 0.85; }
+
+        .tip-box {
+            display: none;
+            margin-top: 16px;
+            padding: 14px;
+            background: #252525;
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+        .tip-box.show { display: block; }
 
         .btn-next {
             width: 100%; background: var(--accent); color: white;
             border: none; padding: 15px; border-radius: 10px;
-            font-weight: bold; margin-top: 20px; cursor: pointer;
-            display: none; /* Solo se muestra al fallar */
+            font-weight: bold; margin-top: 16px; cursor: pointer;
+            display: none; font-size: 15px;
         }
+        .btn-next.show { display: block; }
 
-        /* Resultados finales */
         .results-list {
             text-align: left; background: #000; padding: 15px;
             border-radius: 10px; font-size: 13px; max-height: 300px;
@@ -86,15 +115,17 @@
 <div class="container">
     <div id="quiz-screen">
         <div class="quiz-header">
-            <div id="progreso-texto">Pregunta 1/60</div>
+            <div id="progreso-texto">Pregunta 1/26</div>
             <button class="btn-salir" onclick="window.location.href='nic.html'">✕ Salir</button>
         </div>
         <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
         
         <div class="question-card">
+            <div id="cat-badge" class="cat-badge"></div>
             <h2 id="question-text">Cargando pregunta...</h2>
             <div id="options-container" class="options-grid"></div>
-            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE PREGUNTA</button>
+            <div id="tip-box" class="tip-box"></div>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE PREGUNTA →</button>
         </div>
     </div>
 
@@ -104,169 +135,431 @@
             <p id="score-text"></p>
             <div id="failed-review" class="results-list"></div>
             <button class="btn-next" style="display:block;" onclick="location.reload()">REPETIR TEST</button>
-            <button class="btn-next" style="display:block; background:#444;" onclick="window.location.href='nic.html'">MENU NIC</button>
+            <button class="btn-next" style="display:block; background:#444; margin-top:10px;" onclick="window.location.href='nic.html'">MENÚ NIC</button>
         </div>
     </div>
 </div>
 
 <script>
-    const db = [
-        { q: "¿Cómo se clasifican las señales según su función principal?", a: "Fundamentales, indicadoras y carteles", opts: ["Manuales, fijas y portátiles", "De parada, de precaución y de vía libre", "Fundamentales, indicadoras y carteles", "Eléctricas, mecánicas y luminosas"] },
-        { q: "¿Qué indica una señal fundamental de 'Parada' (rojo)?", a: "Orden de parada ante la señal, sin rebasarla", opts: ["Reducir la velocidad a 5 km/h", "Orden de parada ante la señal, sin rebasarla", "Cantón ocupado por tren de trabajo", "Autoriza paso con precaución"] },
-        { q: "¿Qué significado tiene una señal fundamental que muestra el color verde?", a: "Vía libre; permite circular normalmente si nada se opone", opts: ["Marcha a la vista hasta la siguiente señal", "Realizar un auto-shunt", "Vía libre; permite circular normalmente si nada se opone", "Aviso de próxima señal en parada"] },
-        { q: "¿Cuál es el significado de una señal fundamental con el color amarillo?", a: "Indica que la señal siguiente está en posición de parada", opts: ["Indica que la señal siguiente está en posición de parada", "Circular a paso de hombre", "Detenerse en 100 metros", "Agujas en vía desviada"] },
-        { q: "¿Qué indica una señal indicadora de 'Vía libre con limitación de velocidad' (amarillo-verde)?", a: "Que el tren puede circular normalmente pero sin exceder la velocidad indicada por la señalización", opts: ["Detenerse antes de la curva", "Que el tren puede circular normalmente pero sin exceder la velocidad indicada por la señalización", "Tramo en obras", "Retroceder a la estación anterior"] },
-        { q: "¿Para qué sirven las señales indicadoras de 'Paso a nivel'?", a: "Indican la proximidad de un paso a nivel y su estado (protegido o no)", opts: ["Avisar a peatones", "Indican la proximidad de un paso a nivel y su estado (protegido o no)", "Accionar bocina obligatoriamente", "Final de plataforma en cielo abierto"] },
-        { q: "¿Qué función tienen las señales indicadoras de 'Dirección'?", a: "Indicar la vía hacia la que está encaminado el itinerario en los puntos de bifurcación", opts: ["Sentido en vías banalizadas", "Informar velocidad máxima", "Indicar la vía hacia la que está encaminado el itinerario en los puntos de bifurcación", "Ubicación del PCC"] },
-        { q: "¿Qué indica el cartel de 'Límite de velocidad'?", a: "La velocidad máxima a la que pueden circular los trenes por el tramo que sigue al cartel", opts: ["Velocidad media de la línea", "La velocidad máxima a la que pueden circular los trenes por el tramo que sigue al cartel", "Velocidad mínima anti-patinado", "Aproximación a sacos de maniobras"] },
-        { q: "¿Cuál es la función del cartel 'Anuncio de velocidad limitada'?", a: "Preavisar de una limitación de velocidad que se encuentra más adelante", opts: ["Fin de límite en próxima señal", "Comienzo de zona de obras", "Preavisar de una limitación de velocidad que se encuentra más adelante", "Apagar alumbrado de cabina"] },
-        { q: "¿Qué indica el cartel de 'Fin de velocidad limitada'?", a: "El punto donde el tren puede recuperar la velocidad máxima de la línea", opts: ["El punto donde el tren puede recuperar la velocidad máxima de la línea", "Parada inmediata", "Comienzo de pendiente", "Señalización de obras finalizada"] },
-        { q: "¿Para qué se utiliza el cartel de 'Parada'?", a: "Indica el punto donde el tren debe detenerse normalmente en una estación o ante una señal", opts: ["Detención de viajeros", "Indica el punto donde el tren debe detenerse normalmente en una estación o ante una señal", "Lugar de cambio de cabina", "Fin de plataforma en depósitos"] },
-        { q: "¿Qué indica el cartel de 'Apeadero'?", a: "Un punto de parada que no tiene la consideración de estación", opts: ["Estación sin seguridad", "Un punto de parada que no tiene la consideración de estación", "Descarga de materiales", "Zona de descanso"] },
-        { q: "¿Cuál es el propósito del cartel de 'Silbato'?", a: "Indicar un punto donde es obligatorio accionar el aparato de silbar", opts: ["Comprobar megafonía", "Indicar un punto donde es obligatorio accionar el aparato de silbar", "Zona escolar", "Avisar inicio de marcha"] },
-        { q: "¿Qué función cumple el cartel de 'Cambio de modo de conducción'?", a: "Señala el lugar donde el conductor debe cambiar el modo de conducción (ej. de ATO a Manual)", opts: ["Paso a baterías", "Señala el lugar donde el conductor debe cambiar el modo de conducción (ej. de ATO a Manual)", "Entrada vía banalizada", "Activar hombre muerto"] },
-        { q: "¿Qué indica el cartel de 'Señalización de agujas'?", a: "La posición en la que se encuentra una aguja (normal o invertida)", opts: ["Velocidad en aguja desviada", "La posición en la que se encuentra una aguja (normal o invertida)", "Distancia al enclavamiento", "ID de aguja para el PCC"] },
-        { q: "¿Qué significa el cartel de 'Teléfono'?", a: "Indica la presencia de un teléfono de socorro o comunicación con el PCC", opts: ["Indica la presencia de un teléfono de socorro o comunicación con el PCC", "Prohíbe móviles", "Zona banda estrecha", "Punto conexión mantenimiento"] },
-        { q: "¿Qué función tiene el cartel de 'Piquete de entrevías'?", a: "Indica el punto hasta el cual es compatible la circulación por dos vías que convergen", opts: ["Área trabajo nocturno", "Indica el punto hasta el cual es compatible la circulación por dos vías que convergen", "Colocación balizas rojas", "Inicio zona colindancia"] },
-        { q: "¿Qué indica el cartel de 'Catenaria'?", a: "Informa sobre particularidades de la línea aérea de contacto (inicio, fin o cambios)", opts: ["Tensión superior", "Informa sobre particularidades de la línea aérea de contacto (inicio, fin o cambios)", "Prohibido tocar cables", "Ubicación aisladores"] },
-        { q: "¿Cuál es el propósito del cartel de 'Punto de corte de tensión'?", a: "Delimitar sectores de tracción donde se puede interrumpir el suministro eléctrico", opts: ["Pérdida tracción", "Corte manual", "Delimitar sectores de tracción donde se puede interrumpir el suministro eléctrico", "Frontera depósito/vía"] },
-        { q: "¿Qué indica el cartel de 'Proximidad de señal'?", a: "Previsa la existencia de una señal fundamental más adelante", opts: ["Señal a menos de 50m", "Previsa la existencia de una señal fundamental más adelante", "Señal tipo luminoso", "Falta de visibilidad"] },
-        { q: "¿Qué función cumplen los carteles de 'Numeración de señales'?", a: "Sirven para identificar de forma unívoca cada señal en las comunicaciones", opts: ["Distancia origen línea", "Sirven para identificar de forma unívoca cada señal en las comunicaciones", "Circuitos de vía", "Orden de paso"] },
-        { q: "¿Qué indica el cartel de 'Entrada en túnel'?", a: "El comienzo físico del tramo subterráneo de la línea", opts: ["Encender luces vagones", "El comienzo físico del tramo subterráneo de la línea", "Cerrar ventanillas", "Activar marcha a la vista"] },
-        { q: "¿Qué significa el cartel de 'Salida de túnel'?", a: "El final del tramo subterráneo y comienzo de vía a cielo abierto", opts: ["El final del tramo subterráneo y comienzo de vía a cielo abierto", "Apagar alumbrado túnel", "Proximidad depósito exterior", "Retomar velocidad máxima"] },
-        { q: "¿Qué función tiene el cartel de 'Señal de socorro'?", a: "Señalar un dispositivo que permite emitir una señal de parada de emergencia", opts: ["Ubicación extintor", "Señalar un dispositivo que permite emitir una señal de parada de emergencia", "Salida emergencia viajeros", "Botiquín"] },
-        { q: "¿Qué indica el cartel de 'Límite de maniobra'?", a: "El límite de un tramo de vía donde se pueden realizar movimientos de maniobra", opts: ["Piñón de salida", "El límite de un tramo de vía donde se pueden realizar movimientos de maniobra", "Vía pruebas depósito", "Prohibido invertir marcha"] },
-        { q: "¿Cuál es la función del cartel de 'Señal de parada de emergencia'?", a: "Ordenar la detención inmediata de cualquier tren que circule por la zona", opts: ["Freno de estacionamiento", "Ordenar la detención inmediata de cualquier tren que circule por la zona", "Fallo hombre muerto", "Evacuar tren"] },
-        { q: "¿Qué indica el cartel de 'Baliza de frenado'?", a: "La ubicación de un dispositivo que provoca el frenado automático del tren si rebasa una señal en rojo", opts: ["La ubicación de un dispositivo que provoca el frenado automático del tren si rebasa una señal en rojo", "Punto inicio frenado", "Detector exceso velocidad", "Colocación cuñas"] },
-        { q: "¿Qué significa el cartel de 'Señal de aviso'?", a: "Informa de una condición temporal de la vía que requiere atención", opts: ["Informa de una condición temporal de la vía que requiere atención", "Estación cerrada", "Sustituye señal amarilla", "Curva radio reducido"] },
-        { q: "¿Qué indica el cartel de 'Vía secundaria'?", a: "Identifica una vía que no es principal (depósitos, mangos, etc.)", opts: ["Entrada saco maniobras", "Identifica una vía que no es principal (depósitos, mangos, etc.)", "Limitación carga eje", "Solo vehículos auxiliares"] },
-        { q: "¿Qué función tiene el cartel de 'Señalización de itinerario'?", a: "Indicar el camino o ruta que va a seguir el tren en un complejo de vías", opts: ["Destino final", "Indicar el camino o ruta que va a seguir el tren en un complejo de vías", "Tiempo de espera", "Número de línea"] },
-        { q: "¿Qué indica el cartel de 'Protección de trabajos'?", a: "La existencia de personal trabajando en la plataforma de vía más adelante", opts: ["Ubicación EPI", "La existencia de personal trabajando en la plataforma de vía más adelante", "Área protegida PCC", "Vía fuera servicio"] },
-        { q: "¿Qué significa el cartel de 'Fin de protección de trabajos'?", a: "Que ya no hay personal trabajando y se puede circular normalmente", opts: ["Que ya no hay personal trabajando y se puede circular normalmente", "Trabajo en vía contigua", "Salida área seguridad", "Apagar luces trabajo"] },
-        { q: "¿Qué indica el cartel de 'Señal de precaución'?", a: "Orden de circular con precaución ante una posible eventualidad en la vía", opts: ["Visibilidad reducida", "Orden de circular con precaución ante una posible eventualidad en la vía", "Conducción manual", "Señal apagada"] },
-        { q: "¿Cuál es el propósito del cartel de 'Zona de obras'?", a: "Delimitar el tramo de línea donde se están realizando actuaciones en la infraestructura", opts: ["Delimitar el tramo de línea donde se están realizando actuaciones en la infraestructura", "Reforma andén", "Entrada camiones bi-viales", "Prohibido viajeros"] },
-        { q: "¿Qué indica el cartel de 'Fin de zona de obras'?", a: "El término del tramo afectado por las obras y sus limitaciones", opts: ["El término del tramo afectado por las obras y sus limitaciones", "Subida personal mantenimiento", "Vía banalizada", "Velocidad a 5 km/h"] },
-        { q: "¿Qué función tiene el cartel de 'Señal de marcha'?", a: "Autoriza la puesta en marcha del tren tras una parada prescrita", opts: ["Inicio recorrido línea", "Autoriza la puesta en marcha del tren tras una parada prescrita", "Marcha constante", "Exclusiva trenes trabajo"] },
-        { q: "¿Qué indica el cartel de 'Señal de parada obligatoria'?", a: "Que todos los trenes, sin excepción, deben detenerse ante el cartel", opts: ["Que todos los trenes, sin excepción, deben detenerse ante el cartel", "Parada técnica frenado", "Parada si hay viajeros", "Fin zona maniobras"] },
-        { q: "¿Qué significa el cartel de 'Señal de limitación de gálibo'?", a: "Advierte de que ciertos vehículos no pueden circular por ese tramo debido a sus dimensiones", opts: ["Túnel estrecho", "Advierte de que ciertos vehículos no pueden circular por ese tramo debido a sus dimensiones", "Distancia al andén > 10cm", "Altura máxima carga"] },
-        { q: "¿Qué función tiene el cartel de 'Señal de fin de limitación de gálibo'?", a: "Indica que la restricción por dimensiones de vehículo ha finalizado", opts: ["Dimensiones estándar", "Cualquier vehículo circula", "Indica que la restricción por dimensiones de vehículo ha finalizado", "Entrada andenes anchos"] },
-        { q: "¿Qué indica el cartel de 'Señal de comprobación de frenado'?", a: "El punto donde el conductor debe realizar una prueba de freno de servicio", opts: ["El punto donde el conductor debe realizar una prueba de freno de servicio", "Revisar zapatas", "Prueba automática ATO", "Prueba freno estacionamiento"] },
-        { q: "¿Qué significa el cartel de 'Señal de estacionamiento'?", a: "Señala el punto donde un tren debe quedar estacionado de forma prolongada", opts: ["Aparcamiento emergencia", "Señala el punto donde un tren debe quedar estacionado de forma prolongada", "Vía trenes reserva", "Zona espera viajeros"] },
-        { q: "¿Qué función tiene el cartel de 'Señal de vía muerta'?", a: "Indicar que la vía no tiene salida y termina en un tope fijo", opts: ["Indicar que la vía no tiene salida y termina en un tope fijo", "Vía baja explotación", "Vía sin tensión", "Final enclavamiento"] },
-        { q: "¿Qué indica el cartel de 'Señal de peligro'?", a: "Advierte de una situación de riesgo inminente en la vía", opts: ["Advierte de una situación de riesgo inminente en la vía", "Sustancias inflamables", "Rampa pronunciada", "Reducir velocidad"] },
-        { q: "¿Qué significa el cartel de 'Señal de prohibición'?", a: "Indica una acción que el conductor tiene prohibido realizar en ese punto", opts: ["Indica una acción que el conductor tiene prohibido realizar en ese punto", "Prohibido viajeros", "Prohibido sin ATO", "Prohibido fotos flash"] },
-        { q: "¿Qué función tiene el cartel de 'Señal de obligación'?", a: "Indica una instrucción que el conductor debe cumplir imperativamente", opts: ["Indica una instrucción que el conductor debe cumplir imperativamente", "Guantes dieléctricos", "Chaleco reflectante", "Encender faros"] },
-        { q: "¿Qué indica el cartel de 'Señal de información'?", a: "Proporciona datos útiles sobre la explotación o la infraestructura", opts: ["Proporciona datos útiles sobre la explotación o la infraestructura", "Nombre próxima estación", "Hora sincronizada", "Tráfico exterior"] },
-        { q: "¿Qué significa el cartel de 'Señal de advertencia'?", a: "Llama la atención sobre una circunstancia particular de la vía o el entorno", opts: ["Llama la atención sobre una circunstancia particular de la vía o el entorno", "Señal acústica obligatoria", "Atmósfera confinada", "Cantón corto"] },
-        { q: "¿Qué función tiene el cartel de 'Señal de salida de emergencia'?", a: "Indica el camino a seguir hacia un lugar seguro en caso de incidencia", opts: ["Indica el camino a seguir hacia un lugar seguro en caso de incidencia", "Salida trenes trabajo", "Abandonar tren", "Desbloqueo puertas andén"] },
-        { q: "¿Qué indica el cartel de 'Señal de equipo de lucha contra incendios'?", a: "Señala la ubicación de extintores, bocas de incendio u otros medios", opts: ["Señala la ubicación de extintores, bocas de incendio u otros medios", "Alarma humos", "Prioridad bomberos", "Ventilación forzada"] },
-        { q: "¿Qué significa el cartel de 'Señal de primeros auxilios'?", a: "Indica la ubicación de botiquines, camillas o equipos de rescate", opts: ["Indica la ubicación de botiquines, camillas o equipos de rescate", "Teléfono ambulancias", "Punto encuentro sanitario", "Personal con RCP"] },
-        { q: "¿Qué indican las señales manuales en general?", a: "Son órdenes dadas directamente por el personal mediante gestos o banderas", opts: ["Son órdenes dadas directamente por el personal mediante gestos o banderas", "Accionadas con la mano en cabina", "Cambio aguja manual", "Carteles puestos a mano"] },
-        { q: "¿Qué significa un brazo levantado verticalmente como señal manual?", a: "Orden de parada inmediata", opts: ["Orden de parada inmediata", "Marcha lenta", "Vía libre", "Reducir velocidad"] },
-        { q: "¿Qué indica mover un brazo lateralmente de forma lenta como señal manual?", a: "Orden de disminuir la velocidad", opts: ["Orden de disminuir la velocidad", "Acelerar cantón", "Rebasar señal rojo", "Detener punto exacto"] },
-        { q: "¿Qué significa mover ambos brazos de arriba abajo rápidamente?", a: "Orden de parada de emergencia", opts: ["Orden de parada de emergencia", "Saludo protocolario", "Avería bogie", "Apagar faros"] },
-        { q: "¿Para qué sirven las señales portátiles?", a: "Para señalizar situaciones temporales como obras o peligros puntuales", opts: ["Para señalizar situaciones temporales como obras o peligros puntuales", "Llevar en maletín", "Iluminar trenes", "Guiar transbordos"] },
-        { q: "¿Qué indica una bandera roja o una luz roja como señal portátil?", a: "Orden de parada", opts: ["Orden de parada", "Tensión eléctrica", "Atmósfera peligrosa", "Material de obra"] },
-        { q: "¿Qué significa una bandera amarilla o una luz amarilla como señal portátil?", a: "Orden de circular con precaución", opts: ["Orden de circular con precaución", "Señal fuera servicio", "Fin limitación temporal", "Personal a 50m"] },
-        { q: "¿Qué función tienen las balizas rojas en la vía?", a: "Delimitar áreas de trabajo o protección prohibiendo el paso de trenes", opts: ["Delimitar áreas de trabajo o protección prohibiendo el paso de trenes", "Posición agujas noche", "Centro vía mantenimiento", "Apoyo sacos maniobras"] },
-        { q: "¿Qué indica una luz blanca o un banderín blanco como señal portátil?", a: "Vía libre o autorización para iniciar un movimiento", opts: ["Vía libre o autorización para iniciar un movimiento", "Circula a contravía", "Responsable operativo", "Alumbrado se apaga"] },
-        { q: "¿Qué significa una señal fundamental que está apagada o cuya indicación es dudosa?", a: "Debe considerarse como señal de parada (rojo)", opts: ["Debe considerarse como señal de parada (rojo)", "Rebasar marcha a la vista", "Enclavamiento modo local", "No tiene valor"] }
-    ];
+const CAT_LABELS = {
+    fundamental: "Señal fundamental",
+    indicadora:  "Señal indicadora",
+    cartel:      "Cartel",
+    manual:      "Señal manual / portátil"
+};
 
-    let currentIdx = 0;
-    let hits = 0;
-    let fails = [];
+const db = [
+  {
+    cat: "fundamental",
+    q: "Llegas a una señal luminosa apagada por un fallo técnico. ¿Cómo debes interpretarla?",
+    a: "Como señal de parada (rojo): detenerse sin rebasarla",
+    opts: [
+      "Como señal de parada (rojo): detenerse sin rebasarla",
+      "Como vía libre condicionada: circular a velocidad reducida",
+      "Como señal apagada sin valor: continuar normalmente",
+      "Esperar 30 segundos y rebasarla si no hay respuesta del PCC"
+    ],
+    tip: "Cualquier señal cuya indicación sea dudosa o esté apagada se considera señal de parada. La duda siempre va a favor de la seguridad."
+  },
+  {
+    cat: "fundamental",
+    q: "Una señal fundamental verde significa vía libre. ¿Qué matiz importante añade la normativa?",
+    a: "Circular normalmente si nada más se opone a ello",
+    opts: [
+      "Circular normalmente si nada más se opone a ello",
+      "Circular a la velocidad máxima permitida sin excepciones",
+      "La vía está libre de trenes y obstáculos verificados",
+      "Autoriza el rebase de la siguiente señal en rojo"
+    ],
+    tip: "El verde permite circular SIEMPRE que nada más se oponga. No elimina la obligación de respetar otras señales o indicaciones que puedan aparecer."
+  },
+  {
+    cat: "fundamental",
+    q: "¿Para qué sirve la señal fundamental amarilla y cuál es la acción que debe tomar el maquinista?",
+    a: "Aviso de que la siguiente señal está en parada; el maquinista debe prepararse para detenerse",
+    opts: [
+      "Aviso de que la siguiente señal está en parada; el maquinista debe prepararse para detenerse",
+      "Orden directa de reducir la velocidad a la mitad inmediatamente",
+      "Señal de precaución por obras en la vía contigua",
+      "Límite de velocidad temporal pendiente de confirmación"
+    ],
+    tip: "La señal amarilla es una señal de 'preaviso'. No ordena parar aquí, sino prepararse para la parada en la próxima señal."
+  },
+  {
+    cat: "fundamental",
+    q: "Una señal de parada (rojo) prohíbe el rebase. ¿Qué sucede si el sistema de señalización ordena formalmente rebasarla?",
+    a: "Se puede rebasar solo con autorización expresa y según el procedimiento establecido",
+    opts: [
+      "Se puede rebasar solo con autorización expresa y según el procedimiento establecido",
+      "Nunca puede rebasarse bajo ninguna circunstancia",
+      "Se rebasa tras esperar 1 minuto si no hay respuesta del PCC",
+      "El propio ATO gestiona el rebase sin intervención del maquinista"
+    ],
+    tip: "Rebasar un rojo sin autorización es una infracción grave. Existen procedimientos específicos (por ejemplo, vía libre verbal) que permiten el rebase de forma controlada."
+  },
+  {
+    cat: "indicadora",
+    q: "Una señal indicadora de paso a nivel 'no protegido' aparece en tu cabina. ¿Qué implica esto respecto a la conducción?",
+    a: "Extremar la precaución porque no hay barreras ni semáforos que paren el tráfico rodado",
+    opts: [
+      "Extremar la precaución porque no hay barreras ni semáforos que paren el tráfico rodado",
+      "Detener el tren antes del paso y comprobar visualmente que está libre",
+      "Accionar el silbato obligatoriamente cada 50 metros",
+      "Reducir la velocidad al 50% de la máxima de la línea"
+    ],
+    tip: "Un paso a nivel no protegido no tiene elementos activos (barreras, semáforos). El maquinista debe estar alerta porque el vehículo rodado puede cruzar en cualquier momento."
+  },
+  {
+    cat: "indicadora",
+    q: "La señal indicadora de 'vía libre con limitación de velocidad' muestra amarillo-verde. ¿Cuál es la diferencia clave respecto a una señal verde pura?",
+    a: "La marcha está permitida pero existe una restricción de velocidad que no debe superarse",
+    opts: [
+      "La marcha está permitida pero existe una restricción de velocidad que no debe superarse",
+      "Se puede circular normalmente porque el verde cancela la restricción del amarillo",
+      "Significa que la vía está libre solo en el cantón inmediato, no en los siguientes",
+      "Es una señal redundante idéntica en significado al verde puro"
+    ],
+    tip: "El amarillo-verde combina vía libre con una advertencia. La velocidad indicada en la señalización próxima debe respetarse aunque el estado de vía sea bueno."
+  },
+  {
+    cat: "indicadora",
+    q: "¿En qué puntos de la infraestructura encontrarás principalmente señales indicadoras de 'dirección'?",
+    a: "En bifurcaciones y desvíos, para indicar el itinerario activo del tren",
+    opts: [
+      "En bifurcaciones y desvíos, para indicar el itinerario activo del tren",
+      "En la entrada a cada estación para confirmar el destino",
+      "Antes de cada túnel para indicar la vía correcta",
+      "En los límites de cantón para confirmar la dirección de marcha"
+    ],
+    tip: "Las señales de dirección son específicas de los puntos donde la vía se divide. Le dicen al maquinista hacia qué ramal está encaminado el itinerario."
+  },
+  {
+    cat: "cartel",
+    q: "Un cartel de 'anuncio de velocidad limitada' aparece 300 metros antes de una curva. ¿Qué diferencia a este cartel del de 'límite de velocidad'?",
+    a: "El anuncio es un preaviso; la restricción aún no es efectiva hasta el cartel de límite",
+    opts: [
+      "El anuncio es un preaviso; la restricción aún no es efectiva hasta el cartel de límite",
+      "El anuncio obliga a reducir ya; el límite confirma la velocidad máxima del tramo",
+      "Son equivalentes: ambos obligan a circular a la velocidad indicada desde ese punto",
+      "El anuncio es para trenes de viajeros; el límite aplica a todos los trenes"
+    ],
+    tip: "El anuncio te da tiempo para frenar con suavidad. La restricción real comienza en el cartel de límite de velocidad. No confundir ambos puntos."
+  },
+  {
+    cat: "cartel",
+    q: "El cartel de 'fin de velocidad limitada' aparece. ¿Qué puedes hacer a partir de ese punto?",
+    a: "Recuperar la velocidad máxima permitida por la línea en ese tramo",
+    opts: [
+      "Recuperar la velocidad máxima permitida por la línea en ese tramo",
+      "Acelerar progresivamente pero no superar la velocidad anterior hasta la siguiente estación",
+      "Circular a velocidad libre sin ningún tipo de restricción",
+      "Esperar al siguiente cartel de vía libre para confirmar el fin de la restricción"
+    ],
+    tip: "El fin de velocidad limitada devuelve las condiciones normales de circulación. La velocidad máxima aplicable es la de la línea, no 'velocidad libre' ilimitada."
+  },
+  {
+    cat: "cartel",
+    q: "Un cartel de 'parada obligatoria' está colocado antes de un cambio de agujas en el depósito. ¿Qué lo diferencia de una señal fundamental de parada?",
+    a: "Todo tren debe detenerse aquí sin excepción, independientemente del estado de señales",
+    opts: [
+      "Todo tren debe detenerse aquí sin excepción, independientemente del estado de señales",
+      "Solo aplica a trenes de viajeros; los trenes de trabajo pueden rebasarlo",
+      "Equivale a la señal de parada pero solo en zonas de maniobras",
+      "Es informativo; la detención depende de que el maquinista reciba orden del PCC"
+    ],
+    tip: "La parada obligatoria no está condicionada por ninguna señal. Es absoluta: todos los trenes, siempre, independientemente de lo que indiquen las señales de la zona."
+  },
+  {
+    cat: "cartel",
+    q: "El cartel de 'silbato' obliga a accionar el aparato de aviso sonoro. ¿Por qué en algunas líneas de metro estos carteles son infrecuentes?",
+    a: "Porque la infraestructura es cerrada al público y no hay pasos a nivel ni zonas sin protección",
+    opts: [
+      "Porque la infraestructura es cerrada al público y no hay pasos a nivel ni zonas sin protección",
+      "Porque el ATO activa el silbato automáticamente sin necesidad de carteles",
+      "Porque las normativas de ruido urbano prohíben el uso de señales acústicas en metro",
+      "Porque el silbato ha sido sustituido por señales luminosas en todos los metros modernos"
+    ],
+    tip: "El silbato avisa a personas en riesgo (pasos a nivel, zonas de trabajo, plataformas). En infraestructuras cerradas estas situaciones son menos frecuentes o inexistentes."
+  },
+  {
+    cat: "cartel",
+    q: "¿Qué acción concreta debe realizar el maquinista al ver el cartel de 'comprobación de frenado'?",
+    a: "Aplicar el freno de servicio brevemente para verificar que responde correctamente",
+    opts: [
+      "Aplicar el freno de servicio brevemente para verificar que responde correctamente",
+      "Detener el tren completamente y comprobar las zapatas visualmente",
+      "Registrar la lectura del manómetro de frenos en el libro de conducción",
+      "Activar el freno de estacionamiento y soltarlo para verificar el ciclo completo"
+    ],
+    tip: "La prueba de freno de servicio confirma que el sistema responde. No requiere parada total; es una aplicación controlada en marcha para verificar la respuesta."
+  },
+  {
+    cat: "cartel",
+    q: "El cartel de 'cambio de modo de conducción' indica el punto donde pasar de ATO a Manual. ¿Por qué es crítico actuar exactamente en ese punto?",
+    a: "Porque fuera de ese punto el sistema puede no estar preparado para la transición y puede haber inconsistencias de control",
+    opts: [
+      "Porque fuera de ese punto el sistema puede no estar preparado para la transición y puede haber inconsistencias de control",
+      "Porque la normativa lo exige pero el impacto operativo es mínimo si se adelanta",
+      "Porque el ATO se desconecta automáticamente en ese punto sin posibilidad de elección",
+      "Porque el cartel también desactiva la tracción eléctrica hasta confirmar el modo manual"
+    ],
+    tip: "Los cambios de modo de conducción están planificados para puntos donde la infraestructura y los sistemas de seguridad lo permiten. Hacerlos fuera de lugar puede generar estados indeterminados."
+  },
+  {
+    cat: "cartel",
+    q: "¿Cuál es la función del cartel de 'piquete de entrevías' y en qué situación es especialmente relevante?",
+    a: "Indica hasta dónde puede llegar un tren sin interferir con la vía adyacente; clave en maniobras con vías convergentes",
+    opts: [
+      "Indica hasta dónde puede llegar un tren sin interferir con la vía adyacente; clave en maniobras con vías convergentes",
+      "Señala el punto de máxima aproximación entre dos trenes en vías paralelas",
+      "Delimita la zona de trabajo del personal de vía entre dos trenes estacionados",
+      "Marca el límite de gálibo entre dos vías con diferentes anchos de plataforma"
+    ],
+    tip: "El piquete de entrevías protege la compatibilidad entre circulaciones en vías que se acercan. Rebasarlo con otro tren en la vía contigua puede provocar un choque."
+  },
+  {
+    cat: "cartel",
+    q: "El cartel de 'punto de corte de tensión' delimita sectores eléctricos. ¿Qué precaución debe tomar el maquinista al acercarse a uno?",
+    a: "Conocer el procedimiento de paso por sección neutra para evitar cortocircuitos entre sectores",
+    opts: [
+      "Conocer el procedimiento de paso por sección neutra para evitar cortocircuitos entre sectores",
+      "Detener el tren y esperar autorización del centro de control eléctrico",
+      "Desconectar manualmente el pantógrafo antes de alcanzar el cartel",
+      "Reducir la velocidad al mínimo para que la transición eléctrica sea gradual"
+    ],
+    tip: "En las secciones neutras el tren pasa de un sector eléctrico a otro. Si la transición no se hace correctamente puede producirse un arco eléctrico o corte de tracción."
+  },
+  {
+    cat: "cartel",
+    q: "Un cartel de 'baliza de frenado' indica la presencia de un dispositivo ATP. ¿Qué ocurre si el tren lo rebasa con la señal asociada en rojo?",
+    a: "El sistema aplica el frenado de emergencia automáticamente",
+    opts: [
+      "El sistema aplica el frenado de emergencia automáticamente",
+      "El PCC recibe una alarma pero el tren continúa hasta la siguiente señal",
+      "Se activa una alerta en cabina pero el maquinista decide si frenar",
+      "El tren queda bloqueado hasta que el PCC libere manualmente el enclavamiento"
+    ],
+    tip: "Las balizas de frenado son el último recurso del sistema de protección ATP. Si el tren rebasa la señal en rojo, el freno de emergencia actúa sin intervención del maquinista."
+  },
+  {
+    cat: "cartel",
+    q: "¿En qué se diferencia un cartel de 'vía muerta' de un cartel de 'límite de maniobra'?",
+    a: "La vía muerta indica que la vía termina físicamente; el límite de maniobra es un punto operacional que puede cambiar",
+    opts: [
+      "La vía muerta indica que la vía termina físicamente; el límite de maniobra es un punto operacional que puede cambiar",
+      "Ambos indican el mismo concepto pero en zonas diferentes (depósito vs. línea)",
+      "El límite de maniobra es siempre más restrictivo que la vía muerta",
+      "La vía muerta aplica a trenes de viajeros; el límite de maniobra a trenes de trabajo"
+    ],
+    tip: "La vía muerta es infraestructura fija: más allá hay un tope. El límite de maniobra es operacional: define hasta dónde está autorizado un movimiento en ese momento."
+  },
+  {
+    cat: "cartel",
+    q: "El cartel de 'protección de trabajos' avisa de personal en vía. ¿Qué velocidad o precaución adicional implica su presencia?",
+    a: "Circular a marcha a la vista hasta el cartel de fin de protección de trabajos",
+    opts: [
+      "Circular a marcha a la vista hasta el cartel de fin de protección de trabajos",
+      "Detener el tren y esperar confirmación del jefe de equipo por radio",
+      "Reducir la velocidad a 40 km/h o a la velocidad indicada en la señal previa",
+      "Accionar el silbato continuamente hasta superar la zona de trabajo"
+    ],
+    tip: "La marcha a la vista garantiza que el maquinista puede detenerse ante cualquier obstáculo. Es la medida de seguridad estándar cuando hay personal en la vía."
+  },
+  {
+    cat: "manual",
+    q: "Un agente levanta un brazo verticalmente mientras sostiene una bandera roja. ¿Qué orden recibe el maquinista y cómo debe ejecutarla?",
+    a: "Parada inmediata: frenar lo antes posible y no rebasar la posición del agente",
+    opts: [
+      "Parada inmediata: frenar lo antes posible y no rebasar la posición del agente",
+      "Reducir la velocidad a 10 km/h y esperar nuevas instrucciones",
+      "Parar en la estación siguiente y contactar con el PCC",
+      "Dar un toque de silbato y continuar si el agente no hace nuevas señales"
+    ],
+    tip: "El brazo vertical es la señal de parada más clara. El color rojo refuerza el mensaje. No hay ambigüedad: frenar inmediatamente sin rebasar al agente."
+  },
+  {
+    cat: "manual",
+    q: "Un agente mueve lentamente un brazo de lado a lado. El maquinista no lleva instrucción previa de limitación. ¿Qué debe hacer?",
+    a: "Disminuir la velocidad progresivamente y estar atento a señales adicionales",
+    opts: [
+      "Disminuir la velocidad progresivamente y estar atento a señales adicionales",
+      "Parar inmediatamente porque cualquier señal manual implica detención",
+      "Continuar a la misma velocidad y confirmar por radio con el PCC",
+      "Reducir a 15 km/h exactamente según el manual de operaciones"
+    ],
+    tip: "El movimiento lateral lento significa 'reduce velocidad', no 'para'. El maquinista frena con suavidad y permanece alerta por si sigue una señal de parada."
+  },
+  {
+    cat: "manual",
+    q: "Un agente mueve ambos brazos rápidamente de arriba a abajo. ¿En qué se diferencia esta señal de la de brazo levantado?",
+    a: "Ambos implican parar, pero el movimiento rápido de dos brazos indica emergencia y máxima urgencia",
+    opts: [
+      "Ambos implican parar, pero el movimiento rápido de dos brazos implica emergencia y máxima urgencia",
+      "El brazo levantado es parada ordinaria; dos brazos en movimiento significa solo reducir velocidad",
+      "Son señales equivalentes con idéntico nivel de urgencia",
+      "Dos brazos en movimiento descendente autoriza la marcha; el brazo vertical la detiene"
+    ],
+    tip: "El movimiento enérgico de ambos brazos es la señal de parada de emergencia. Indica que la situación es crítica y requiere la máxima respuesta de frenado."
+  },
+  {
+    cat: "manual",
+    q: "Una bandera blanca o luz blanca agitada por un agente indica vía libre. ¿Bajo qué condición puede el maquinista rebasar una señal en rojo con esta indicación?",
+    a: "Solo si la autorización verbal o escrita del procedimiento lo respalda junto con la señal blanca",
+    opts: [
+      "Solo si la autorización verbal o escrita del procedimiento lo respalda junto con la señal blanca",
+      "La bandera blanca por sí sola sustituye cualquier señal fija en rojo",
+      "Nunca: la señal blanca solo aplica en maniobras dentro del depósito",
+      "Si el PCC lo confirma por megafonía de estación, no es necesario ningún procedimiento escrito"
+    ],
+    tip: "Una señal manual no anula automáticamente una señal fija. La autorización de rebase debe seguir el procedimiento establecido; la señal blanca es una parte, no el todo."
+  },
+  {
+    cat: "manual",
+    q: "Las balizas rojas delimitan un área de trabajo. ¿Qué consecuencia tiene para un maquinista rebasarlas sin autorización?",
+    a: "Penetra en la zona protegida poniendo en riesgo al personal que trabaja en la vía",
+    opts: [
+      "Penetra en la zona protegida poniendo en riesgo al personal que trabaja en la vía",
+      "El sistema ATP detiene automáticamente el tren antes de alcanzarlas",
+      "El PCC recibe una alarma y corta la tracción del tren de forma remota",
+      "El tren puede continuar si el maquinista comprueba visualmente que la vía está libre"
+    ],
+    tip: "Las balizas rojas son la barrera de protección del personal. No hay sistema automático que garantice la detención: la responsabilidad recae en el maquinista."
+  },
+  {
+    cat: "cartel",
+    q: "El cartel de 'señalización de agujas' informa de la posición de una aguja. ¿Cuál sería la consecuencia de circular por una aguja en posición incorrecta?",
+    a: "El tren podría ser encaminado a una vía diferente a la prevista o descarrilar",
+    opts: [
+      "El tren podría ser encaminado a una vía diferente a la prevista o descarrilar",
+      "El sistema de señalización detectaría el conflicto y detendría el tren automáticamente",
+      "No hay consecuencias si la velocidad es inferior a la velocidad en aguja desviada",
+      "Se activa una alarma sonora pero el tren puede continuar su recorrido"
+    ],
+    tip: "Las agujas mal posicionadas son uno de los principales riesgos de desvío involuntario o descarrilamiento. El cartel informa al maquinista del estado actual para que lo verifique."
+  },
+  {
+    cat: "cartel",
+    q: "El cartel de 'numeración de señales' identifica de forma unívoca cada señal. ¿En qué situación práctica resulta más útil esta identificación?",
+    a: "Cuando el maquinista comunica al PCC la señal ante la que está detenido para recibir instrucciones",
+    opts: [
+      "Cuando el maquinista comunica al PCC la señal ante la que está detenido para recibir instrucciones",
+      "Para que el personal de mantenimiento sepa qué señales revisar en el turno de noche",
+      "Para identificar el kilómetro exacto de la vía en los planos de infraestructura",
+      "Para registrar automáticamente los datos de paso en el sistema de gestión de tráfico"
+    ],
+    tip: "En situaciones de incidencia, la comunicación precisa entre maquinista y PCC es vital. Indicar el número de señal elimina ambigüedades sobre la posición del tren."
+  },
+  {
+    cat: "fundamental",
+    q: "¿Cuál es la diferencia entre la acción requerida por una señal amarilla y la requerida por una señal de parada (rojo)?",
+    a: "El amarillo permite seguir circulando preparándose para parar; el rojo obliga a detenerse antes de la señal",
+    opts: [
+      "El amarillo permite seguir circulando preparándose para parar; el rojo obliga a detenerse antes de la señal",
+      "El amarillo obliga a parar a mitad del cantón; el rojo a parar en la señal misma",
+      "Ambos obligan a detener el tren; el amarillo permite continuar si el PCC lo confirma",
+      "No hay diferencia de acción; ambos son señales de precaución con diferente urgencia"
+    ],
+    tip: "El amarillo y el rojo son señales de distinta naturaleza: una advierte, la otra ordena. No confundir 'prepararse para parar' con 'parar ya'."
+  }
+];
 
-    function initQuiz() {
+// Mezclar preguntas al inicio
+let questions = [...db].sort(() => Math.random() - 0.5);
+let currentIdx = 0;
+let hits = 0;
+let fails = [];
+
+function initQuiz() {
+    document.getElementById('progreso-texto').innerText = `Pregunta 1/${questions.length}`;
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = questions[currentIdx];
+
+    document.getElementById('progreso-texto').innerText = `Pregunta ${currentIdx + 1}/${questions.length}`;
+    document.getElementById('progress-fill').style.width = `${(currentIdx / questions.length) * 100}%`;
+    document.getElementById('question-text').innerText = q.q;
+    document.getElementById('btn-next').classList.remove('show');
+    document.getElementById('tip-box').classList.remove('show');
+    document.getElementById('tip-box').innerText = '';
+
+    // Badge de categoría
+    const badge = document.getElementById('cat-badge');
+    badge.innerText = CAT_LABELS[q.cat] || q.cat;
+    badge.className = 'cat-badge cat-' + q.cat;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
+    shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(btn, opt, q.a, q.tip);
+        container.appendChild(btn);
+    });
+}
+
+function checkAnswer(btn, selected, correct, tip) {
+    const buttons = document.querySelectorAll('.opt-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const tipBox = document.getElementById('tip-box');
+    tipBox.innerText = tip;
+    tipBox.classList.add('show');
+
+    if (selected === correct) {
+        btn.classList.add('correct');
+        hits++;
+        setTimeout(nextQuestion, 1200);
+    } else {
+        btn.classList.add('wrong');
+        fails.push({ q: questions[currentIdx].q, a: correct });
+        guardarFallo(questions[currentIdx].q, questions[currentIdx].opts, correct, "NIC: Señales");
+        buttons.forEach(b => { if (b.innerText === correct) b.classList.add('reveal'); });
+        document.getElementById('btn-next').classList.add('show');
+    }
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx < questions.length) {
         showQuestion();
+    } else {
+        showResults();
     }
+}
 
-    function showQuestion() {
-        const q = db[currentIdx];
-        document.getElementById('progreso-texto').innerText = `Pregunta ${currentIdx + 1}/${db.length}`;
-        document.getElementById('progress-fill').style.width = `${(currentIdx / db.length) * 100}%`;
-        document.getElementById('question-text').innerText = q.q;
-        document.getElementById('btn-next').style.display = "none";
+function showResults() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.remove('hidden');
 
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
+    const percent = Math.round((hits / questions.length) * 100);
+    document.getElementById('score-percent').innerText = `${percent}%`;
+    document.getElementById('score-text').innerText = `Has acertado ${hits} de ${questions.length}`;
 
-        // Mezclar opciones
-        const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
-
-        shuffled.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'opt-btn';
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(btn, opt, q.a);
-            container.appendChild(btn);
-        });
+    const review = document.getElementById('failed-review');
+    if (fails.length > 0) {
+        review.innerHTML = '<strong>Tus errores:</strong><br><br>' +
+            fails.map(f => `<div class="result-item">• ${f.q}<br><span style="color:var(--correct)">✔ ${f.a}</span></div>`).join('');
+    } else {
+        review.innerHTML = '¡Perfecto! No has tenido ningún fallo.';
     }
+}
 
-    function checkAnswer(btn, selected, correct) {
-        const buttons = document.querySelectorAll('.opt-btn');
-        buttons.forEach(b => b.disabled = true);
-
-        if (selected === correct) {
-            btn.classList.add('correct');
-            hits++;
-            // PASA SOLO SI ESTÁ BIEN (tras 0.8 seg)
-            setTimeout(nextQuestion, 800);
-        } else {
-            btn.classList.add('wrong');
-            // GUARDAR FALLO
-            fails.push({ q: db[currentIdx].q, a: correct });
-            guardarFallo(db[currentIdx].q, db[currentIdx].opts, correct, "NIC: Señales");
-
-            // Mostrar la correcta
-            buttons.forEach(b => { if(b.innerText === correct) b.classList.add('correct'); });
-            // NO PASA SOLO, espera al botón
-            document.getElementById('btn-next').style.display = "block";
-        }
-    }
-
-    function nextQuestion() {
-        currentIdx++;
-        if (currentIdx < db.length) {
-            showQuestion();
-        } else {
-            showResults();
-        }
-    }
-
-    function showResults() {
-        document.getElementById('quiz-screen').classList.add('hidden');
-        document.getElementById('results-screen').classList.remove('hidden');
-        
-        const percent = Math.round((hits / db.length) * 100);
-        document.getElementById('score-percent').innerText = `${percent}%`;
-        document.getElementById('score-text').innerText = `Has acertado ${hits} de ${db.length}`;
-
-        const review = document.getElementById('failed-review');
-        if (fails.length > 0) {
-            review.innerHTML = '<strong>Tus errores:</strong><br><br>' + 
-                fails.map(f => `<div class="result-item">• ${f.q}<br><span style="color:var(--correct)">✔ ${f.a}</span></div>`).join('');
-        } else {
-            review.innerHTML = "¡Perfecto! No has tenido fallos.";
-        }
-    }
-
-    function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+    try {
         let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
-        const nuevoFallo = {
-            id: Date.now(),
-            modulo: modulo,
-            q: pregunta,
-            opts: opciones,
-            a: respuestaCorrecta
-        };
         if (!listaFallos.find(f => f.q === pregunta)) {
-            listaFallos.push(nuevoFallo);
+            listaFallos.push({ id: Date.now(), modulo, q: pregunta, opts: opciones, a: respuestaCorrecta });
             localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
         }
-    }
+    } catch(e) {}
+}
 
-    initQuiz();
+initQuiz();
 </script>
 
 </body>

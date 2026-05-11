@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CRTM - Organización y Normativa (20 preguntas)</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --accent: #e67e22;
+            --correct: #009543;
+            --wrong: #ff3b30;
+            --text: #ffffff;
+        }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh;
+        }
+        .container { width: 100%; max-width: 500px; padding: 20px; }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #progreso-texto { font-size: 14px; color: #888; }
+        .btn-salir {
+            background: none; border: 1px solid #444; color: #ccc;
+            padding: 5px 12px; border-radius: 5px; cursor: pointer;
+        }
+
+        .progress-bar {
+            width: 100%; height: 6px; background: #333;
+            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: var(--accent);
+            width: 0%; transition: width 0.3s;
+        }
+
+        .question-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .cat-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 99px;
+            margin-bottom: 12px;
+            background: #333;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .cat-crtm       { background: #1a2a1a; color: #7de87d; }
+        .cat-fundamental { background: #3a1a1a; color: #ff6b6b; }
+        .cat-indicadora  { background: #1a2a3a; color: #6ab0ff; }
+        .cat-cartel      { background: #2a2a1a; color: #f0c040; }
+        .cat-manual      { background: #1a3a1a; color: #6fd88a; }
+
+        h2 { font-size: 1.1rem; line-height: 1.5; margin-bottom: 20px; margin-top: 0; }
+
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .opt-btn {
+            background: #2a2a2a; border: 1px solid #333; color: white;
+            padding: 16px; border-radius: 12px; text-align: left;
+            font-size: 14px; cursor: pointer; transition: 0.2s; line-height: 1.4;
+        }
+        .opt-btn:hover:not(:disabled) { background: #333; border-color: #555; }
+        .opt-btn.correct { background: var(--correct) !important; border-color: var(--correct); }
+        .opt-btn.wrong   { background: var(--wrong)   !important; border-color: var(--wrong); }
+        .opt-btn.reveal  { background: #005a28 !important; border-color: var(--correct); opacity: 0.85; }
+
+        .tip-box {
+            display: none;
+            margin-top: 16px;
+            padding: 14px;
+            background: #252525;
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #ccc;
+        }
+        .tip-box.show { display: block; }
+
+        .btn-next {
+            width: 100%; background: var(--accent); color: white;
+            border: none; padding: 15px; border-radius: 10px;
+            font-weight: bold; margin-top: 16px; cursor: pointer;
+            display: none; font-size: 15px;
+        }
+        .btn-next.show { display: block; }
+
+        .results-list {
+            text-align: left; background: #000; padding: 15px;
+            border-radius: 10px; font-size: 13px; max-height: 300px;
+            overflow-y: auto; margin-top: 15px;
+        }
+        .result-item { margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="quiz-screen">
+        <div class="quiz-header">
+            <div id="progreso-texto">Pregunta 1/10</div>
+            <button class="btn-salir" onclick="history.back()">✕ Salir</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        
+        <div class="question-card">
+            <div id="cat-badge" class="cat-badge"></div>
+            <h2 id="question-text">Cargando pregunta...</h2>
+            <div id="options-container" class="options-grid"></div>
+            <div id="tip-box" class="tip-box"></div>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE PREGUNTA →</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="hidden">
+        <div class="question-card" style="text-align:center;">
+            <h1 id="score-percent">0%</h1>
+            <p id="score-text"></p>
+            <div id="failed-review" class="results-list"></div>
+            <button class="btn-next" style="display:block;" onclick="location.reload()">REPETIR TEST</button>
+            <button class="btn-next" style="display:block; background:#444; margin-top:10px;" onclick="history.back()">VOLVER AL MENÚ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const CAT_LABELS = {
+    crtm:        "CRTM",
+    fundamental: "Señal fundamental",
+    indicadora:  "Señal indicadora",
+    cartel:      "Cartel",
+    manual:      "Señal manual / portátil"
+};
+
+const db = [
+  {
+    cat: "crtm",
+    q: "¿Qué naturaleza tiene el CRTM?",
+    a: "c) Organismo Autónomo de la Comunidad de Madrid",
+    opts: [
+      "a) Empresa pública estatal",
+      "b) Sociedad mercantil autonómica",
+      "c) Organismo Autónomo de la Comunidad de Madrid",
+      "d) Entidad privada concesionaria"
+    ],
+    tip: "El CRTM es un Organismo Autónomo de la Comunidad de Madrid, con personalidad jurídica propia y plena capacidad de obrar."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué función prioritaria incluye la integración modal?",
+    a: "c) Planificación de infraestructuras",
+    opts: [
+      "a) Control económico",
+      "b) Imagen corporativa",
+      "c) Planificación de infraestructuras",
+      "d) Marco financiero"
+    ],
+    tip: "La planificación de infraestructuras es la función clave que permite la integración entre los distintos modos de transporte bajo un mismo sistema."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué función se refiere a todos los modos de transporte?",
+    a: "a) Planificación de servicios y coordinación de programas de explotación",
+    opts: [
+      "a) Planificación de servicios y coordinación de programas de explotación",
+      "b) Marco de financiación",
+      "c) Imagen global",
+      "d) Control económico de operadores"
+    ],
+    tip: "La planificación de servicios y coordinación de programas de explotación es la función transversal que abarca todos los modos de transporte gestionados por el CRTM."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué ámbito territorial gestiona integralmente el CRTM?",
+    a: "d) Territorio de la Comunidad de Madrid",
+    opts: [
+      "a) Solo el municipio de Madrid",
+      "b) Área metropolitana estricta",
+      "c) Municipios adheridos voluntariamente únicamente",
+      "d) Territorio de la Comunidad de Madrid"
+    ],
+    tip: "El CRTM tiene competencia sobre todo el territorio de la Comunidad de Madrid, no solo la capital ni el área metropolitana."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué establece el CRTM respecto a la financiación?",
+    a: "c) Marco estable de financiación",
+    opts: [
+      "a) Modelo variable anual",
+      "b) Sistema privado",
+      "c) Marco estable de financiación",
+      "d) Fondo estatal único"
+    ],
+    tip: "El CRTM establece un marco estable de financiación que garantiza la continuidad y planificación a largo plazo de los servicios de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "El sistema tarifario definido por el CRTM debe ser:",
+    a: "d) Integrado",
+    opts: [
+      "a) Flexible",
+      "b) Municipal",
+      "c) Experimental",
+      "d) Integrado"
+    ],
+    tip: "El sistema tarifario integrado es una de las señas de identidad del CRTM, permitiendo al usuario viajar con un único título en distintos modos y operadores."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué tipo de transporte se menciona como objetivo futuro de incorporación?",
+    a: "a) Transporte discrecional de viajeros con reiteración de itinerario",
+    opts: [
+      "a) Transporte discrecional de viajeros con reiteración de itinerario",
+      "b) Transporte escolar",
+      "c) Transporte sanitario",
+      "d) Transporte turístico"
+    ],
+    tip: "El transporte discrecional de viajeros con reiteración de itinerario (servicios regulares de facto) es el objetivo futuro de incorporación al sistema integrado del CRTM."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué norma crea el CRTM?",
+    a: "c) Ley 5/1985, de 16 de mayo",
+    opts: [
+      "a) Ley 7/1982",
+      "b) Decreto 3/1985",
+      "c) Ley 5/1985, de 16 de mayo",
+      "d) Ley Orgánica 3/1985, de 16 de mayo"
+    ],
+    tip: "El CRTM fue creado mediante la Ley 5/1985, de 16 de mayo, de la Comunidad de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "El CRTM ejerce competencias en materia de:",
+    a: "c) Transporte público regular de viajeros",
+    opts: [
+      "a) Transporte de mercancías",
+      "b) Infraestructuras viarias",
+      "c) Transporte público regular de viajeros",
+      "d) Transporte aéreo regional"
+    ],
+    tip: "El ámbito competencial del CRTM se centra en el transporte público regular de viajeros dentro de la Comunidad de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué institución aprueba la Ley 5/1985?",
+    a: "b) Asamblea de Madrid",
+    opts: [
+      "a) Congreso de los Diputados",
+      "b) Asamblea de Madrid",
+      "c) Senado",
+      "d) Consejo de Gobierno"
+    ],
+    tip: "Al ser una ley autonómica, la Ley 5/1985 fue aprobada por la Asamblea de Madrid, el parlamento de la Comunidad de Madrid."
+  },
+  // --- TEST 2 ---
+  {
+    cat: "crtm",
+    q: "La complejidad de la red obliga a muchos viajeros a usar:",
+    a: "d) Más de un medio de transporte",
+    opts: [
+      "a) Un solo título",
+      "b) Transporte privado",
+      "c) Servicios especiales",
+      "d) Más de un medio de transporte"
+    ],
+    tip: "La complejidad de la red de transporte de Madrid hace que muchos desplazamientos requieran usar más de un modo, lo que justifica la existencia de un sistema tarifario integrado."
+  },
+  {
+    cat: "crtm",
+    q: "¿Sobre qué realiza control y seguimiento el CRTM?",
+    a: "c) Gestión económica de los operadores",
+    opts: [
+      "a) Infraestructuras ferroviarias",
+      "b) Usuarios",
+      "c) Gestión económica de los operadores",
+      "d) Contratos laborales"
+    ],
+    tip: "El CRTM ejerce control y seguimiento sobre la gestión económica de los operadores de transporte para garantizar el correcto uso de los recursos públicos."
+  },
+  {
+    cat: "crtm",
+    q: "Los planes de explotación han sido considerados:",
+    a: "b) La globalidad de los usuarios y el conjunto de medios",
+    opts: [
+      "a) La tecnología",
+      "b) La globalidad de los usuarios y el conjunto de medios",
+      "c) Las subvenciones",
+      "d) Las inversiones estatales"
+    ],
+    tip: "Los planes de explotación del CRTM tienen en cuenta la globalidad de los usuarios y el conjunto de medios disponibles para optimizar la oferta de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué número de boletín publica la ley?",
+    a: "c) 124",
+    opts: [
+      "a) 125",
+      "b) 95",
+      "c) 124",
+      "d) 37"
+    ],
+    tip: "La Ley 5/1985 se publicó en el Boletín Oficial de la Comunidad de Madrid número 124."
+  },
+  {
+    cat: "crtm",
+    q: "El marco legislativo vigente crea una separación entre:",
+    a: "c) Transportes interiores urbanos y los que superan ese ámbito",
+    opts: [
+      "a) Transporte público y privado",
+      "b) Ferroviario y aéreo",
+      "c) Transportes interiores urbanos y los que superan ese ámbito",
+      "d) Estatal y autonómico"
+    ],
+    tip: "El marco legislativo establece una separación entre los transportes interiores urbanos (competencia municipal) y los que superan ese ámbito (competencia autonómica o estatal)."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué superposición se menciona expresamente?",
+    a: "d) Líneas de autobuses con metro o ferrocarril",
+    opts: [
+      "a) Tren y avión",
+      "b) Taxi y metro",
+      "c) Bicicleta y tren",
+      "d) Líneas de autobuses con metro o ferrocarril"
+    ],
+    tip: "La normativa menciona expresamente la superposición entre líneas de autobuses y las redes de metro o ferrocarril como uno de los problemas que el CRTM debe coordinar."
+  },
+  {
+    cat: "crtm",
+    q: "¿Dónde se publica la Ley 5/1985?",
+    a: "b) Boletín Oficial de la Comunidad de Madrid",
+    opts: [
+      "a) BOE",
+      "b) Boletín Oficial de la Comunidad de Madrid",
+      "c) Diario Oficial de la UE",
+      "d) Gaceta Municipal"
+    ],
+    tip: "Al ser una ley autonómica de la Comunidad de Madrid, se publica en el Boletín Oficial de la Comunidad de Madrid (BOCM), no en el BOE."
+  },
+  {
+    cat: "crtm",
+    q: "La creación de una imagen global del sistema busca unificar:",
+    a: "c) Relaciones externas con los usuarios",
+    opts: [
+      "a) Tarifas técnicas",
+      "b) Infraestructuras físicas",
+      "c) Relaciones externas con los usuarios",
+      "d) Contratos de programa"
+    ],
+    tip: "La imagen global unificada del sistema tiene como objetivo mejorar las relaciones externas con los usuarios, facilitando la comprensión y uso de la red de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué fecha de publicación en el BOE tiene la Ley 5/1985?",
+    a: "d) 27 de mayo de 1985",
+    opts: [
+      "a) 16 de mayo de 1985",
+      "b) 5 de junio de 1985",
+      "c) 28 de mayo de 1985",
+      "d) 27 de mayo de 1985"
+    ],
+    tip: "Aunque la Ley 5/1985 es del 16 de mayo, su publicación en el BOE tuvo lugar el 27 de mayo de 1985."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién promulga la Ley en nombre del Rey?",
+    a: "a) Presidente de la Comunidad de Madrid",
+    opts: [
+      "a) Presidente de la Comunidad de Madrid",
+      "b) Presidente del Gobierno",
+      "c) Ministro de Transportes",
+      "d) Alcalde de Madrid"
+    ],
+    tip: "Las leyes autonómicas son promulgadas en nombre del Rey por el Presidente de la Comunidad Autónoma correspondiente, en este caso el Presidente de la Comunidad de Madrid."
+  },
+  // --- TEST 3 ---
+  {
+    cat: "crtm",
+    q: "El interés de la colectividad demanda:",
+    a: "a) Ordenación técnica, administrativa y reglamentaria",
+    opts: [
+      "a) Ordenación técnica, administrativa y reglamentaria",
+      "b) Liberalización",
+      "c) Privatización",
+      "d) Reducción de líneas"
+    ],
+    tip: "El interés colectivo en el transporte público requiere una ordenación técnica, administrativa y reglamentaria que garantice la calidad, seguridad y accesibilidad del servicio."
+  },
+  {
+    cat: "crtm",
+    q: "Los efectos recaen primero sobre:",
+    a: "c) Los viajeros",
+    opts: [
+      "a) Las empresas",
+      "b) El Estado",
+      "c) Los viajeros",
+      "d) Los ayuntamientos"
+    ],
+    tip: "Los efectos de las deficiencias o mejoras en el sistema de transporte recaen en primer lugar sobre los viajeros, que son quienes lo utilizan directamente."
+  },
+  {
+    cat: "crtm",
+    q: "El órgano debe fijar un marco de tarifas:",
+    a: "d) Común",
+    opts: [
+      "a) Municipal",
+      "b) Variable",
+      "c) Experimental",
+      "d) Común"
+    ],
+    tip: "El CRTM debe fijar un marco tarifario común para toda la red, garantizando la integración y la equidad en el acceso al transporte público."
+  },
+  {
+    cat: "crtm",
+    q: "El órgano de dirección colegiada del Consorcio es el:",
+    a: "d) Consejo de Administración",
+    opts: [
+      "a) Comité Técnico",
+      "b) Director Gerente",
+      "c) Consejo Asesor",
+      "d) Consejo de Administración"
+    ],
+    tip: "El Consejo de Administración es el órgano de dirección colegiada del CRTM, encargado de tomar las decisiones estratégicas y de gobierno del organismo."
+  },
+  {
+    cat: "crtm",
+    q: "No basta con la voluntad de coordinación de:",
+    a: "d) Empresas explotadoras y administraciones implicadas",
+    opts: [
+      "a) Solo empresas",
+      "b) Solo administraciones",
+      "c) Usuarios",
+      "d) Empresas explotadoras y administraciones implicadas"
+    ],
+    tip: "La coordinación efectiva del transporte requiere la voluntad conjunta tanto de las empresas explotadoras como de todas las administraciones implicadas, no siendo suficiente la voluntad de solo una de las partes."
+  },
+  {
+    cat: "crtm",
+    q: "Frente a la situación precedente, la Comunidad aporta capacidad:",
+    a: "b) Legislativa",
+    opts: [
+      "a) Financiera",
+      "b) Legislativa",
+      "c) Técnica",
+      "d) Empresarial"
+    ],
+    tip: "La Comunidad de Madrid aporta fundamentalmente su capacidad legislativa para ordenar y coordinar el sistema de transporte en su territorio."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio se constituye como:",
+    a: "c) Organismo Autónomo",
+    opts: [
+      "a) Sociedad estatal",
+      "b) Empresa mixta",
+      "c) Organismo Autónomo",
+      "d) Fundación pública"
+    ],
+    tip: "El CRTM se constituye como Organismo Autónomo de la Comunidad de Madrid, dotado de personalidad jurídica propia y plena capacidad de obrar."
+  },
+  {
+    cat: "crtm",
+    q: "La denominación 'Consorcio' traslada la idea de:",
+    a: "b) Cooperación entre Administraciones",
+    opts: [
+      "a) Competencia",
+      "b) Cooperación entre Administraciones",
+      "c) Centralización",
+      "d) Autonomía municipal"
+    ],
+    tip: "El término 'consorcio' implica la unión y cooperación entre distintas administraciones para gestionar un servicio de interés común, en este caso el transporte público."
+  },
+  {
+    cat: "crtm",
+    q: "El sistema presenta irracionalidad económica que afecta a:",
+    a: "c) Costes globales",
+    opts: [
+      "a) Ayuntamientos",
+      "b) Empresas privadas",
+      "c) Costes globales",
+      "d) Tarifas técnicas"
+    ],
+    tip: "La irracionalidad económica del sistema de transporte sin coordinación afecta a los costes globales, generando ineficiencias que encarecen el servicio para todos."
+  },
+  {
+    cat: "crtm",
+    q: "El fundamento estatutario citado en el artículo es el:",
+    a: "c) 39.5",
+    opts: [
+      "a) 25.6",
+      "b) 27.1",
+      "c) 39.5",
+      "d) 28.3"
+    ],
+    tip: "El artículo 39.5 del Estatuto de Autonomía de la Comunidad de Madrid es el fundamento jurídico-estatutario que habilita al CRTM para ejercer sus competencias en materia de transporte."
+  },
+  // --- TEST 4 ---
+  {
+    cat: "crtm",
+    q: "El Comité Técnico es un órgano de:",
+    a: "c) Concertación y apoyo",
+    opts: [
+      "a) Inspección",
+      "b) Control financiero",
+      "c) Concertación y apoyo",
+      "d) Gestión directa"
+    ],
+    tip: "El Comité Técnico del CRTM es un órgano de concertación y apoyo, donde participan representantes de las administraciones y empresas del sector para asesorar y colaborar en la toma de decisiones."
+  },
+  {
+    cat: "crtm",
+    q: "Los convenios con Renfe y concesionarios privados obligan a adecuarse a:",
+    a: "b) Planes de servicios y marco tarifario del Consorcio",
+    opts: [
+      "a) Planes municipales",
+      "b) Planes de servicios y marco tarifario del Consorcio",
+      "c) Estatutos laborales",
+      "d) Reglamentos estatales"
+    ],
+    tip: "Mediante convenios, Renfe y los concesionarios privados se obligan a adecuarse a los planes de servicios y al marco tarifario establecido por el Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "El Director Gerente actúa bajo la autoridad del:",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Comité Técnico",
+      "b) Presidente regional",
+      "c) Consejo de Administración",
+      "d) Ministerio"
+    ],
+    tip: "El Director Gerente del CRTM actúa bajo la autoridad del Consejo de Administración, que es el órgano supremo de dirección del organismo."
+  },
+  {
+    cat: "crtm",
+    q: "Con Renfe y concesionarios privados, la relación se instrumenta mediante:",
+    a: "a) Acuerdos y contratos programa",
+    opts: [
+      "a) Acuerdos y contratos programa",
+      "b) Subvenciones directas",
+      "c) Órdenes ministeriales",
+      "d) Licencias"
+    ],
+    tip: "La relación del CRTM con Renfe y los concesionarios privados se articula a través de acuerdos y contratos programa que establecen las obligaciones de servicio y las contraprestaciones económicas."
+  },
+  {
+    cat: "crtm",
+    q: "El Estado puede incorporarse por ser titular de los ferrocarriles que explota:",
+    a: "b) Renfe",
+    opts: [
+      "a) Metro",
+      "b) Renfe",
+      "c) ADIF",
+      "d) FEVE"
+    ],
+    tip: "El Estado puede incorporarse al CRTM por ser titular de los ferrocarriles que explota Renfe, cuyas líneas forman parte fundamental de la red de transporte de la Comunidad de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio respeta de las empresas su:",
+    a: "d) Patrimonio, personalidad jurídica y autonomía de gestión",
+    opts: [
+      "a) Capital social",
+      "b) Régimen laboral",
+      "c) Política exterior",
+      "d) Patrimonio, personalidad jurídica y autonomía de gestión"
+    ],
+    tip: "El CRTM respeta el patrimonio, la personalidad jurídica y la autonomía de gestión de las empresas integradas, sin absorberlas ni interferir en su funcionamiento interno."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio concentra competencias sobre transporte de viajeros de:",
+    a: "d) Comunidad y Ayuntamientos adheridos",
+    opts: [
+      "a) Solo Comunidad",
+      "b) Solo Ayuntamientos",
+      "c) Estado",
+      "d) Comunidad y Ayuntamientos adheridos"
+    ],
+    tip: "El CRTM concentra las competencias en materia de transporte de viajeros tanto de la Comunidad de Madrid como de los Ayuntamientos que se han adherido al sistema."
+  },
+  {
+    cat: "crtm",
+    q: "Con empresas públicas incorporadas, la relación es de:",
+    a: "b) Dependencia",
+    opts: [
+      "a) Contrato programa",
+      "b) Dependencia",
+      "c) Convenio especial",
+      "d) Colaboración voluntaria"
+    ],
+    tip: "Las empresas públicas incorporadas al CRTM mantienen una relación de dependencia con el organismo, a diferencia de las privadas con las que la relación se articula mediante convenios."
+  },
+  {
+    cat: "crtm",
+    q: "En el Comité Técnico participan representantes de:",
+    a: "c) Administraciones, empresas públicas y privadas y usuarios",
+    opts: [
+      "a) Administraciones, empresas públicas y privadas y trabajadores del sector",
+      "b) Administraciones, empresas públicas y trabajadores del sector",
+      "c) Administraciones, empresas públicas y privadas y usuarios",
+      "d) Usuarios, empresas públicas y privadas y trabajadores del sector"
+    ],
+    tip: "El Comité Técnico integra a representantes de las administraciones, las empresas públicas y privadas del sector, y los usuarios del transporte público."
+  },
+  {
+    cat: "crtm",
+    q: "Los compromisos del Consorcio se basan en:",
+    a: "d) Módulos objetivos de valoración",
+    opts: [
+      "a) Costes históricos",
+      "b) Decisiones políticas",
+      "c) Tarifas medias",
+      "d) Módulos objetivos de valoración"
+    ],
+    tip: "Los compromisos económicos del CRTM con los operadores se basan en módulos objetivos de valoración, garantizando la transparencia y equidad en la distribución de recursos."
+  },
+  // --- TEST 5 ---
+  {
+    cat: "crtm",
+    q: "El Director Gerente es responsable de la:",
+    a: "c) Dirección inmediata del Consorcio",
+    opts: [
+      "a) Política tarifaria",
+      "b) Relación con el Estado",
+      "c) Dirección inmediata del Consorcio",
+      "d) Planificación legislativa"
+    ],
+    tip: "El Director Gerente asume la dirección inmediata del Consorcio, ejecutando los acuerdos del Consejo de Administración y gestionando el funcionamiento diario del organismo."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio define al grado de: (pregunta con fallo — respuesta correcta: Cobertura)",
+    a: "d) Cobertura",
+    opts: [
+      "a) Inversión",
+      "b) Coordinación",
+      "c) Fiscalidad",
+      "d) Cobertura"
+    ],
+    tip: "El Consorcio define el grado de cobertura del sistema tarifario integrado, determinando qué servicios y zonas quedan incluidos en el mismo."
+  },
+  {
+    cat: "crtm",
+    q: "Los usuarios tienen costes diferenciados según:",
+    a: "d) Localización y medio disponible",
+    opts: [
+      "a) Edad",
+      "b) Tipo de billete",
+      "c) Frecuencia",
+      "d) Localización y medio disponible"
+    ],
+    tip: "Los costes de transporte para los usuarios varían según su localización geográfica y los medios de transporte disponibles en su zona, generando desequilibrios que el CRTM trata de corregir."
+  },
+  {
+    cat: "crtm",
+    q: "La red anterior presentaba desequilibrio espacial y temporal en: (respuesta correcta: Tarifas)",
+    a: "a) Tarifas",
+    opts: [
+      "a) Tarifas",
+      "b) Capacidad ofertada",
+      "c) Infraestructuras",
+      "d) Usuarios"
+    ],
+    tip: "La red de transporte anterior al CRTM presentaba desequilibrios espaciales y temporales en las tarifas, con precios muy distintos según la zona o el operador."
+  },
+  {
+    cat: "crtm",
+    q: "La estructura del Consorcio responde a líneas directrices de la Ley reguladora de la Administración:",
+    a: "b) Institucional de la Comunidad",
+    opts: [
+      "a) General del Estado",
+      "b) Institucional de la Comunidad",
+      "c) Local",
+      "d) Financiera"
+    ],
+    tip: "La estructura orgánica del CRTM sigue las líneas directrices de la Ley reguladora de la Administración Institucional de la Comunidad de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "La Ley abre posibilidades para definir módulos de reparto de aportaciones de:",
+    a: "a) Entes representados en el Consorcio",
+    opts: [
+      "a) Entes representados en el Consorcio",
+      "b) Usuarios",
+      "c) Empresas",
+      "d) Sindicatos"
+    ],
+    tip: "La Ley permite definir módulos de reparto de las aportaciones económicas entre los entes representados en el Consorcio (Comunidad, Ayuntamientos, etc.)."
+  },
+  {
+    cat: "crtm",
+    q: "Además de ingresos tarifarios, también se requieren:",
+    a: "d) Subvenciones presupuestarias",
+    opts: [
+      "a) Créditos bancarios",
+      "b) Ingresos publicitarios",
+      "c) Multas",
+      "d) Subvenciones presupuestarias"
+    ],
+    tip: "El sistema de transporte público no es autofinanciable solo con tarifas, por lo que requiere subvenciones presupuestarias de las administraciones para cubrir su coste total."
+  },
+  {
+    cat: "crtm",
+    q: "Según el principio de que los beneficiarios del sistema no son únicamente: (respuesta correcta: Ayuntamientos)",
+    a: "b) Ayuntamientos",
+    opts: [
+      "a) Empresas",
+      "b) Ayuntamientos",
+      "c) Usuarios",
+      "d) Estado"
+    ],
+    tip: "El principio establece que los beneficiarios del sistema de transporte no son únicamente los Ayuntamientos, sino también la Comunidad y el Estado, lo que justifica la participación de todos en su financiación."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio ordena y regula para mantener la autonomía de gestión de:",
+    a: "d) Empresas públicas y privadas",
+    opts: [
+      "a) Solo públicas",
+      "b) Solo privadas",
+      "c) Solo ferroviarias",
+      "d) Empresas públicas y privadas"
+    ],
+    tip: "El CRTM ordena y regula el sistema de transporte respetando y manteniendo la autonomía de gestión tanto de las empresas públicas como privadas que operan en la red."
+  },
+  {
+    cat: "crtm",
+    q: "Las tarifas no deben cubrir:",
+    a: "c) La totalidad de los costes",
+    opts: [
+      "a) Costes variables",
+      "b) Inversiones",
+      "c) La totalidad de los costes",
+      "d) Subvenciones"
+    ],
+    tip: "Las tarifas del transporte público no deben cubrir la totalidad de los costes del sistema, ya que el transporte público tiene un carácter de servicio esencial que requiere financiación pública complementaria."
+  },
+  // --- TEST 6 ---
+  {
+    cat: "crtm",
+    q: "¿A qué Consejería está adscrito el Consorcio?",
+    a: "d) Obras Públicas y Transportes",
+    opts: [
+      "a) Economía",
+      "b) Presidencia",
+      "c) Medio Ambiente",
+      "d) Obras Públicas y Transportes"
+    ],
+    tip: "El CRTM está adscrito a la Consejería de Obras Públicas y Transportes de la Comunidad de Madrid, que es la competente en materia de infraestructuras y transporte."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué condición orgánica tiene el Consorcio según el artículo 1.3?",
+    a: "c) Organismo Autónomo de la Comunidad de Madrid",
+    opts: [
+      "a) Empresa pública",
+      "b) Ente público empresarial estatal",
+      "c) Organismo Autónomo de la Comunidad de Madrid",
+      "d) Sociedad anónima pública"
+    ],
+    tip: "Según el artículo 1.3 de sus estatutos, el CRTM tiene la condición de Organismo Autónomo de la Comunidad de Madrid, con personalidad jurídica y patrimonio propios."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué está prohibido cubrir con subvenciones?",
+    a: "c) Déficits por inadecuada gestión empresarial",
+    opts: [
+      "a) Inversiones iniciales",
+      "b) Tarifas sociales",
+      "c) Déficits por inadecuada gestión empresarial",
+      "d) Costes energéticos"
+    ],
+    tip: "Las subvenciones públicas no pueden destinarse a cubrir déficits derivados de una inadecuada gestión empresarial, para evitar el riesgo moral y garantizar la eficiencia de los operadores."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién puede prestar el servicio según el artículo 1.21?",
+    a: "c) Empresas públicas y privadas",
+    opts: [
+      "a) Solo empresas públicas autonómicas",
+      "b) Solo empresas municipales",
+      "c) Empresas públicas y privadas",
+      "d) Solo empresas privadas concesionarias estatales"
+    ],
+    tip: "Según el artículo 1.21, el servicio de transporte puede ser prestado tanto por empresas públicas como privadas integradas en el sistema del Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué Administraciones articulan su cooperación a través del Consorcio?",
+    a: "c) Comunidad de Madrid y Ayuntamientos de la misma",
+    opts: [
+      "a) Estado y Comunidad de Madrid",
+      "b) Diputaciones y Ayuntamientos",
+      "c) Comunidad de Madrid y Ayuntamientos de la misma",
+      "d) Comunidad de Madrid y Estado exclusivamente"
+    ],
+    tip: "El Consorcio es el instrumento de cooperación entre la Comunidad de Madrid y los Ayuntamientos de su territorio para la gestión coordinada del transporte público."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuál es el ámbito territorial de actuación?",
+    a: "d) Comunidad de Madrid",
+    opts: [
+      "a) Municipio de Madrid",
+      "b) España",
+      "c) Área metropolitana",
+      "d) Comunidad de Madrid"
+    ],
+    tip: "El ámbito territorial de actuación del CRTM es toda la Comunidad de Madrid, abarcando tanto la capital como el resto de municipios de la región."
+  },
+  {
+    cat: "crtm",
+    q: "¿La compensación económica especial puede hacerse en función de qué?",
+    a: "b) Demanda o kilómetros realizados",
+    opts: [
+      "a) Beneficios empresariales",
+      "b) Demanda o kilómetros realizados",
+      "c) Antigüedad de la empresa",
+      "d) Número de empleados"
+    ],
+    tip: "La compensación económica especial a los operadores puede calcularse en función de la demanda atendida o los kilómetros realizados, como indicadores objetivos de la prestación del servicio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué naturaleza tiene el Consorcio según el artículo 1.1?",
+    a: "c) Entidad con personalidad jurídica y patrimonio propios",
+    opts: [
+      "a) Sociedad mercantil pública",
+      "b) Órgano desconcentrado",
+      "c) Entidad con personalidad jurídica y patrimonio propios",
+      "d) Fundación pública"
+    ],
+    tip: "Según el artículo 1.1 de sus estatutos, el Consorcio es una entidad dotada de personalidad jurídica propia y patrimonio propio, lo que le otorga plena capacidad de obrar."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuál NO es función del artículo 2?",
+    a: "c) Gestión directa de carreteras",
+    opts: [
+      "a) Inspección y sanción",
+      "b) Planificación de servicios",
+      "c) Gestión directa de carreteras",
+      "d) La tramitación y resolución de las autorizaciones y concesiones"
+    ],
+    tip: "La gestión directa de carreteras no es una función del CRTM según el artículo 2 de sus estatutos, ya que sus competencias se limitan al transporte público de viajeros, no a la infraestructura viaria."
+  },
+  {
+    cat: "crtm",
+    q: "¿Sobre qué servicios recae la gestión conjunta?",
+    a: "d) Transporte público regular de viajeros",
+    opts: [
+      "a) Transporte escolar",
+      "b) Transporte discrecional",
+      "c) Transporte de mercancías",
+      "d) Transporte público regular de viajeros"
+    ],
+    tip: "La gestión conjunta del CRTM recae sobre el transporte público regular de viajeros, que es el servicio esencial de movilidad que articula el sistema integrado de la Comunidad de Madrid."
+  },
+  // --- TEST 7 ---
+  {
+    cat: "crtm",
+    q: "¿Qué controla el Consorcio según el art. 2.2.j?",
+    a: "b) Ingresos y costes de las empresas",
+    opts: [
+      "a) Plantillas municipales",
+      "b) Ingresos y costes de las empresas",
+      "c) Impuestos autonómicos",
+      "d) Precios de carburantes"
+    ],
+    tip: "Según el artículo 2.2.j, el Consorcio controla los ingresos y costes de las empresas operadoras para garantizar la correcta aplicación de los recursos públicos y la eficiencia del sistema."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué órgano ejerce la dirección colegiada?",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Presidente",
+      "b) Comité Técnico",
+      "c) Consejo de Administración",
+      "d) Director Gerente"
+    ],
+    tip: "El Consejo de Administración es el órgano colegiado de dirección del CRTM, con competencias para adoptar las decisiones estratégicas y de gobierno del organismo."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué es el Comité Técnico?",
+    a: "c) Órgano de concertación y apoyo",
+    opts: [
+      "a) Órgano sancionador",
+      "b) Órgano decisorio superior",
+      "c) Órgano de concertación y apoyo",
+      "d) Órgano presupuestario"
+    ],
+    tip: "El Comité Técnico es el órgano de concertación y apoyo del CRTM, donde se reúnen representantes de todas las partes implicadas para asesorar y colaborar en la gestión del sistema."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuántos de los vocales municipales son del Ayuntamiento de Madrid?",
+    a: "a) Tres",
+    opts: [
+      "a) Tres",
+      "b) Dos",
+      "c) Cuatro",
+      "d) Uno"
+    ],
+    tip: "Tres de los vocales municipales del Consejo de Administración del CRTM representan al Ayuntamiento de Madrid, dada la relevancia de la capital en el sistema de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién nombra al Vicepresidente?",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Consejo de Gobierno",
+      "b) Presidente",
+      "c) Consejo de Administración",
+      "d) Asamblea"
+    ],
+    tip: "El Vicepresidente del CRTM es nombrado por el propio Consejo de Administración entre sus miembros, siguiendo el procedimiento establecido en los estatutos."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuántos vocales representan a la Comunidad de Madrid?",
+    a: "c) Seis",
+    opts: [
+      "a) Cinco",
+      "b) Tres",
+      "c) Seis",
+      "d) Ocho"
+    ],
+    tip: "Seis vocales del Consejo de Administración representan a la Comunidad de Madrid, reflejando el papel predominante de la administración autonómica en la dirección del CRTM."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién puede proponer representantes por la Administración del Estado?",
+    a: "d) Delegado del Gobierno en la Comunidad",
+    opts: [
+      "a) Ministro de Transportes",
+      "b) Presidente del Gobierno",
+      "c) Senado",
+      "d) Delegado del Gobierno en la Comunidad"
+    ],
+    tip: "El Delegado del Gobierno en la Comunidad de Madrid es quien puede proponer los representantes de la Administración del Estado en el Consejo de Administración del CRTM."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuántos miembros tiene la Comisión Delegada?",
+    a: "c) Siete",
+    opts: [
+      "a) Cinco",
+      "b) Seis",
+      "c) Siete",
+      "d) Ocho"
+    ],
+    tip: "La Comisión Delegada del Consejo de Administración del CRTM está compuesta por siete miembros, ejerciendo las competencias que le delega el Consejo pleno."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuántos vocales representan a los Ayuntamientos?",
+    a: "b) Seis",
+    opts: [
+      "a) Cinco",
+      "b) Seis",
+      "c) Siete",
+      "d) Tres"
+    ],
+    tip: "Seis vocales del Consejo de Administración representan a los Ayuntamientos adheridos al Consorcio, garantizando la participación municipal en la toma de decisiones."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién nombra al Presidente del Consorcio?",
+    a: "c) Consejo de Gobierno",
+    opts: [
+      "a) Asamblea de Madrid",
+      "b) Consejo de Administración",
+      "c) Consejo de Gobierno",
+      "d) Delegado del Gobierno"
+    ],
+    tip: "El Presidente del Consorcio es nombrado por el Consejo de Gobierno de la Comunidad de Madrid, reflejando el carácter autonómico del organismo."
+  },
+  // --- TEST 8 ---
+  {
+    cat: "crtm",
+    q: "¿Qué queda excluido del plan general?",
+    a: "a) Carreteras",
+    opts: [
+      "a) Carreteras",
+      "b) Ferrocarriles",
+      "c) Metro",
+      "d) Autobuses"
+    ],
+    tip: "Las carreteras quedan excluidas del plan general del CRTM, ya que son competencia de la Consejería de Infraestructuras y no forman parte del sistema de transporte público de viajeros."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién convoca las reuniones del Consejo de Administración?",
+    a: "b) Presidente",
+    opts: [
+      "a) Vicepresidente",
+      "b) Presidente",
+      "c) Director Gerente",
+      "d) Secretario"
+    ],
+    tip: "Es el Presidente del Consejo de Administración quien tiene la competencia de convocar las reuniones del mismo, fijando el orden del día y presidiendo las sesiones."
+  },
+  {
+    cat: "crtm",
+    q: "¿De quién depende el Director Gerente?",
+    a: "d) Consejo de Administración",
+    opts: [
+      "a) Presidente exclusivamente",
+      "b) Consejería",
+      "c) Asamblea",
+      "d) Consejo de Administración"
+    ],
+    tip: "El Director Gerente depende jerárquicamente del Consejo de Administración, que es el órgano que le nombra y ante quien responde de su gestión."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién aprueba la estructura tarifaria?",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Presidente",
+      "b) Comunidad de Madrid",
+      "c) Consejo de Administración",
+      "d) Comité Técnico"
+    ],
+    tip: "La aprobación de la estructura tarifaria integrada corresponde al Consejo de Administración del CRTM, que es el órgano con competencia para fijar las condiciones económicas del sistema."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué no puede delegarse a la Comisión Delegada?",
+    a: "c) Funciones de determinados apartados del art. 5",
+    opts: [
+      "a) Inspección",
+      "b) Recaudación",
+      "c) Funciones de determinados apartados del art. 5",
+      "d) Publicidad"
+    ],
+    tip: "Existen funciones específicas recogidas en determinados apartados del artículo 5 que no pueden delegarse a la Comisión Delegada por ser competencia exclusiva del Consejo de Administración pleno."
+  },
+  {
+    cat: "crtm",
+    q: "¿Ante qué órgano comparece el Presidente para informar?",
+    a: "d) Consejo de Gobierno",
+    opts: [
+      "a) Senado",
+      "b) Congreso",
+      "c) Asamblea de Madrid",
+      "d) Consejo de Gobierno"
+    ],
+    tip: "El Presidente del CRTM comparece ante el Consejo de Gobierno de la Comunidad de Madrid para informar sobre la gestión y actividad del Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién aprueba el Anteproyecto de Presupuestos del Consorcio?",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Presidente",
+      "b) Director Gerente",
+      "c) Consejo de Administración",
+      "d) Consejo de Gobierno"
+    ],
+    tip: "El Consejo de Administración es el órgano competente para aprobar el Anteproyecto de Presupuestos del Consorcio, antes de su elevación a la Comunidad de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién elabora los contratos programa?",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Director Gerente",
+      "b) Presidente",
+      "c) Consejo de Administración",
+      "d) Consejería"
+    ],
+    tip: "Los contratos programa, que regulan las relaciones económicas con los operadores, son elaborados por el Consejo de Administración del CRTM."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién aprueba definitivamente el plan general de infraestructuras?",
+    a: "d) Consejo de Gobierno",
+    opts: [
+      "a) Consejo de Administración",
+      "b) Asamblea",
+      "c) Presidente",
+      "d) Consejo de Gobierno"
+    ],
+    tip: "La aprobación definitiva del plan general de infraestructuras corresponde al Consejo de Gobierno de la Comunidad de Madrid, dado el alcance estratégico y presupuestario de dicho plan."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién sustituye al Presidente en caso de fallecimiento?",
+    a: "c) Vicepresidente",
+    opts: [
+      "a) Director Gerente",
+      "b) Vocal más antiguo",
+      "c) Vicepresidente",
+      "d) Delegado del Gobierno"
+    ],
+    tip: "En caso de fallecimiento, ausencia o enfermedad del Presidente, le sustituye el Vicepresidente del Consejo de Administración del CRTM."
+  }
+];
+
+// Mezclar preguntas al inicio
+let questions = [...db].sort(() => Math.random() - 0.5);
+let currentIdx = 0;
+let hits = 0;
+let fails = [];
+
+function initQuiz() {
+    document.getElementById('progreso-texto').innerText = `Pregunta 1/${questions.length}`;
+    showQuestion();
+}
+
+function showQuestion() {
+    const q = questions[currentIdx];
+
+    document.getElementById('progreso-texto').innerText = `Pregunta ${currentIdx + 1}/${questions.length}`;
+    document.getElementById('progress-fill').style.width = `${(currentIdx / questions.length) * 100}%`;
+    document.getElementById('question-text').innerText = q.q;
+    document.getElementById('btn-next').classList.remove('show');
+    document.getElementById('tip-box').classList.remove('show');
+    document.getElementById('tip-box').innerText = '';
+
+    // Badge de categoría
+    const badge = document.getElementById('cat-badge');
+    badge.innerText = CAT_LABELS[q.cat] || q.cat;
+    badge.className = 'cat-badge cat-' + q.cat;
+
+    const container = document.getElementById('options-container');
+    container.innerHTML = '';
+
+    const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
+    shuffled.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(btn, opt, q.a, q.tip);
+        container.appendChild(btn);
+    });
+}
+
+function checkAnswer(btn, selected, correct, tip) {
+    const buttons = document.querySelectorAll('.opt-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const tipBox = document.getElementById('tip-box');
+    tipBox.innerText = tip;
+    tipBox.classList.add('show');
+
+    if (selected === correct) {
+        btn.classList.add('correct');
+        hits++;
+        setTimeout(nextQuestion, 1200);
+    } else {
+        btn.classList.add('wrong');
+        fails.push({ q: questions[currentIdx].q, a: correct });
+        guardarFallo(questions[currentIdx].q, questions[currentIdx].opts, correct, "CRTM: Organización y Normativa");
+        buttons.forEach(b => { if (b.innerText === correct) b.classList.add('reveal'); });
+        document.getElementById('btn-next').classList.add('show');
+    }
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx < questions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.remove('hidden');
+
+    const percent = Math.round((hits / questions.length) * 100);
+    document.getElementById('score-percent').innerText = `${percent}%`;
+    document.getElementById('score-text').innerText = `Has acertado ${hits} de ${questions.length}`;
+
+    const review = document.getElementById('failed-review');
+    if (fails.length > 0) {
+        review.innerHTML = '<strong>Tus errores:</strong><br><br>' +
+            fails.map(f => `<div class="result-item">• ${f.q}<br><span style="color:var(--correct)">✔ ${f.a}</span></div>`).join('');
+    } else {
+        review.innerHTML = '¡Perfecto! No has tenido ningún fallo.';
+    }
+}
+
+function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+    try {
+        let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+        if (!listaFallos.find(f => f.q === pregunta)) {
+            listaFallos.push({ id: Date.now(), modulo, q: pregunta, opts: opciones, a: respuestaCorrecta });
+            localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
+        }
+    } catch(e) {}
+}
+
+initQuiz();
+</script>
+
+</body>
+</html>

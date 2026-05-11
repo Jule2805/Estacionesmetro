@@ -7,7 +7,7 @@
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #007bff;
-            --metro: #f31431; --cercanias: #ff6600; --otros: #36cdf3;--sistema: #93117e; --fallo:#15ec44;--nic:#ec15a4;
+            --metro: #f31431; --cercanias: #ff6600; --otros: #36cdf3;--sistema: #93117e; --fallo:#15ec44;--nic:#ec15a4;--academia:#fbe600;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
@@ -22,14 +22,17 @@
         .menu-block { 
             aspect-ratio: 1 / 1; border-radius: 20px; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s;
-            border: none; color: white; font-weight: bold; font-size: 16px; gap: 10px;
-        }
+            border: none; color: white; font-weight: bold; font-size: 16px; gap: 10px; }
+    
         .block-metro { background: var(--metro); }
         .block-detodito { background: var(--cercanias); }
         .block-otros { background: var(--otros);}
         .block-sistema { background: var(--sistema) !important;}
         .block-fallo {background: var(--fallo);} 
-        .block-nic {background-color:var(--nic)};
+        .block-nic {background-color:var(--nic);}
+        .block-aca {background-color:var(--academia)};
+
+   
         /* ESTILOS DEL JUEGO */
         .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; margin-bottom: 15px; overflow: hidden; }
         #progress-fill { height: 100%; background: #28a745; width: 0%; transition: 0.3s; }
@@ -425,6 +428,9 @@ function showMainMenu() {
             </button>
             <button class="menu-block block-nic" onclick="window.location.href='nic.html'">
                 <span>📐</span> NIC
+            </button>
+               <button class="menu-block block-aca" onclick="window.location.href='academia.html'">
+                <span>🏫</span> Test academia
             </button>
         </div>
     `;
