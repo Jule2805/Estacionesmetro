@@ -3,130 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test CRTM - Organización y Normativa (20 preguntas)</title>
+    <title>Test CRTM</title>
     <style>
         :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --accent: #e67e22;
-            --correct: #009543;
-            --wrong: #ff3b30;
-            --text: #ffffff;
+            --bg: #121212; --card: #1e1e1e; --accent: #e67e22;
+            --correct: #009543; --wrong: #ff3b30; --text: #ffffff;
         }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            min-height: 100vh;
-        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
         .container { width: 100%; max-width: 500px; padding: 20px; }
-        
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+
+        .menu-title { text-align: center; margin-bottom: 6px; font-size: 1.3rem; font-weight: 700; }
+        .menu-subtitle { text-align: center; color: #888; font-size: 13px; margin-bottom: 24px; }
+        .menu-grid { display: flex; flex-direction: column; gap: 12px; }
+        .menu-btn {
+            background: var(--card); border: 1px solid #333; color: var(--text);
+            padding: 18px 20px; border-radius: 14px; text-align: left;
+            cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center;
         }
+        .menu-btn:hover { background: #2a2a2a; border-color: var(--accent); }
+        .menu-btn .label { font-size: 15px; font-weight: 600; }
+        .menu-btn .meta { font-size: 12px; color: #888; margin-top: 3px; }
+        .menu-btn .arrow { color: var(--accent); font-size: 20px; }
+        .menu-btn-all { background: var(--accent); border-color: var(--accent); margin-top: 6px; }
+        .menu-btn-all:hover { opacity: 0.9; }
+
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         #progreso-texto { font-size: 14px; color: #888; }
-        .btn-salir {
-            background: none; border: 1px solid #444; color: #ccc;
-            padding: 5px 12px; border-radius: 5px; cursor: pointer;
-        }
-
-        .progress-bar {
-            width: 100%; height: 6px; background: #333;
-            border-radius: 10px; margin-bottom: 25px; overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%; background: var(--accent);
-            width: 0%; transition: width 0.3s;
-        }
-
-        .question-card {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .cat-badge {
-            display: inline-block;
-            font-size: 11px;
-            padding: 3px 10px;
-            border-radius: 99px;
-            margin-bottom: 12px;
-            background: #333;
-            color: #aaa;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-        .cat-crtm       { background: #1a2a1a; color: #7de87d; }
-        .cat-fundamental { background: #3a1a1a; color: #ff6b6b; }
-        .cat-indicadora  { background: #1a2a3a; color: #6ab0ff; }
-        .cat-cartel      { background: #2a2a1a; color: #f0c040; }
-        .cat-manual      { background: #1a3a1a; color: #6fd88a; }
-
+        .btn-salir { background: none; border: 1px solid #444; color: #ccc; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 10px; margin-bottom: 25px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
+        .question-card { background: var(--card); padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .cat-badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 99px; margin-bottom: 12px; background: #1a2a1a; color: #7de87d; text-transform: uppercase; letter-spacing: 0.06em; }
         h2 { font-size: 1.1rem; line-height: 1.5; margin-bottom: 20px; margin-top: 0; }
-
         .options-grid { display: flex; flex-direction: column; gap: 12px; }
-        .opt-btn {
-            background: #2a2a2a; border: 1px solid #333; color: white;
-            padding: 16px; border-radius: 12px; text-align: left;
-            font-size: 14px; cursor: pointer; transition: 0.2s; line-height: 1.4;
-        }
+        .opt-btn { background: #2a2a2a; border: 1px solid #333; color: white; padding: 16px; border-radius: 12px; text-align: left; font-size: 14px; cursor: pointer; transition: 0.2s; line-height: 1.4; }
         .opt-btn:hover:not(:disabled) { background: #333; border-color: #555; }
         .opt-btn.correct { background: var(--correct) !important; border-color: var(--correct); }
-        .opt-btn.wrong   { background: var(--wrong)   !important; border-color: var(--wrong); }
-        .opt-btn.reveal  { background: #005a28 !important; border-color: var(--correct); opacity: 0.85; }
-
-        .tip-box {
-            display: none;
-            margin-top: 16px;
-            padding: 14px;
-            background: #252525;
-            border-left: 3px solid var(--accent);
-            border-radius: 8px;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #ccc;
-        }
+        .opt-btn.wrong { background: var(--wrong) !important; border-color: var(--wrong); }
+        .opt-btn.reveal { background: #005a28 !important; border-color: var(--correct); opacity: 0.85; }
+        .tip-box { display: none; margin-top: 16px; padding: 14px; background: #252525; border-left: 3px solid var(--accent); border-radius: 8px; font-size: 13px; line-height: 1.6; color: #ccc; }
         .tip-box.show { display: block; }
-
-        .btn-next {
-            width: 100%; background: var(--accent); color: white;
-            border: none; padding: 15px; border-radius: 10px;
-            font-weight: bold; margin-top: 16px; cursor: pointer;
-            display: none; font-size: 15px;
-        }
+        .btn-next { width: 100%; background: var(--accent); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; margin-top: 16px; cursor: pointer; display: none; font-size: 15px; }
         .btn-next.show { display: block; }
-
-        .results-list {
-            text-align: left; background: #000; padding: 15px;
-            border-radius: 10px; font-size: 13px; max-height: 300px;
-            overflow-y: auto; margin-top: 15px;
-        }
+        .results-list { text-align: left; background: #000; padding: 15px; border-radius: 10px; font-size: 13px; max-height: 300px; overflow-y: auto; margin-top: 15px; }
         .result-item { margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 5px; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <div id="quiz-screen">
+
+    <div id="menu-screen">
+        <div class="menu-title">&#x1F687; Test CRTM</div>
+        <div class="menu-subtitle">Elige un bloque de preguntas</div>
+        <button class="btn-salir" style="margin-bottom:16px;" onclick="history.back()">&#x2190; Volver al menú principal</button>
+        <div class="menu-grid" id="menu-grid"></div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
         <div class="quiz-header">
-            <div id="progreso-texto">Pregunta 1/10</div>
-            <button class="btn-salir" onclick="history.back()">✕ Salir</button>
+            <div id="progreso-texto">Pregunta 1/30</div>
+            <button class="btn-salir" onclick="volverMenu()">&#x2715; Salir</button>
         </div>
         <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-        
         <div class="question-card">
-            <div id="cat-badge" class="cat-badge"></div>
-            <h2 id="question-text">Cargando pregunta...</h2>
+            <div id="cat-badge" class="cat-badge">CRTM</div>
+            <h2 id="question-text">Cargando...</h2>
             <div id="options-container" class="options-grid"></div>
             <div id="tip-box" class="tip-box"></div>
-            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE PREGUNTA →</button>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE PREGUNTA &#x2192;</button>
         </div>
     </div>
 
@@ -135,21 +81,13 @@
             <h1 id="score-percent">0%</h1>
             <p id="score-text"></p>
             <div id="failed-review" class="results-list"></div>
-            <button class="btn-next" style="display:block;" onclick="location.reload()">REPETIR TEST</button>
-            <button class="btn-next" style="display:block; background:#444; margin-top:10px;" onclick="history.back()">VOLVER AL MENÚ</button>
+            <button class="btn-next show" onclick="repetirBloque()">REPETIR ESTE BLOQUE</button>
+            <button class="btn-next show" style="background:#444; margin-top:10px;" onclick="volverMenu()">ELEGIR OTRO BLOQUE</button>
         </div>
     </div>
+
 </div>
-
 <script>
-const CAT_LABELS = {
-    crtm:        "CRTM",
-    fundamental: "Señal fundamental",
-    indicadora:  "Señal indicadora",
-    cartel:      "Cartel",
-    manual:      "Señal manual / portátil"
-};
-
 const db = [
   {
     cat: "crtm",
@@ -1117,107 +1055,1247 @@ const db = [
       "d) Delegado del Gobierno"
     ],
     tip: "En caso de fallecimiento, ausencia o enfermedad del Presidente, le sustituye el Vicepresidente del Consejo de Administración del CRTM."
+  },
+  // --- TEST 9 ---
+  {
+    cat: "crtm",
+    q: "¿Quién nombra al Director Gerente?",
+    a: "c) Consejo de Administración a propuesta del Presidente",
+    opts: [
+      "a) Consejo de Gobierno",
+      "b) Presidente directamente",
+      "c) Consejo de Administración a propuesta del Presidente",
+      "d) Asamblea"
+    ],
+    tip: "El Director Gerente es nombrado por el Consejo de Administración, pero a propuesta del Presidente del Consorcio, combinando así la colegialidad con el liderazgo ejecutivo."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién decide los empates con voto de calidad?",
+    a: "d) Presidente",
+    opts: [
+      "a) Vicepresidente",
+      "b) Director Gerente",
+      "c) Vocal más antiguo",
+      "d) Presidente"
+    ],
+    tip: "En caso de empate en las votaciones del Consejo de Administración, el Presidente tiene voto de calidad, es decir, su voto cuenta doble para deshacer el empate."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién representa legalmente al Consorcio?",
+    a: "d) Presidente",
+    opts: [
+      "a) Consejo de Administración",
+      "b) Director Gerente",
+      "c) Vicepresidente",
+      "d) Presidente"
+    ],
+    tip: "El Presidente del Consorcio es su representante legal, ostentando la representación institucional del organismo ante terceros y las administraciones públicas."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién aprueba la plantilla del personal del Consorcio?",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Consejo de Administración",
+      "b) Consejería",
+      "c) Consejo de Administración",
+      "d) Presidente"
+    ],
+    tip: "La aprobación de la plantilla de personal del Consorcio corresponde al Consejo de Administración, que es el órgano competente para tomar decisiones sobre la estructura organizativa."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién elabora propuestas de convenios con otras CCAA?",
+    a: "c) Consorcio",
+    opts: [
+      "a) Consejo de Gobierno",
+      "b) Asamblea",
+      "c) Consorcio",
+      "d) Presidente"
+    ],
+    tip: "Es el propio Consorcio quien elabora las propuestas de convenios de colaboración con otras Comunidades Autónomas en materia de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién ejerce la facultad sancionadora directa?",
+    a: "c) Director Gerente",
+    opts: [
+      "a) Consejo de Administración",
+      "b) Presidente",
+      "c) Director Gerente",
+      "d) Comité Técnico"
+    ],
+    tip: "El Director Gerente tiene atribuida la facultad sancionadora directa, pudiendo imponer sanciones en el ejercicio de las funciones inspectoras y de control del Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Con qué periodicidad el Director Gerente informa sobre expedientes sancionadores?",
+    a: "c) Semestral",
+    opts: [
+      "a) Anual",
+      "b) Trimestral",
+      "c) Semestral",
+      "d) Mensual"
+    ],
+    tip: "El Director Gerente debe informar al Consejo de Administración con periodicidad semestral sobre los expedientes sancionadores tramitados por el Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién ejerce la dirección inmediata del personal?",
+    a: "d) Director Gerente",
+    opts: [
+      "a) Presidente",
+      "b) Consejo",
+      "c) Vicepresidente",
+      "d) Director Gerente"
+    ],
+    tip: "El Director Gerente ejerce la dirección inmediata del personal del Consorcio, siendo el responsable de la gestión cotidiana de los recursos humanos de la organización."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cómo asiste el Director Gerente al Consejo?",
+    a: "c) Director Gerente",
+    opts: [
+      "a) Con voto",
+      "b) Comité Técnico",
+      "c) Director Gerente",
+      "d) Asamblea"
+    ],
+    tip: "El Director Gerente asiste a las reuniones del Consejo de Administración con voz pero sin voto, pudiendo participar en los debates pero no en las votaciones."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién redacta el Proyecto de Estatutos?",
+    a: "c) Consejo de Administración",
+    opts: [
+      "a) Presidente",
+      "b) Director Gerente",
+      "c) Consejo de Administración",
+      "d) Asamblea"
+    ],
+    tip: "La redacción del Proyecto de Estatutos del Consorcio corresponde al Consejo de Administración, que es el órgano con competencia para definir el marco normativo interno del organismo."
+  },
+  // --- TEST 10 ---
+  {
+    cat: "crtm",
+    q: "¿Quién forma parte del Comité Técnico según el artículo 9?",
+    a: "c) El Presidente",
+    opts: [
+      "a) El Consejero de Transportes",
+      "b) El Alcalde de Madrid",
+      "c) El Presidente",
+      "d) El Delegado del Gobierno"
+    ],
+    tip: "Según el artículo 9, el Presidente del Consorcio forma parte del Comité Técnico, presidiendo este órgano de concertación y apoyo."
+  },
+  {
+    cat: "crtm",
+    q: "Uno de los representantes municipales del Comité Técnico debe pertenecer a:",
+    a: "c) Ayuntamiento de Madrid",
+    opts: [
+      "a) Alcalá de Henares",
+      "b) Getafe",
+      "c) Ayuntamiento de Madrid",
+      "d) Móstoles"
+    ],
+    tip: "Dado el peso específico de la capital, uno de los representantes municipales en el Comité Técnico debe pertenecer necesariamente al Ayuntamiento de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué entidad empresarial tiene representación en el Comité Técnico?",
+    a: "d) Cámara Oficial de Comercio e Industria de Madrid",
+    opts: [
+      "a) CCM",
+      "b) CEOE",
+      "c) Cámara de Comercio de España",
+      "d) Cámara Oficial de Comercio e Industria de Madrid"
+    ],
+    tip: "La Cámara Oficial de Comercio e Industria de Madrid tiene representación en el Comité Técnico del CRTM como entidad representativa del tejido empresarial de la región."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuántos representantes de los Ayuntamientos hay en el Comité Técnico?",
+    a: "b) Tres",
+    opts: [
+      "a) Uno",
+      "b) Tres",
+      "c) Cuatro",
+      "d) Dos"
+    ],
+    tip: "El Comité Técnico cuenta con tres representantes de los Ayuntamientos adheridos al Consorcio, garantizando la participación municipal en el órgano consultivo."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuántos representantes de organizaciones de consumidores o asociaciones vecinales hay?",
+    a: "a) Dos",
+    opts: [
+      "a) Dos",
+      "b) Cuatro",
+      "c) Tres",
+      "d) Cinco"
+    ],
+    tip: "El Comité Técnico incluye dos representantes de organizaciones de consumidores o asociaciones vecinales, dando voz a la sociedad civil en la planificación del transporte."
+  },
+  {
+    cat: "crtm",
+    q: "Los representantes de los trabajadores del sector transportes son:",
+    a: "b) Elegibles por sindicatos mayoritarios",
+    opts: [
+      "a) Uno y determinados reglamentariamente",
+      "b) Elegibles por sindicatos mayoritarios",
+      "c) Designados por el Consorcio",
+      "d) Cuatro por sorteo"
+    ],
+    tip: "Los representantes de los trabajadores del sector del transporte en el Comité Técnico son elegidos por los sindicatos más representativos del sector."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué cargo del Consorcio está expresamente incluido en el Comité Técnico?",
+    a: "c) Director general del Consorcio",
+    opts: [
+      "a) Director financiero",
+      "b) Secretario general",
+      "c) Director general del Consorcio",
+      "d) Interventor"
+    ],
+    tip: "El Director General del Consorcio está expresamente incluido como miembro del Comité Técnico, asegurando la coordinación entre el órgano ejecutivo y el consultivo."
+  },
+  {
+    cat: "crtm",
+    q: "¿De qué entidades proceden los Directores Generales mencionados en el Comité Técnico?",
+    a: "b) Empresa Municipal de Transportes de Madrid y Compañía Metropolitana de Madrid",
+    opts: [
+      "a) RENFE y ADIF",
+      "b) Empresa Municipal de Transportes de Madrid y Compañía Metropolitana de Madrid",
+      "c) Comunidad y Estado",
+      "d) Ministerio de Transportes y Metro Ligero"
+    ],
+    tip: "Los Directores Generales de la EMT (Empresa Municipal de Transportes de Madrid) y de la Compañía Metropolitana de Madrid forman parte del Comité Técnico del CRTM."
+  },
+  {
+    cat: "crtm",
+    q: "El representante de la Administración del Estado se designa a través de:",
+    a: "c) Delegado del Gobierno de la Comunidad",
+    opts: [
+      "a) Ministerio de Transportes",
+      "b) Presidencia del Gobierno",
+      "c) Delegado del Gobierno de la Comunidad",
+      "d) Senado"
+    ],
+    tip: "El representante de la Administración del Estado en el Comité Técnico se designa a través del Delegado del Gobierno en la Comunidad de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuántos representantes de empresas privadas concesionarias hay?",
+    a: "a) Uno",
+    opts: [
+      "a) Uno",
+      "b) Dos",
+      "c) Tres",
+      "d) Cuatro"
+    ],
+    tip: "Hay un único representante de las empresas privadas concesionarias en el Comité Técnico, asegurando la presencia del sector privado sin que predomine sobre las administraciones públicas."
+  },
+  // --- TEST 11 ---
+  {
+    cat: "crtm",
+    q: "El Comité trata sobre:",
+    a: "b) Estructuras tarifarias",
+    opts: [
+      "a) Salarios",
+      "b) Estructuras tarifarias",
+      "c) Subvenciones estatales",
+      "d) Impuestos municipales"
+    ],
+    tip: "El Comité Técnico aborda entre sus materias las estructuras tarifarias del sistema integrado de transporte, asesorando al Consejo de Administración sobre su diseño y modificación."
+  },
+  {
+    cat: "crtm",
+    q: "El Comité Técnico puede tratar programas de:",
+    a: "c) Coordinación de servicios",
+    opts: [
+      "a) Seguridad ciudadana",
+      "b) Medio ambiente",
+      "c) Coordinación de servicios",
+      "d) Protección civil"
+    ],
+    tip: "El Comité Técnico puede tratar programas de coordinación de servicios de transporte, siendo esta una de sus funciones principales como órgano de concertación."
+  },
+  {
+    cat: "crtm",
+    q: "El Comité Técnico deberá informar preceptivamente sobre cuestiones:",
+    a: "c) De carácter técnico",
+    opts: [
+      "a) Económicas",
+      "b) Jurídicas",
+      "c) De carácter técnico",
+      "d) Disciplinarias"
+    ],
+    tip: "El Comité Técnico debe informar preceptivamente sobre las cuestiones de carácter técnico que le sean sometidas, siendo este informe obligatorio aunque no vinculante."
+  },
+  {
+    cat: "crtm",
+    q: "Las quejas de usuarios tratadas por el Comité cuando afectan a:",
+    a: "d) El conjunto del sistema de transportes",
+    opts: [
+      "a) Una línea concreta",
+      "b) Una empresa concreta",
+      "c) Solo transporte urbano",
+      "d) El conjunto del sistema de transportes"
+    ],
+    tip: "El Comité Técnico trata las quejas de usuarios cuando estas afectan al conjunto del sistema de transportes, no cuando son quejas puntuales sobre una línea o empresa concreta."
+  },
+  {
+    cat: "crtm",
+    q: "Entre las cuestiones técnicas se incluyen los planes:",
+    a: "b) Anuales de actuación del Consorcio",
+    opts: [
+      "a) Estratégicos quinquenales",
+      "b) Anuales de actuación del Consorcio",
+      "c) Presupuestarios estatales",
+      "d) De infraestructuras nacionales"
+    ],
+    tip: "Entre las cuestiones técnicas que trata el Comité se incluyen los planes anuales de actuación del Consorcio, que definen los objetivos y acciones para cada ejercicio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué empresa puede integrarse a iniciativa propia en el Comité Técnico?",
+    a: "c) RENFE",
+    opts: [
+      "a) EMT",
+      "b) Metro Ligero",
+      "c) RENFE",
+      "d) ADIF"
+    ],
+    tip: "RENFE puede integrarse a iniciativa propia en el Comité Técnico del CRTM, dado su papel como operador ferroviario de ámbito estatal con servicios en la Comunidad de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "Las medidas generales de ordenación del transporte son elaboradas por:",
+    a: "d) Órganos del Consorcio",
+    opts: [
+      "a) Comunidad",
+      "b) Estado",
+      "c) Ayuntamientos",
+      "d) Órganos del Consorcio"
+    ],
+    tip: "Las medidas generales de ordenación del transporte en el ámbito de la Comunidad de Madrid son elaboradas por los propios órganos del Consorcio, en ejercicio de sus competencias."
+  },
+  {
+    cat: "crtm",
+    q: "Las aportaciones de empresas para servicios de interés común se relacionan con el artículo:",
+    a: "b) 11.5",
+    opts: [
+      "a) 10",
+      "b) 11.5",
+      "c) 13.2",
+      "d) 14.1"
+    ],
+    tip: "El artículo 11.5 de los estatutos regula las aportaciones que deben realizar las empresas operadoras para la financiación de los servicios de interés común del sistema."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio aborda la distribución de:",
+    a: "c) Ingresos y compensaciones a las Empresas",
+    opts: [
+      "a) Subvenciones",
+      "b) Inversiones",
+      "c) Ingresos y compensaciones a las Empresas",
+      "d) Sanciones"
+    ],
+    tip: "El Consorcio gestiona la distribución de los ingresos tarifarios y las compensaciones económicas entre las empresas operadoras del sistema integrado de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio interviene en la creación o supresión de:",
+    a: "a) Líneas y servicios",
+    opts: [
+      "a) Líneas y servicios",
+      "b) Tarifas",
+      "c) Estaciones",
+      "d) Contratos laborales"
+    ],
+    tip: "El Consorcio tiene competencia para intervenir en la creación o supresión de líneas y servicios de transporte público en el ámbito de la Comunidad de Madrid."
+  },
+  // --- TEST 12 ---
+  {
+    cat: "crtm",
+    q: "El Consejo de Administración puede nombrar en las empresas un:",
+    a: "b) Consejero delegado",
+    opts: [
+      "a) Interventor",
+      "b) Consejero delegado",
+      "c) Delegado",
+      "d) Comisario"
+    ],
+    tip: "El Consejo de Administración del CRTM tiene la facultad de nombrar un Consejero delegado en las empresas operadoras para ejercer su representación y supervisión."
+  },
+  {
+    cat: "crtm",
+    q: "Las empresas públicas tienen personalidad jurídica:",
+    a: "c) Independiente",
+    opts: [
+      "a) Dependiente",
+      "b) Estatal",
+      "c) Independiente",
+      "d) Delegada"
+    ],
+    tip: "Las empresas públicas integradas en el sistema del Consorcio tienen personalidad jurídica independiente, lo que les permite actuar con autonomía en el tráfico jurídico."
+  },
+  {
+    cat: "crtm",
+    q: "La financiación de empresas públicas se basa en:",
+    a: "c) Sistema de compensación del art. 2.2.h",
+    opts: [
+      "a) Tarifas libres",
+      "b) Presupuesto estatal",
+      "c) Sistema de compensación del art. 2.2.h",
+      "d) Fondos europeos"
+    ],
+    tip: "La financiación de las empresas públicas integradas se basa en el sistema de compensación regulado en el artículo 2.2.h de los estatutos del Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "Las relaciones con RENFE se regulan mediante:",
+    a: "d) Contrato programa",
+    opts: [
+      "a) Convenio",
+      "b) Decreto",
+      "c) Orden ministerial",
+      "d) Contrato programa"
+    ],
+    tip: "Las relaciones entre el Consorcio y RENFE se articulan mediante contratos programa, que establecen las obligaciones de servicio y las contraprestaciones económicas."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio puede adquirir participaciones previa acuerdo con:",
+    a: "c) Ente titular de las mismas",
+    opts: [
+      "a) Comunidad",
+      "b) Ministerio",
+      "c) Ente titular de las mismas",
+      "d) Tribunal de Cuentas"
+    ],
+    tip: "El Consorcio puede adquirir participaciones en empresas de transporte, siempre que exista un acuerdo previo con el ente titular de dichas participaciones."
+  },
+  {
+    cat: "crtm",
+    q: "Las empresas deben hacer aportaciones económicas para:",
+    a: "b) Servicios de interés común",
+    opts: [
+      "a) Inversiones propias",
+      "b) Servicios de interés común",
+      "c) Formación",
+      "d) Seguridad"
+    ],
+    tip: "Las empresas operadoras están obligadas a realizar aportaciones económicas para financiar los servicios de interés común del sistema integrado de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "La titularidad de las acciones de empresas dependientes corresponde a:",
+    a: "d) Comunidad y Ayuntamientos",
+    opts: [
+      "a) Solo Comunidad",
+      "b) Solo Ayuntamientos",
+      "c) Estado",
+      "d) Comunidad y Ayuntamientos"
+    ],
+    tip: "La titularidad de las acciones de las empresas dependientes del Consorcio corresponde conjuntamente a la Comunidad de Madrid y a los Ayuntamientos adheridos."
+  },
+  {
+    cat: "crtm",
+    q: "El Comité será informado de propuestas de:",
+    a: "c) Sanciones",
+    opts: [
+      "a) Convenios",
+      "b) Tarifas",
+      "c) Sanciones",
+      "d) Nombramientos"
+    ],
+    tip: "El Comité Técnico debe ser informado de las propuestas de sanciones antes de que sean impuestas, como garantía del procedimiento sancionador del Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "El proyecto de contrato programa lo elabora:",
+    a: "c) Consejo de Administración del Consorcio",
+    opts: [
+      "a) Presidente",
+      "b) Asamblea",
+      "c) Consejo de Administración del Consorcio",
+      "d) Consejería"
+    ],
+    tip: "El proyecto de contrato programa con los operadores es elaborado por el Consejo de Administración del Consorcio, que es el órgano con competencia para definir las relaciones económicas con las empresas."
+  },
+  {
+    cat: "crtm",
+    q: "El contrato programa con RENFE regula al menos:",
+    a: "b) Oferta de transporte",
+    opts: [
+      "a) Plantillas",
+      "b) Oferta de transporte",
+      "c) Infraestructuras",
+      "d) Convenios laborales"
+    ],
+    tip: "El contrato programa entre el Consorcio y RENFE regula como mínimo la oferta de transporte que debe prestar la operadora ferroviaria en el ámbito de la Comunidad de Madrid."
+  },
+  // --- TEST 13 ---
+  {
+    cat: "crtm",
+    q: "La competencia sobre Metro corresponde a:",
+    a: "c) Comunidad de Madrid",
+    opts: [
+      "a) Estado",
+      "b) Ayuntamiento",
+      "c) Comunidad de Madrid",
+      "d) Consorcio"
+    ],
+    tip: "La competencia sobre el servicio de Metro corresponde a la Comunidad de Madrid, que es quien ostenta las competencias en materia de transporte ferroviario urbano e interurbano en su territorio."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio puede imponer a empresas privadas:",
+    a: "b) Tarifas combinadas",
+    opts: [
+      "a) Subvenciones",
+      "b) Tarifas combinadas",
+      "c) Plantillas mínimas",
+      "d) Convenios laborales"
+    ],
+    tip: "El Consorcio tiene la facultad de imponer a las empresas privadas operadoras la aplicación de tarifas combinadas, que son parte esencial del sistema de integración tarifaria."
+  },
+  {
+    cat: "crtm",
+    q: "El contrato programa lo firma:",
+    a: "c) Presidente del Consorcio",
+    opts: [
+      "a) Consejero",
+      "b) Delegado del Gobierno",
+      "c) Presidente del Consorcio",
+      "d) Alcalde"
+    ],
+    tip: "El contrato programa es firmado por el Presidente del Consorcio, quien ostenta la representación legal del organismo en sus relaciones con los operadores de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "Las resoluciones frente a empresas privadas pueden recurrirse ante:",
+    a: "c) Consejería de Obras Públicas y Transportes",
+    opts: [
+      "a) Tribunal Supremo",
+      "b) Ministerio",
+      "c) Consejería de Obras Públicas y Transportes",
+      "d) Defensor del Pueblo"
+    ],
+    tip: "Las resoluciones del Consorcio frente a empresas privadas pueden recurrirse ante la Consejería de Obras Públicas y Transportes, que es el órgano superior jerárquico en materia de transporte."
+  },
+  {
+    cat: "crtm",
+    q: "El servicio de Metro de Madrid se considera:",
+    a: "d) Supramunicipal",
+    opts: [
+      "a) Municipal",
+      "b) Estatal",
+      "c) Interurbano",
+      "d) Supramunicipal"
+    ],
+    tip: "El servicio de Metro de Madrid tiene carácter supramunicipal, ya que trasciende los límites del municipio de Madrid y sirve a varios municipios de la Comunidad."
+  },
+  {
+    cat: "crtm",
+    q: "La entrega de bienes se formaliza mediante:",
+    a: "a) Acta de entrega y recepción",
+    opts: [
+      "a) Acta de entrega y recepción",
+      "b) Escritura",
+      "c) Convenio",
+      "d) Decreto"
+    ],
+    tip: "La entrega de bienes entre administraciones o al Consorcio se formaliza mediante un acta de entrega y recepción, que da fe del traspaso efectivo de los mismos."
+  },
+  {
+    cat: "crtm",
+    q: "La Comisión Mixta tiene representación:",
+    a: "d) Paritaria Comunidad-Ayuntamiento",
+    opts: [
+      "a) Estatal-municipal",
+      "b) Estatal-autonómica",
+      "c) Tripartita",
+      "d) Paritaria Comunidad-Ayuntamiento"
+    ],
+    tip: "La Comisión Mixta de transferencias tiene representación paritaria entre la Comunidad de Madrid y los Ayuntamientos, garantizando el equilibrio entre ambas administraciones."
+  },
+  {
+    cat: "crtm",
+    q: "Metro de Madrid está obligado a:",
+    a: "d) Conservar la parte de red que explota",
+    opts: [
+      "a) Ampliar red",
+      "b) Fijar tarifas",
+      "c) Financiar otras empresas",
+      "d) Conservar la parte de red que explota"
+    ],
+    tip: "Metro de Madrid tiene la obligación de conservar en buen estado la parte de la red que explota, siendo esta una de las condiciones de su régimen de gestión del servicio."
+  },
+  {
+    cat: "crtm",
+    q: "Las modificaciones que alteran el equilibrio económico se compensan con:",
+    a: "a) Modificaciones de signo opuesto y nuevas tarifas",
+    opts: [
+      "a) Modificaciones de signo opuesto y nuevas tarifas",
+      "b) Subvención estatal",
+      "c) Reducción de servicios",
+      "d) Créditos bancarios"
+    ],
+    tip: "Cuando se producen modificaciones que alteran el equilibrio económico del contrato programa, deben compensarse mediante modificaciones de signo contrario o ajustes en las tarifas."
+  },
+  {
+    cat: "crtm",
+    q: "La Comisión Mixta de transferencias está integrada por:",
+    a: "b) 6 miembros",
+    opts: [
+      "a) 4 miembros",
+      "b) 6 miembros",
+      "c) 8 miembros",
+      "d) 2 miembros"
+    ],
+    tip: "La Comisión Mixta de transferencias está integrada por 6 miembros, distribuidos de forma paritaria entre representantes de la Comunidad de Madrid y de los Ayuntamientos."
+  },
+  // --- TEST 14 ---
+  {
+    cat: "crtm",
+    q: "El incumplimiento municipal permite al Consorcio:",
+    a: "d) Impugnar presupuestos municipales",
+    opts: [
+      "a) Multar al Ayuntamiento",
+      "b) Suspender servicios",
+      "c) Intervenir el Ayuntamiento",
+      "d) Impugnar presupuestos municipales"
+    ],
+    tip: "Ante el incumplimiento de sus obligaciones por parte de un Ayuntamiento adherido, el Consorcio tiene la facultad de impugnar sus presupuestos municipales como mecanismo de presión."
+  },
+  {
+    cat: "crtm",
+    q: "Son recursos del Consorcio los ingresos por:",
+    a: "c) Venta de títulos multimodales",
+    opts: [
+      "a) Multas de tráfico",
+      "b) Impuestos",
+      "c) Venta de títulos multimodales",
+      "d) Peajes"
+    ],
+    tip: "La venta de títulos multimodales (abonos, tarjetas de transporte) es una de las principales fuentes de ingresos propios del Consorcio Regional de Transportes de Madrid."
+  },
+  {
+    cat: "crtm",
+    q: "La disolución del Consorcio requiere propuesta de al menos:",
+    a: "c) La mitad de los miembros del Consejo",
+    opts: [
+      "a) Un tercio",
+      "b) Dos tercios",
+      "c) La mitad de los miembros del Consejo",
+      "d) Todos"
+    ],
+    tip: "Para proponer la disolución del Consorcio se requiere la propuesta de al menos la mitad de los miembros del Consejo de Administración, garantizando así un amplio consenso."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio atiende compensaciones por uso de:",
+    a: "b) Títulos multimodales",
+    opts: [
+      "a) Líneas interurbanas",
+      "b) Títulos multimodales",
+      "c) Subvenciones",
+      "d) Infraestructuras"
+    ],
+    tip: "El Consorcio gestiona y atiende las compensaciones económicas a los operadores derivadas del uso de los títulos multimodales por parte de los usuarios."
+  },
+  {
+    cat: "crtm",
+    q: "Las aportaciones de Ayuntamientos se fijan en:",
+    a: "c) Presupuesto del Consorcio",
+    opts: [
+      "a) Asamblea",
+      "b) Consejería",
+      "c) Presupuesto del Consorcio",
+      "d) Senado"
+    ],
+    tip: "Las aportaciones económicas de los Ayuntamientos adheridos se fijan en el presupuesto anual del Consorcio, que es aprobado por el Consejo de Administración."
+  },
+  {
+    cat: "crtm",
+    q: "La distribución de aportaciones municipales la realiza:",
+    a: "d) Consejo de Administración",
+    opts: [
+      "a) Presidente",
+      "b) Comunidad",
+      "c) Ministerio",
+      "d) Consejo de Administración"
+    ],
+    tip: "La distribución de las aportaciones entre los municipios adheridos es competencia del Consejo de Administración del Consorcio, que aplica los criterios establecidos en los estatutos."
+  },
+  {
+    cat: "crtm",
+    q: "El Consorcio solo financia abonos de usuarios residentes en:",
+    a: "c) Comunidad de Madrid y otras con convenio",
+    opts: [
+      "a) España",
+      "b) Provincia",
+      "c) Comunidad de Madrid y otras con convenio",
+      "d) Unión Europea"
+    ],
+    tip: "El sistema de financiación del Consorcio cubre los abonos de transporte de usuarios residentes en la Comunidad de Madrid y de otras comunidades con las que exista convenio."
+  },
+  {
+    cat: "crtm",
+    q: "El acuerdo de disolución exige mayoría de:",
+    a: "c) Tres quintos",
+    opts: [
+      "a) Simple",
+      "b) Dos tercios",
+      "c) Tres quintos",
+      "d) Absoluta"
+    ],
+    tip: "El acuerdo de disolución del Consorcio requiere una mayoría cualificada de tres quintos de los miembros del Consejo de Administración, dado el carácter excepcional de esta decisión."
+  },
+  {
+    cat: "crtm",
+    q: "El plazo para que el Ayuntamiento acredite el pago tras retención es de:",
+    a: "d) 30 días",
+    opts: [
+      "a) 15 días",
+      "b) 20 días",
+      "c) 60 días",
+      "d) 30 días"
+    ],
+    tip: "Una vez aplicada la retención por incumplimiento, el Ayuntamiento dispone de un plazo de 30 días para acreditar el pago de sus obligaciones económicas con el Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "También son recursos del Consorcio los derivados de:",
+    a: "c) Publicidad y patrocinio",
+    opts: [
+      "a) Donaciones particulares",
+      "b) Impuesto de circulación",
+      "c) Publicidad y patrocinio",
+      "d) Tasas judiciales"
+    ],
+    tip: "Los ingresos derivados de publicidad y patrocinio constituyen uno de los recursos propios del Consorcio, complementando las fuentes de financiación tarifaria y presupuestaria."
+  },
+  // --- TEST 15 ---
+  {
+    cat: "crtm",
+    q: "Además, la disolución debe aprobarse por:",
+    a: "c) Ley de la Asamblea de Madrid",
+    opts: [
+      "a) Consejo de Gobierno",
+      "b) Congreso",
+      "c) Ley de la Asamblea de Madrid",
+      "d) Senado"
+    ],
+    tip: "Además del acuerdo del Consejo de Administración, la disolución del Consorcio debe ser aprobada mediante una ley de la Asamblea de Madrid, dado su carácter de Organismo Autónomo."
+  },
+  {
+    cat: "crtm",
+    q: "Las empresas públicas actúan como ejecutoras del servicio en régimen de:",
+    a: "b) Concesión",
+    opts: [
+      "a) Gestión directa",
+      "b) Concesión",
+      "c) Mixto",
+      "d) Indirecto"
+    ],
+    tip: "Las empresas públicas de transporte actúan como ejecutoras del servicio en régimen de concesión administrativa, lo que implica que prestan el servicio bajo las condiciones fijadas por el Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "La retirada municipal debe aprobarse en:",
+    a: "b) Acuerdo plenario",
+    opts: [
+      "a) Junta de Gobierno",
+      "b) Acuerdo plenario",
+      "c) Consejo de Administración",
+      "d) Referéndum"
+    ],
+    tip: "La retirada de un Ayuntamiento del Consorcio debe aprobarse mediante acuerdo plenario del Ayuntamiento correspondiente, como expresión de la voluntad democrática del municipio."
+  },
+  {
+    cat: "crtm",
+    q: "Para retirarse, un Ayuntamiento debe llevar al menos:",
+    a: "c) 7 años",
+    opts: [
+      "a) 5 años",
+      "b) 6 años",
+      "c) 7 años",
+      "d) 10 años"
+    ],
+    tip: "Para poder ejercer el derecho de retirada del Consorcio, un Ayuntamiento debe haber permanecido en él al menos 7 años, garantizando así la estabilidad del sistema."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué carácter tienen las infraestructuras ferroviarias a efectos de la licencia municipal?",
+    a: "a) Infraestructuras supramunicipales de interés público",
+    opts: [
+      "a) Infraestructuras supramunicipales de interés público",
+      "b) Infraestructuras privadas de uso público",
+      "c) Servicios locales",
+      "d) Bienes patrimoniales"
+    ],
+    tip: "Las infraestructuras ferroviarias tienen el carácter de infraestructuras supramunicipales de interés público, lo que implica un régimen especial respecto a la licencia municipal de obras."
+  },
+  {
+    cat: "crtm",
+    q: "Además del personal previsto en la Ley 1/1984, ¿qué otro personal puede integrarse al Consorcio?",
+    a: "a) Funcionarios de Ayuntamientos adheridos en comisión de servicios",
+    opts: [
+      "a) Funcionarios de Ayuntamientos adheridos en comisión de servicios",
+      "b) Personal laboral de la Comunidad de Madrid",
+      "c) Funcionarios del Estado en comisión de servicio",
+      "d) Empleados de empresas concesionarias"
+    ],
+    tip: "Además del personal de la Ley 1/1984, pueden integrarse al Consorcio funcionarios de los Ayuntamientos adheridos mediante comisión de servicios, aportando experiencia municipal."
+  },
+  {
+    cat: "crtm",
+    q: "Antes del inicio de las obras, ¿qué debe hacerse?",
+    a: "c) Ponerlo en conocimiento de los ayuntamientos afectados",
+    opts: [
+      "a) Solicitar autorización al Ministerio",
+      "b) Publicar anuncio en prensa",
+      "c) Ponerlo en conocimiento de los ayuntamientos afectados",
+      "d) Aprobarlo en Pleno municipal"
+    ],
+    tip: "Antes del inicio de las obras de infraestructura ferroviaria, es obligatorio poner este hecho en conocimiento de los ayuntamientos afectados, respetando así su papel en la ordenación territorial."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué tipo de obras se mencionan en la disposición adicional segunda?",
+    a: "b) Obras de reparación, conservación, mejora o ampliación",
+    opts: [
+      "a) Obras de nueva construcción, conservación, mejora o ampliación",
+      "b) Obras de reparación, conservación, mejora o ampliación",
+      "c) Obras de reparación, conservación, mejora o demolición",
+      "d) Obras de urbanización, conservación, mejora o ampliación"
+    ],
+    tip: "La disposición adicional segunda menciona específicamente las obras de reparación, conservación, mejora o ampliación de las infraestructuras ferroviarias supramunicipales."
+  },
+  {
+    cat: "crtm",
+    q: "Las infraestructuras ferroviarias citadas son de titularidad de:",
+    a: "d) La Comunidad de Madrid",
+    opts: [
+      "a) El Estado",
+      "b) Los Ayuntamientos",
+      "c) Empresas públicas",
+      "d) La Comunidad de Madrid"
+    ],
+    tip: "Las infraestructuras ferroviarias supramunicipales de interés público son de titularidad de la Comunidad de Madrid, que es la administración competente en esta materia."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué norma se menciona expresamente como referencia para la integración del personal del Consorcio?",
+    a: "c) Ley 1/1984",
+    opts: [
+      "a) Ley 7/1985",
+      "b) Ley 30/1984",
+      "c) Ley 1/1984",
+      "d) Estatuto Básico del Empleado Público"
+    ],
+    tip: "La Ley 1/1984, de la Función Pública de la Comunidad de Madrid, es la norma expresamente mencionada como referencia para la integración y régimen del personal del Consorcio."
+  },
+  // --- TEST 16 ---
+  {
+    cat: "crtm",
+    q: "¿Qué objeto pueden tener los convenios con los Ayuntamientos?",
+    a: "c) Transferencia de acciones representativas de capital social de empresas de transporte",
+    opts: [
+      "a) Transferencia de bienes inmuebles",
+      "b) Cesión de personal",
+      "c) Transferencia de acciones representativas de capital social de empresas de transporte",
+      "d) Gestión de infraestructuras"
+    ],
+    tip: "Los convenios con los Ayuntamientos pueden tener por objeto la transferencia de acciones representativas del capital social de las empresas de transporte al Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿En qué plazo debe remitirse la comunicación tras la aprobación del presupuesto?",
+    a: "a) 30 días",
+    opts: [
+      "a) 30 días",
+      "b) 15 días",
+      "c) 60 días",
+      "d) 90 días"
+    ],
+    tip: "Tras la aprobación del presupuesto, la comunicación pertinente debe remitirse en un plazo de 30 días, para garantizar la coordinación financiera entre el Consorcio y las administraciones adheridas."
+  },
+  {
+    cat: "crtm",
+    q: "¿La transferencia puede afectar a qué parte de las acciones?",
+    a: "d) A la totalidad o parte",
+    opts: [
+      "a) Solo a la mitad",
+      "b) Solo a la totalidad",
+      "c) Solo a una minoría",
+      "d) A la totalidad o parte"
+    ],
+    tip: "La transferencia de acciones puede afectar tanto a la totalidad como a una parte del paquete accionarial, ofreciendo flexibilidad en el proceso de integración de las empresas en el Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿De qué compañía se habla respecto a la transferencia de acciones en el punto 2 de la Disposición Transitoria única?",
+    a: "d) Compañía Metropolitana de Madrid",
+    opts: [
+      "a) RENFE",
+      "b) Metro Ligero Oeste",
+      "c) Empresa Municipal de Transportes",
+      "d) Compañía Metropolitana de Madrid"
+    ],
+    tip: "El punto 2 de la Disposición Transitoria única hace referencia específica a la Compañía Metropolitana de Madrid en relación con la transferencia de acciones al Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué órgano es autorizado para aprobar el Presupuesto del Consorcio Regional de Transportes para 1985?",
+    a: "d) El Consejo de Gobierno",
+    opts: [
+      "a) La Asamblea de Madrid",
+      "b) El Ministerio de Hacienda",
+      "c) El Consorcio",
+      "d) El Consejo de Gobierno"
+    ],
+    tip: "Para el ejercicio 1985, el Consejo de Gobierno quedó autorizado para aprobar el presupuesto inicial del Consorcio, como medida transitoria hasta la plena normalización del organismo."
+  },
+  {
+    cat: "crtm",
+    q: "¿A qué trámite no están sujetas las obras mencionadas en la Disposición Adicional Segunda?",
+    a: "a) Autorización autonómica",
+    opts: [
+      "a) Autorización autonómica",
+      "b) Evaluación ambiental",
+      "c) Licencia municipal",
+      "d) Aprobación estatal"
+    ],
+    tip: "Las obras de infraestructura ferroviaria supramunicipal no están sujetas a licencia municipal, dado su carácter de interés público supramunicipal que prevalece sobre la ordenación urbanística local."
+  },
+  {
+    cat: "crtm",
+    q: "¿Con qué Administración puede negociar también el Consorcio según el punto 2 de la Disposición Transitoria única?",
+    a: "b) Administración del Estado",
+    opts: [
+      "a) Diputaciones Provinciales",
+      "b) Administración del Estado",
+      "c) Unión Europea",
+      "d) Ministerios sectoriales"
+    ],
+    tip: "Según la Disposición Transitoria única, el Consorcio puede negociar también con la Administración del Estado para la integración de servicios estatales en el sistema de transporte integrado."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién debe aprobar los convenios mencionados en la Disposición Transitoria única?",
+    a: "c) El Consejo de Gobierno de la Comunidad y los órganos competentes de las otras Administraciones Públicas",
+    opts: [
+      "a) Solo el Consorcio",
+      "b) Solo la Asamblea",
+      "c) El Consejo de Gobierno de la Comunidad y los órganos competentes de las otras Administraciones Públicas",
+      "d) El Ministerio de Transportes"
+    ],
+    tip: "Los convenios de la Disposición Transitoria requieren la aprobación conjunta del Consejo de Gobierno de la Comunidad de Madrid y de los órganos competentes de las otras Administraciones implicadas."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué tipo son las empresas de transporte necesarias en la Disposición Transitoria única?",
+    a: "a) De propiedad municipal",
+    opts: [
+      "a) De propiedad municipal",
+      "b) Estatales",
+      "c) Privadas",
+      "d) Mixtas"
+    ],
+    tip: "Las empresas de transporte referenciadas en la Disposición Transitoria única son de propiedad municipal, siendo precisamente su integración en el sistema del Consorcio el objeto de dicha disposición."
+  },
+  {
+    cat: "crtm",
+    q: "¿Qué entidad es autorizada para negociar convenios con los Ayuntamientos?",
+    a: "c) El Consorcio",
+    opts: [
+      "a) El Consejo de Gobierno",
+      "b) La Asamblea",
+      "c) El Consorcio",
+      "d) El Ayuntamiento de Madrid"
+    ],
+    tip: "El Consorcio es la entidad expresamente autorizada para negociar y suscribir convenios con los Ayuntamientos para la transferencia de acciones de empresas de transporte."
+  },
+  // --- TEST 17 ---
+  {
+    cat: "crtm",
+    q: "¿Para qué ejercicio se menciona expresamente el presupuesto del CRTM?",
+    a: "c) 1985",
+    opts: [
+      "a) 1984",
+      "b) 1986",
+      "c) 1985",
+      "d) 1983"
+    ],
+    tip: "La disposición final de la Ley 5/1985 menciona expresamente el ejercicio presupuestario de 1985 como el primer año de funcionamiento del Consorcio."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién queda autorizado para aprobar disposiciones para el desarrollo y ejecución de la Ley?",
+    a: "d) El Consejo de Gobierno",
+    opts: [
+      "a) La Asamblea",
+      "b) El Presidente",
+      "c) El Consorcio",
+      "d) El Consejo de Gobierno"
+    ],
+    tip: "El Consejo de Gobierno de la Comunidad de Madrid queda autorizado para aprobar las disposiciones reglamentarias necesarias para el desarrollo y ejecución de la Ley 5/1985."
+  },
+  {
+    cat: "crtm",
+    q: "¿En qué fecha se firma la Ley?",
+    a: "c) 16 de mayo de 1985",
+    opts: [
+      "a) 15 de abril de 1985",
+      "b) 15 de mayo de 1985",
+      "c) 16 de mayo de 1985",
+      "d) 17 de mayo de 1985"
+    ],
+    tip: "La Ley 5/1985, de creación del Consorcio Regional de Transportes de Madrid, fue firmada el 16 de mayo de 1985."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quién firma como Presidente de la Comunidad de Madrid?",
+    a: "c) Joaquín Leguina Herrán",
+    opts: [
+      "a) Alberto Ruiz-Gallardón",
+      "b) Enrique Tierno Galván",
+      "c) Joaquín Leguina Herrán",
+      "d) Felipe González"
+    ],
+    tip: "Joaquín Leguina Herrán, primer Presidente de la Comunidad de Madrid, es quien firma la Ley 5/1985 en nombre del Ejecutivo autonómico."
+  },
+  {
+    cat: "crtm",
+    q: "¿En qué ciudad se firma el texto?",
+    a: "b) Madrid",
+    opts: [
+      "a) Barcelona",
+      "b) Madrid",
+      "c) Valencia",
+      "d) Toledo"
+    ],
+    tip: "El texto de la Ley 5/1985 se firma en Madrid, sede del Gobierno de la Comunidad Autónoma."
+  },
+  {
+    cat: "crtm",
+    q: "¿Cuándo entra en vigor la Ley?",
+    a: "d) El mismo día de su publicación en el Boletín Oficial de la Comunidad de Madrid",
+    opts: [
+      "a) A los 20 días de su publicación",
+      "b) Al día siguiente de su publicación",
+      "c) Tres su aprobación parlamentaria",
+      "d) El mismo día de su publicación en el Boletín Oficial de la Comunidad de Madrid"
+    ],
+    tip: "La Ley 5/1985 entra en vigor el mismo día de su publicación en el Boletín Oficial de la Comunidad de Madrid, sin período de vacatio legis."
+  },
+  {
+    cat: "crtm",
+    q: "¿Dónde debe publicarse la Ley según la disposición final segunda?",
+    a: "a) En el Boletín Oficial de la Comunidad de Madrid y también en el Boletín Oficial del Estado",
+    opts: [
+      "a) En el Boletín Oficial de la Comunidad de Madrid y también en el Boletín Oficial del Estado",
+      "b) Solo en el BOE",
+      "c) Solo en boletines municipales",
+      "d) En diarios oficiales europeos"
+    ],
+    tip: "La disposición final segunda establece que la Ley debe publicarse tanto en el Boletín Oficial de la Comunidad de Madrid como en el Boletín Oficial del Estado."
+  },
+  {
+    cat: "crtm",
+    q: "¿A quién se ordena cumplir la Ley?",
+    a: "c) A todos los ciudadanos a los que sea de aplicación",
+    opts: [
+      "a) Solo a las Administraciones Públicas",
+      "b) Solo a los funcionarios",
+      "c) A todos los ciudadanos a los que sea de aplicación",
+      "d) Solo a los tribunales"
+    ],
+    tip: "La Ley ordena su cumplimiento a todos los ciudadanos a los que sea de aplicación, siguiendo la fórmula promulgatoria habitual de las leyes autonómicas."
+  },
+  {
+    cat: "crtm",
+    q: "¿A qué comisión debe remitirse la comunicación tras la aprobación del presupuesto?",
+    a: "c) Comisión de Urbanismo, Vivienda y Obras Públicas de la Asamblea",
+    opts: [
+      "a) Comisión de Transportes",
+      "b) Comisión de Economía",
+      "c) Comisión de Urbanismo, Vivienda y Obras Públicas de la Asamblea",
+      "d) Comisión de Hacienda"
+    ],
+    tip: "La comunicación del presupuesto aprobado debe remitirse a la Comisión de Urbanismo, Vivienda y Obras Públicas de la Asamblea de Madrid, que es la comisión parlamentaria competente."
+  },
+  {
+    cat: "crtm",
+    q: "¿Quiénes deben guardarlo y hacerlo guardar, además de cumplirlo?",
+    a: "a) Los Tribunales y autoridades a los que corresponda",
+    opts: [
+      "a) Los Tribunales y autoridades a los que corresponda",
+      "b) Las fuerzas de seguridad",
+      "c) El Gobierno central",
+      "d) Los Ayuntamientos exclusivamente"
+    ],
+    tip: "Los Tribunales y las autoridades a las que corresponda tienen la obligación de guardar y hacer guardar la Ley, además de cumplirla, según la fórmula promulgatoria estándar."
   }
 ];
 
-// Mezclar preguntas al inicio
-let questions = [...db].sort(() => Math.random() - 0.5);
-let currentIdx = 0;
-let hits = 0;
-let fails = [];
+var BLOCK_SIZE = 30;
+var bloques = [];
+var totalQ = db.length;
+for (var i = 0; i < totalQ; i += BLOCK_SIZE) {
+    bloques.push(db.slice(i, i + BLOCK_SIZE));
+}
 
-function initQuiz() {
-    document.getElementById('progreso-texto').innerText = `Pregunta 1/${questions.length}`;
+var currentBlock = null;
+var questions = [];
+var currentIdx = 0;
+var hits = 0;
+var fails = [];
+
+function buildMenu() {
+    var grid = document.getElementById('menu-grid');
+    grid.innerHTML = '';
+    bloques.forEach(function(bloque, i) {
+        var desde = i * BLOCK_SIZE + 1;
+        var hasta = Math.min((i + 1) * BLOCK_SIZE, totalQ);
+        var btn = document.createElement('button');
+        btn.className = 'menu-btn';
+        btn.innerHTML =
+            '<div>' +
+            '<div class="label">Bloque ' + (i+1) + '</div>' +
+            '<div class="meta">Preguntas ' + desde + ' &ndash; ' + hasta + ' &nbsp;&middot;&nbsp; ' + bloque.length + ' preguntas</div>' +
+            '</div>' +
+            '<span class="arrow">&#x203A;</span>';
+        btn.onclick = (function(idx){ return function(){ startBlock(idx); }; })(i);
+        grid.appendChild(btn);
+    });
+    var btnAll = document.createElement('button');
+    btnAll.className = 'menu-btn menu-btn-all';
+    btnAll.innerHTML =
+        '<div>' +
+        '<div class="label">&#x1F500; Todas las preguntas</div>' +
+        '<div class="meta">' + totalQ + ' preguntas mezcladas</div>' +
+        '</div>' +
+        '<span class="arrow">&#x203A;</span>';
+    btnAll.onclick = startAll;
+    grid.appendChild(btnAll);
+}
+
+function startBlock(idx) {
+    currentBlock = idx;
+    questions = bloques[idx].slice().sort(function(){ return Math.random() - 0.5; });
+    beginQuiz();
+}
+
+function startAll() {
+    currentBlock = null;
+    questions = db.slice().sort(function(){ return Math.random() - 0.5; });
+    beginQuiz();
+}
+
+function volverMenu() {
+    document.getElementById('menu-screen').classList.remove('hidden');
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.add('hidden');
+}
+
+function repetirBloque() {
+    if (currentBlock !== null) startBlock(currentBlock);
+    else startAll();
+}
+
+function beginQuiz() {
+    currentIdx = 0; hits = 0; fails = [];
+    document.getElementById('menu-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
     showQuestion();
 }
 
 function showQuestion() {
-    const q = questions[currentIdx];
-
-    document.getElementById('progreso-texto').innerText = `Pregunta ${currentIdx + 1}/${questions.length}`;
-    document.getElementById('progress-fill').style.width = `${(currentIdx / questions.length) * 100}%`;
+    var q = questions[currentIdx];
+    document.getElementById('progreso-texto').innerText = 'Pregunta ' + (currentIdx+1) + '/' + questions.length;
+    document.getElementById('progress-fill').style.width = ((currentIdx / questions.length) * 100) + '%';
     document.getElementById('question-text').innerText = q.q;
     document.getElementById('btn-next').classList.remove('show');
-    document.getElementById('tip-box').classList.remove('show');
-    document.getElementById('tip-box').innerText = '';
+    var tipBox = document.getElementById('tip-box');
+    tipBox.classList.remove('show');
+    tipBox.innerText = '';
 
-    // Badge de categoría
-    const badge = document.getElementById('cat-badge');
-    badge.innerText = CAT_LABELS[q.cat] || q.cat;
-    badge.className = 'cat-badge cat-' + q.cat;
-
-    const container = document.getElementById('options-container');
+    var container = document.getElementById('options-container');
     container.innerHTML = '';
-
-    const shuffled = [...q.opts].sort(() => Math.random() - 0.5);
-    shuffled.forEach(opt => {
-        const btn = document.createElement('button');
+    var shuffled = q.opts.slice().sort(function(){ return Math.random() - 0.5; });
+    shuffled.forEach(function(opt) {
+        var btn = document.createElement('button');
         btn.className = 'opt-btn';
         btn.innerText = opt;
-        btn.onclick = () => checkAnswer(btn, opt, q.a, q.tip);
+        btn.onclick = (function(b, o){ return function(){ checkAnswer(b, o, q.a, q.tip); }; })(btn, opt);
         container.appendChild(btn);
     });
 }
 
 function checkAnswer(btn, selected, correct, tip) {
-    const buttons = document.querySelectorAll('.opt-btn');
-    buttons.forEach(b => b.disabled = true);
-
-    const tipBox = document.getElementById('tip-box');
+    document.querySelectorAll('.opt-btn').forEach(function(b){ b.disabled = true; });
+    var tipBox = document.getElementById('tip-box');
     tipBox.innerText = tip;
     tipBox.classList.add('show');
 
     if (selected === correct) {
         btn.classList.add('correct');
         hits++;
-        setTimeout(nextQuestion, 1200);
     } else {
         btn.classList.add('wrong');
         fails.push({ q: questions[currentIdx].q, a: correct });
-        guardarFallo(questions[currentIdx].q, questions[currentIdx].opts, correct, "CRTM: Organización y Normativa");
-        buttons.forEach(b => { if (b.innerText === correct) b.classList.add('reveal'); });
-        document.getElementById('btn-next').classList.add('show');
+        guardarFallo(questions[currentIdx].q, questions[currentIdx].opts, correct, 'CRTM');
+        document.querySelectorAll('.opt-btn').forEach(function(b){
+            if (b.innerText === correct) b.classList.add('reveal');
+        });
     }
+    document.getElementById('btn-next').classList.add('show');
 }
 
 function nextQuestion() {
     currentIdx++;
-    if (currentIdx < questions.length) {
-        showQuestion();
-    } else {
-        showResults();
-    }
+    if (currentIdx < questions.length) showQuestion();
+    else showResults();
 }
 
 function showResults() {
     document.getElementById('quiz-screen').classList.add('hidden');
     document.getElementById('results-screen').classList.remove('hidden');
-
-    const percent = Math.round((hits / questions.length) * 100);
-    document.getElementById('score-percent').innerText = `${percent}%`;
-    document.getElementById('score-text').innerText = `Has acertado ${hits} de ${questions.length}`;
-
-    const review = document.getElementById('failed-review');
+    var percent = Math.round((hits / questions.length) * 100);
+    document.getElementById('score-percent').innerText = percent + '%';
+    document.getElementById('score-text').innerText = 'Has acertado ' + hits + ' de ' + questions.length;
+    var review = document.getElementById('failed-review');
     if (fails.length > 0) {
         review.innerHTML = '<strong>Tus errores:</strong><br><br>' +
-            fails.map(f => `<div class="result-item">• ${f.q}<br><span style="color:var(--correct)">✔ ${f.a}</span></div>`).join('');
+            fails.map(function(f){
+                return '<div class="result-item">&bull; ' + f.q + '<br><span style="color:var(--correct)">&#x2714; ' + f.a + '</span></div>';
+            }).join('');
     } else {
-        review.innerHTML = '¡Perfecto! No has tenido ningún fallo.';
+        review.innerHTML = '&#x1F389; Sin ningún fallo. ¡Perfecto!';
     }
 }
 
 function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
     try {
-        let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
-        if (!listaFallos.find(f => f.q === pregunta)) {
-            listaFallos.push({ id: Date.now(), modulo, q: pregunta, opts: opciones, a: respuestaCorrecta });
-            localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
+        var lista = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+        if (!lista.find(function(f){ return f.q === pregunta; })) {
+            lista.push({ id: Date.now(), modulo: modulo, q: pregunta, opts: opciones, a: respuestaCorrecta });
+            localStorage.setItem('mis_fallos', JSON.stringify(lista));
         }
     } catch(e) {}
 }
 
-initQuiz();
+buildMenu();
 </script>
-
 </body>
 </html>
