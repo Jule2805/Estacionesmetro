@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Tarifas</title>
+    <style>
+        :root { --bg:#121212; --card:#1e1e1e; --accent:#3498db; --correct:#009543; --wrong:#ff3b30; --text:#ffffff; }
+        * { box-sizing:border-box; }
+        body { font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); margin:0; display:flex; justify-content:center; min-height:100vh; }
+        .container { width:100%; max-width:500px; padding:20px; }
+        .menu-title { text-align:center; margin-bottom:6px; font-size:1.3rem; font-weight:700; }
+        .menu-subtitle { text-align:center; color:#888; font-size:13px; margin-bottom:16px; }
+        .menu-grid { display:flex; flex-direction:column; gap:12px; }
+        .menu-btn { background:var(--card); border:1px solid #333; color:var(--text); padding:18px 20px; border-radius:14px; text-align:left; cursor:pointer; transition:0.2s; display:flex; justify-content:space-between; align-items:center; }
+        .menu-btn:hover { background:#2a2a2a; border-color:var(--accent); }
+        .menu-btn .label { font-size:15px; font-weight:600; }
+        .menu-btn .meta { font-size:12px; color:#888; margin-top:3px; }
+        .menu-btn .arrow { color:var(--accent); font-size:20px; }
+        .menu-btn-all { background:var(--accent); border-color:var(--accent); margin-top:6px; }
+        .menu-btn-all:hover { opacity:0.9; }
+        .btn-salir { background:none; border:1px solid #444; color:#ccc; padding:5px 12px; border-radius:5px; cursor:pointer; font-size:13px; }
+        .quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        #progreso-texto { font-size:14px; color:#888; }
+        .progress-bar { width:100%; height:6px; background:#333; border-radius:10px; margin-bottom:25px; overflow:hidden; }
+        .progress-fill { height:100%; background:var(--accent); width:0%; transition:width 0.3s; }
+        .question-card { background:var(--card); padding:25px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+        .cat-badge { display:inline-block; font-size:11px; padding:3px 10px; border-radius:99px; margin-bottom:12px; background:#1a2535; color:#6ab0ff; text-transform:uppercase; letter-spacing:0.06em; }
+        h2 { font-size:1.1rem; line-height:1.5; margin-bottom:20px; margin-top:0; }
+        .options-grid { display:flex; flex-direction:column; gap:12px; }
+        .opt-btn { background:#2a2a2a; border:1px solid #333; color:white; padding:16px; border-radius:12px; text-align:left; font-size:14px; cursor:pointer; transition:0.2s; line-height:1.4; }
+        .opt-btn:hover:not(:disabled) { background:#333; border-color:#555; }
+        .opt-btn.correct { background:var(--correct) !important; border-color:var(--correct); }
+        .opt-btn.wrong { background:var(--wrong) !important; border-color:var(--wrong); }
+        .opt-btn.reveal { background:#005a28 !important; border-color:var(--correct); opacity:0.85; }
+        .tip-box { display:none; margin-top:16px; padding:14px; background:#252525; border-left:3px solid var(--accent); border-radius:8px; font-size:13px; line-height:1.6; color:#ccc; }
+        .tip-box.show { display:block; }
+        .btn-next { width:100%; background:var(--accent); color:white; border:none; padding:15px; border-radius:10px; font-weight:bold; margin-top:16px; cursor:pointer; display:none; font-size:15px; }
+        .btn-next.show { display:block; }
+        .results-list { text-align:left; background:#000; padding:15px; border-radius:10px; font-size:13px; max-height:300px; overflow-y:auto; margin-top:15px; }
+        .result-item { margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px; }
+        .hidden { display:none; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div id="menu-screen">
+        <div class="menu-title">&#x1F3AB; Test Tarifas</div>
+        <div class="menu-subtitle">Elige un bloque de preguntas</div>
+        <button class="btn-salir" style="margin-bottom:16px;" onclick="history.back()">&#x2190; Volver al men&uacute; principal</button>
+        <div class="menu-grid" id="menu-grid"></div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div class="quiz-header">
+            <div id="progreso-texto">Pregunta 1/30</div>
+            <button class="btn-salir" onclick="volverMenu()">&#x2715; Salir</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="question-card">
+            <div id="cat-badge" class="cat-badge">Tarifas</div>
+            <h2 id="question-text">Cargando...</h2>
+            <div id="options-container" class="options-grid"></div>
+            <div id="tip-box" class="tip-box"></div>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE PREGUNTA &#x2192;</button>
+        </div>
+    </div>
+
+    <div id="results-screen" class="hidden">
+        <div class="question-card" style="text-align:center;">
+            <h1 id="score-percent">0%</h1>
+            <p id="score-text"></p>
+            <div id="failed-review" class="results-list"></div>
+            <button class="btn-next show" onclick="repetirBloque()">REPETIR ESTE BLOQUE</button>
+            <button class="btn-next show" style="background:#444;margin-top:10px;" onclick="volverMenu()">ELEGIR OTRO BLOQUE</button>
+        </div>
+    </div>
+
+</div>
+<script>
+var db = [
+  // --- TEST 1 ---
+  {cat:"tarifas", q:"¿Dónde se pueden cargar los títulos de transporte para viajar en Metro de Madrid?", a:"d) En las máquinas disponibles en las estaciones, excepto el Abono Anual", opts:["a) Solo en estaciones","b) Solo a través de la app","c) Únicamente en oficinas del Consorcio","d) En las máquinas disponibles en las estaciones, excepto el Abono Anual"], tip:"Los títulos de transporte para Metro se cargan en las máquinas de las estaciones, con la excepción del Abono Anual que requiere gestión especial."},
+  {cat:"tarifas", q:"¿Quiénes pueden viajar sin título de transporte?", a:"c) Los niños menores de cuatro años", opts:["a) Las menores de dos años","b) Los mayores de 65 años","c) Los niños menores de cuatro años","d) Los estudiantes"], tip:"Los niños menores de 4 años pueden viajar gratis en el transporte público de Madrid sin necesitar título de transporte."},
+  {cat:"tarifas", q:"¿Cuál es la validez general de un billete Sencillo una vez comprado?", a:"a) Solo consume el mismo día de la compra", opts:["a) Solo consume el mismo día de la compra","b) Dos días naturales","c) Hasta consumirlo","d) Una semana"], tip:"El billete Sencillo debe consumirse el mismo día de su compra, no puede guardarse para otro día."},
+  {cat:"tarifas", q:"¿Qué información muestran los tornos al validar un Billete Sencillo o de 10 Viajes?", a:"a) Los viajes disponibles", opts:["a) Los viajes disponibles","b) El precio del billete","c) La fecha de compra","d) El tipo de tarjeta utilizada"], tip:"Al validar un Sencillo o 10 Viajes, los tornos muestran los viajes disponibles restantes en el título."},
+  {cat:"tarifas", q:"¿Cuál es el máximo de viajes de un mismo tipo de billete de 10 Viajes que admite una Tarjeta de Transporte Público?", a:"c) 30 viajes", opts:["a) 10 viajes","b) 15 viajes","c) 30 viajes","d) 50 viajes"], tip:"Una Tarjeta de Transporte Público puede almacenar hasta 30 viajes del mismo tipo de billete de 10 Viajes (es decir, 3 cargas de 10)."},
+  {cat:"tarifas", q:"¿En qué tipo de tarjetas se pueden cargar los Billetes Sencillos y de 10 Viajes?", a:"b) En Tarjeta de Transporte Público Personal y Multi", opts:["a) Solo en tarjetas personales","b) En Tarjeta de Transporte Público Personal y Multi","c) Solo en tarjetas Multi","d) Únicamente en tarjetas turísticas"], tip:"Los billetes Sencillo y de 10 Viajes se pueden cargar tanto en la Tarjeta de Transporte Público Personal como en la Multi."},
+  {cat:"tarifas", q:"¿Cuál es el número máximo de viajes de un mismo Billete Sencillo que puede haber en una Tarjeta de Transporte Público?", a:"c) 25 viajes", opts:["a) 5 viajes","b) 15 viajes","c) 25 viajes","d) 10 viajes"], tip:"El número máximo de billetes Sencillo acumulables en una Tarjeta de Transporte Público es de 25 viajes."},
+  {cat:"tarifas", q:"¿Para qué sirve la app 'Tarjeta Transporte Público' desarrollada por el Consorcio Regional de Transportes de Madrid?", a:"d) Para consultar el saldo disponible de cada título/tarjeta", opts:["a) Para comprar billetes","b) Para bloquear la tarjeta","c) Para validar el viaje","d) Para consultar el saldo disponible de cada título/tarjeta"], tip:"La app del Consorcio permite consultar el saldo y los viajes disponibles de cada título cargado en la tarjeta, pero no se usa para validar ni comprar."},
+  {cat:"tarifas", q:"¿Qué es obligatorio para viajar en Metro de Madrid?", a:"c) Una Tarjeta de Transporte Público con un título válido", opts:["a) Un billete sencillo en papel","b) Una tarjeta bancaria","c) Una Tarjeta de Transporte Público con un título válido","d) Un abono anual únicamente"], tip:"Para viajar en Metro de Madrid es obligatorio disponer de una Tarjeta de Transporte Público (física o virtual) con un título de transporte válido cargado."},
+  {cat:"tarifas", q:"¿Qué información muestran los tornos en el caso de los títulos Turísticos y abonos cuando se acerca su caducidad?", a:"b) La fecha hasta la cual es válido", opts:["a) El número de viajes restantes","b) La fecha hasta la cual es válido","c) El importe pendiente","d) La zona tarifaria"], tip:"Cuando un título Turístico o abono está próximo a caducar, los tornos muestran la fecha de caducidad para que el usuario sea consciente de cuándo vence."},
+
+  // --- TEST 2 (Suplemento Aeropuerto) ---
+  {cat:"tarifas", q:"¿En qué estaciones es obligatorio el Suplemento de Aeropuerto?", a:"c) En Aeropuerto T1-T2-T3 y Aeropuerto T4", opts:["a) En todas las estaciones de Metro","b) Solo en estaciones de la zona A","c) En Aeropuerto T1-T2-T3 y Aeropuerto T4","d) En estaciones de Cercanías"], tip:"El Suplemento Aeropuerto es obligatorio únicamente en las estaciones de Metro Aeropuerto T1-T2-T3 y Aeropuerto T4, independientemente del título que se use."},
+  {cat:"tarifas", q:"¿Qué viajeros deben disponer del Suplemento de Aeropuerto?", a:"b) Los que viajen con billete Sencillo o 10 Viajes válidos en zona A", opts:["a) Los que usen cualquier título de transporte","b) Los que viajen con billete Sencillo o 10 Viajes válidos en zona A","c) Los que tengan Abono Anual","d) Los que usen Título Turístico"], tip:"Solo los viajeros con billetes Sencillo o 10 Viajes válidos en zona A están obligados a adquirir el Suplemento Aeropuerto; otros títulos como el Turístico ya lo incluyen."},
+  {cat:"tarifas", q:"¿Qué ocurre si se intenta usar el Suplemento de Aeropuerto al día siguiente de su compra?", a:"a) Los validadores no permiten el paso por estar caducado", opts:["a) Los validadores no permiten el paso por estar caducado","b) Se aplica una penalización","c) Se permite el acceso con aviso","d) Se descuenta automáticamente otro suplemento"], tip:"El Suplemento de Aeropuerto tiene validez únicamente el día de su compra; al día siguiente está caducado y los validadores deniegan el acceso."},
+  {cat:"tarifas", q:"¿Cuándo debe consumirse el Suplemento de Aeropuerto una vez cargado?", a:"b) El día de la compra", opts:["a) En un plazo de 7 días","b) El día de la compra","c) Antes de finalizar el mes","d) En cualquier momento"], tip:"El Suplemento de Aeropuerto es de validez diaria: debe utilizarse el mismo día en que se carga, no puede guardarse para otro día."},
+  {cat:"tarifas", q:"¿Con qué títulos se puede cargar conjuntamente el Suplemento de Aeropuerto?", a:"c) Billetes Sencillos o 10 Viajes válidos", opts:["a) Abonos mensuales","b) Abonos anuales","c) Billetes Sencillos o 10 Viajes válidos","d) Títulos turísticos"], tip:"El Suplemento de Aeropuerto se puede cargar conjuntamente con billetes Sencillo o de 10 Viajes, que son los únicos que requieren dicho suplemento."},
+  {cat:"tarifas", q:"¿Qué título NO requiere Suplemento de Aeropuerto?", a:"d) Abono 30 días", opts:["a) Sencillo Zona A","b) 10 Viajes Metrobús","c) Sencillo Combinado","d) Abono 30 días"], tip:"El Abono 30 días (y otros abonos temporales) ya incluye el acceso a las estaciones de aeropuerto sin necesidad de suplemento adicional."},
+  {cat:"tarifas", q:"¿Qué tarjeta NO permite cargar en un Abono 30 Días?", a:"b) Tarjeta Multi", opts:["a) TTP Personal","b) Tarjeta Multi","c) Tarjeta con perfil Joven","d) Tarjeta con perfil +65"], tip:"El Abono 30 Días solo puede cargarse en la Tarjeta de Transporte Público Personal, no en la Tarjeta Multi, que está orientada a títulos de uso más flexible."},
+  {cat:"tarifas", q:"¿Es posible cargar el Suplemento de Aeropuerto posteriormente al billete?", a:"a) Sí, también es posible cargarlo posteriormente", opts:["a) Sí, también es posible cargarlo posteriormente","b) Solo en estaciones","c) No, solo conjuntamente","d) Solo en estaciones de aeropuerto"], tip:"El Suplemento de Aeropuerto puede cargarse en un momento posterior al billete Sencillo o de 10 Viajes, no es obligatorio hacerlo en la misma operación."},
+  {cat:"tarifas", q:"¿Cuál es el número mínimo de Suplementos de Aeropuerto que se pueden adquirir de una vez?", a:"c) Tantos como viajes disponibles del billete al que acompaña", opts:["a) Uno por tarjeta","b) Diez por usuario","c) Tantos como viajes disponibles del billete al que acompaña","d) Ilimitados"], tip:"Se pueden adquirir tantos Suplementos de Aeropuerto como viajes tenga disponibles el billete al que acompañan, ni más ni menos."},
+  {cat:"tarifas", q:"¿En qué tipo de tarjeta puede cargarse el Abono 30 días?", a:"a) Tarjeta Transporte Público Personal", opts:["a) Tarjeta Transporte Público Personal","b) Cualquier tarjeta sin restricción","c) Tarjeta Multi","d) Tarjeta Turística"], tip:"El Abono 30 días es un título personal que solo puede cargarse en la Tarjeta de Transporte Público Personal, que está vinculada a una persona concreta."},
+
+  // --- TEST 3 (Abono 30 Días) ---
+  {cat:"tarifas", q:"¿Cuándo se puede realizar la segunda carga del mismo abono?", a:"c) Solo si ya ha comenzado a utilizarse la primera", opts:["a) En cualquier momento","b) Antes de usar la primera","c) Solo si ya ha comenzado a utilizarse la primera","d) Al finalizar la validez"], tip:"La segunda carga del Abono 30 Días solo se puede realizar una vez que se ha comenzado a usar la primera carga, no antes."},
+  {cat:"tarifas", q:"¿Cuántos días tiene el usuario para empezar a usar el Abono 30 Días desde su carga?", a:"b) 10 días", opts:["a) 5 días","b) 10 días","c) 15 días","d) 30 días"], tip:"El usuario dispone de 10 días desde la carga del Abono 30 Días para comenzar a utilizarlo. A partir del primer uso, el contador de 30 días se inicia."},
+  {cat:"tarifas", q:"¿Cuántos tipos de abono pueden coexistir en una misma tarjeta?", a:"a) Uno solo", opts:["a) Uno solo","b) Tres","c) Dos distintos","d) Ilimitados"], tip:"En una Tarjeta de Transporte Público solo puede haber un tipo de abono cargado a la vez; no se pueden combinar dos abonos distintos en la misma tarjeta."},
+  {cat:"tarifas", q:"¿Qué sucede si no se empieza a usar el Abono 30 Días dentro del plazo establecido?", a:"d) Comienza el descuento de días de validez", opts:["a) Se anula automáticamente","b) Se devuelve el descuento","c) Se bloquea la tarjeta","d) Comienza el descuento de días de validez"], tip:"Si el usuario no activa el Abono 30 Días en los 10 días siguientes a su carga, la validez empieza a contar automáticamente desde el día 11."},
+  {cat:"tarifas", q:"¿Qué perfiles pueden cargar abonos 30 Días E1 o E2?", a:"b) Solo perfil Joven", opts:["a) Solo perfil Normal","b) Solo perfil Joven","c) Perfil +65","d) Perfil Turístico"], tip:"Los abonos 30 Días E1 y E2 están reservados exclusivamente para el perfil Joven (usuarios de hasta 26 años)."},
+  {cat:"tarifas", q:"¿Qué zonas cubre un Abono 30 Días Interzonal B2-C1?", a:"d) B2, B3 y C1", opts:["a) B1, B2 y C1","b) B1 y C1","c) Solo B2 y C1","d) B2, B3 y C1"], tip:"El Abono 30 Días Interzonal B2-C1 cubre las zonas B2, B3 y C1, permitiendo viajar por todas ellas con un único título."},
+  {cat:"tarifas", q:"¿Qué tipos de Abono 30 Días existen según el perfil?", a:"c) Joven, Normal y +65", opts:["a) Básico y Plus","b) Normal y Senior","c) Joven, Normal y +65","d) Urbano e Interurbano"], tip:"El Abono 30 Días existe en tres perfiles: Joven (hasta 26 años), Normal (público general) y +65 (mayores de 65 años)."},
+  {cat:"tarifas", q:"¿Para qué zonas es válido el Abono 30 Días zonal B2?", a:"b) A, B1, B2 y B3", opts:["a) Solo B2","b) A, B1, B2 y B3","c) B2 y C1","d) B2 y B3"], tip:"El Abono 30 Días zonal B2 es válido para todas las zonas desde A hasta B3, es decir, incluye A, B1, B2 y B3."},
+  {cat:"tarifas", q:"¿De qué depende el tipo de Abono 30 Días que se puede cargarse?", a:"b) De la edad del propietario de la tarjeta", opts:["a) De la zona elegida","b) De la edad del propietario de la tarjeta","c) Del número de viajes","d) Del punto de venta"], tip:"El tipo de Abono 30 Días (Joven, Normal o +65) depende de la edad del titular de la Tarjeta de Transporte Público en la que se carga."},
+  {cat:"tarifas", q:"¿Qué municipio está incluido en la zona C1?", a:"a) El Fresno de Torote", opts:["a) El Fresno de Torote","b) Fuenlabrada de Tajo","c) Cidrleña","d) Aldea del Fresno"], tip:"El Fresno de Torote es uno de los municipios que forman parte de la zona C1 del sistema tarifario del Consorcio Regional de Transportes de Madrid."},
+
+  // --- TEST 4 (Título Turístico) ---
+  {cat:"tarifas", q:"¿Hasta qué zona llega la cobertura de la zona T del Título Turístico?", a:"d) Hasta la zona E2", opts:["a) Hasta B3","b) Hasta C2","c) Hasta E1","d) Hasta la zona E2"], tip:"La zona T del Título Turístico cubre hasta la zona E2, que es la zona más exterior del sistema tarifario del Consorcio."},
+  {cat:"tarifas", q:"¿Cuántas zonas se definen para el Título Turístico?", a:"b) Dos", opts:["a) Una","b) Dos","c) Tres","d) Cuatro"], tip:"El Título Turístico se define en dos zonas: una zona más reducida (ciudad de Madrid) y la zona T que abarca toda la red hasta E2."},
+  {cat:"tarifas", q:"¿Dónde puede cargarse el Abono 30 Días además de en máquinas de Metro?", a:"b) En estaciones, puntos autorizados y estaciones de Renfe-Cercanías", opts:["a) Solo en oficinas centrales","b) En estaciones, puntos autorizados y estaciones de Renfe-Cercanías","c) Solo por internet","d) En autobuses interurbanos"], tip:"El Abono 30 Días puede cargarse en máquinas de estaciones de Metro, en puntos de venta autorizados y en estaciones de Renfe-Cercanías, además de online."},
+  {cat:"tarifas", q:"¿Qué títulos pueden seguir cargándose en la TTP Personal tras la suspensión del Abono Anual?", a:"b) Abono 30 días o títulos de 10 viajes", opts:["a) Solo títulos turísticos","b) Abono 30 días o títulos de 10 viajes","c) Solo billetes sencillos","d) Exclusivamente MetroBús"], tip:"Tras la suspensión del Abono Anual, la Tarjeta de Transporte Público Personal puede seguir usándose para cargar el Abono 30 días o títulos de 10 viajes."},
+  {cat:"tarifas", q:"¿Qué descuento se aplica a los abonos anuales para empresas?", a:"c) El mismo que en el ejercicio 2023", opts:["a) Uno nuevo en 2024","b) Ninguno","c) El mismo que en el ejercicio 2023","d) Un descuento reducido"], tip:"El descuento para los abonos anuales de empresas se mantiene igual al del ejercicio 2023, sin cambios para el año siguiente."},
+  {cat:"tarifas", q:"¿Qué decisión se tomó respecto a la venta de Abonos Anuales?", a:"d) Se mantiene la suspensión para particulares", opts:["a) Se reanudó la venta general","b) Se eliminó definitivamente","c) Se redujo su precio","d) Se mantiene la suspensión para particulares"], tip:"La venta de Abonos Anuales para particulares permanece suspendida; solo se mantiene la comercialización para empresas."},
+  {cat:"tarifas", q:"¿Qué abarca la zona T del Título Turístico?", a:"c) La totalidad de la cobertura geográfica de los Abonos Transporte", opts:["a) Solo la ciudad de Madrid","b) Las zonas interiores","c) La totalidad de la cobertura geográfica de los Abonos Transporte","d) Únicamente la zona A"], tip:"La zona T del Título Turístico abarca toda la cobertura geográfica del sistema de transporte integrado, equivalente a la cobertura total de los Abonos Transporte."},
+  {cat:"tarifas", q:"¿Con qué territorio coincide principalmente la zona A del Título Turístico?", a:"a) El término municipal de Madrid", opts:["a) El término municipal de Madrid","b) La Comunidad de Madrid","c) La zona B1","d) El área metropolitana"], tip:"La zona A del Título Turístico coincide aproximadamente con el término municipal de Madrid, que es el área de mayor densidad de transporte público."},
+  {cat:"tarifas", q:"¿Con qué tarifas cargan los perfiles +65 los abonos E1 y E2?", a:"c) Con las mismas tarifas que el perfil Normal", opts:["a) Con tarifa reducida","b) Con tarifa especial","c) Con las mismas tarifas que el perfil Normal","d) Con tarifa gratuita"], tip:"Los usuarios con perfil +65 abonan los abonos E1 y E2 con las mismas tarifas que el perfil Normal, sin descuento adicional en estas zonas exteriores."},
+  {cat:"tarifas", q:"¿Para quién se mantiene la comercialización del Abono Anual?", a:"a) Personas jurídicas (empresas)", opts:["a) Personas jurídicas (empresas)","b) Turistas","c) Personas mayores de 65 años","d) Jóvenes"], tip:"El Abono Anual se mantiene únicamente para personas jurídicas (empresas), que pueden adquirirlo para sus empleados como beneficio laboral."},
+
+  // --- TEST 5 (Título Turístico / zonas horarias) ---
+  {cat:"tarifas", q:"¿Hasta qué hora se extiende la validez en los servicios nocturnos el último día?", a:"c) Hasta las 05:00 h", opts:["a) Hasta las 00:00 h","b) Hasta las 02:00 h","c) Hasta las 05:00 h","d) Hasta las 06:00 h"], tip:"En el último día de validez del Título Turístico, la cobertura se extiende hasta las 05:00 h del día siguiente para incluir los servicios nocturnos."},
+  {cat:"tarifas", q:"¿En qué red del Consorcio puede utilizarse el título de la zona T?", a:"c) En toda la red del Consorcio", opts:["a) Solo en la zona A","b) En líneas seleccionadas","c) En toda la red del Consorcio","d) Solo en horario nocturno"], tip:"El Título Turístico zona T es válido en toda la red del Consorcio Regional de Transportes de Madrid, sin restricción de líneas o modos."},
+  {cat:"tarifas", q:"¿Qué línea de autobús queda excluida en la zona A?", a:"b) La línea exprés al Aeropuerto", opts:["a) Todas las líneas nocturnas","b) La línea exprés al Aeropuerto","c) Las líneas interurbanas","d) Las líneas circulares"], tip:"En la zona A del Título Turístico queda excluida la línea exprés al Aeropuerto, ya que requiere el Suplemento de Aeropuerto o el título de zona T."},
+  {cat:"tarifas", q:"¿Qué líneas de Metro Ligero están incluidas en la zona T?", a:"d) Todas las líneas sin excepción", opts:["a) Solo ML1","b) ML1 y ML2","c) ML2, ML3 y ML4","d) Todas las líneas sin excepción"], tip:"En la zona T del Título Turístico están incluidas todas las líneas de Metro Ligero sin excepción, permitiendo el acceso a toda la red de tranvía metropolitano."},
+  {cat:"tarifas", q:"¿En qué medio puede utilizarse un título válido para la zona A?", a:"d) Metro en todas sus líneas dentro de la zona", opts:["a) Autobuses exprés al Aeropuerto","b) Servicios Regionales de RENFE","c) Metro Ligero ML3","d) Metro en todas sus líneas dentro de la zona"], tip:"Con un título válido para la zona A se puede usar el Metro en todas sus líneas dentro de esa zona, aunque con las exclusiones mencionadas (aeropuerto, etc.)."},
+  {cat:"tarifas", q:"¿Qué línea de Metro Ligero está incluida en la zona A?", a:"c) ML1", opts:["a) ML2","b) ML3","c) ML1","d) ML4"], tip:"La línea ML1 del Metro Ligero es la única que está incluida en la zona A del sistema tarifario, ya que circula por el municipio de Madrid."},
+  {cat:"tarifas", q:"¿Desde cuándo comienza a contarse la validez de un Título Turístico?", a:"c) Desde la fecha de la primera utilización", opts:["a) Desde la fecha de compra","b) Desde las 00:00 h del día siguiente a la compra","c) Desde la fecha de la primera utilización","d) Desde la fecha indicada en el recibo"], tip:"La validez del Título Turístico comienza a contarse desde el momento de la primera utilización, no desde la compra, lo que da flexibilidad al usuario."},
+  {cat:"tarifas", q:"¿Qué servicio adicional incluye la zona T respecto a la zona A?", a:"c) Servicios Regionales de RENFE", opts:["a) Autobuses exprés al Aeropuerto","b) Servicios regulares de transporte por carretera","c) Servicios Regionales de RENFE","d) Líneas internacionales"], tip:"La zona T del Título Turístico incluye los Servicios Regionales de RENFE, a diferencia de la zona A que está limitada al transporte urbano de Madrid."},
+  {cat:"tarifas", q:"¿Es obligatorio que la fecha de compra coincida con la de la primera utilización?", a:"d) No es necesario que coincida", opts:["a) Sí, siempre","b) Solo en títulos de un día","c) Depende del tipo de título","d) No es necesario que coincida"], tip:"No es obligatorio que la fecha de compra y la de primera utilización coincidan; el usuario puede comprar el Título Turístico con antelación y activarlo cuando quiera."},
+  {cat:"tarifas", q:"¿En qué servicio de RENFE es válido el título de la zona A?", a:"a) Entre las estaciones de Cercanías de la zona A", opts:["a) Entre las estaciones de Cercanías de la zona A","b) En toda la red ferroviaria","c) En servicios Regionales","d) Solo en trenes de largo recorrido"], tip:"El título de zona A es válido en Cercanías RENFE únicamente entre las estaciones que pertenecen a la zona A del sistema tarifario integrado."}
+,
+// --- TEST 6 (Título Turístico características) ---
+  {cat:"tarifas", q:"¿Qué carácter tiene el Título Turístico?", a:"c) Personal", opts:["a) Transferible","b) Familiar","c) Personal","d) Colectivo"], tip:"El Título Turístico es de carácter personal e intransferible, por lo que solo puede ser utilizado por la persona que lo adquirió."},
+  {cat:"tarifas", q:"¿Dónde puede cargarse el Título Turístico además de en las máquinas de Metro?", a:"d) En estaciones, puntos autorizados y estaciones de Renfe-Cercanías", opts:["a) Solo en oficinas del Consorcio","b) Únicamente en estaciones","c) En aeropuertos","d) En estaciones, puntos autorizados y estaciones de Renfe-Cercanías"], tip:"El Título Turístico puede cargarse en las máquinas de Metro, en puntos de venta autorizados y en estaciones de Renfe-Cercanías."},
+  {cat:"tarifas", q:"¿Son válidos los Títulos Turísticos en los Servicios Regionales de RENFE Operadora?", a:"a) Sí, siempre", opts:["a) Sí, siempre","b) Solo en la zona T","c) No, no son válidos","d) Solo con suplemento"], tip:"Los Títulos Turísticos son válidos en los Servicios Regionales de RENFE Operadora, lo que los convierte en una opción muy completa para los visitantes."},
+  {cat:"tarifas", q:"¿Para cuántos días naturales consecutivos puede adquirirse el Título Turístico?", a:"a) Para 1, 2, 3, 4, 5 o 7 días", opts:["a) Para 1, 2, 3, 4, 5 o 7 días","b) Para un máximo de 10 días","c) Solo para 1 o 7 días","d) Para cualquier número de días"], tip:"El Título Turístico puede adquirirse para 1, 2, 3, 4, 5 o 7 días naturales consecutivos, adaptándose a distintas duraciones de visita."},
+  {cat:"tarifas", q:"¿En qué tipo de tarjeta puede cargarse el Título Turístico?", a:"a) En cualquier tarjeta de transporte", opts:["a) En cualquier tarjeta de transporte","b) Exclusivamente en la tarjeta Multi","c) En tarjetas bancarias","d) En tarjetas personalizadas"], tip:"El Título Turístico puede cargarse en cualquier Tarjeta de Transporte Público, tanto Personal como Multi, así como en soportes específicos para turistas."},
+  {cat:"tarifas", q:"¿Cuándo comienza a descontarse la validez del Título Turístico?", a:"d) En el momento de la primera validación", opts:["a) Al comprarlo","b) Al día siguiente de la compra","c) Al activarlo manualmente","d) En el momento de la primera validación"], tip:"La validez del Título Turístico empieza a contar desde el primer uso (primera validación), no desde la compra, dando flexibilidad al usuario."},
+  {cat:"tarifas", q:"¿Qué ocurre con el precio de la tarjeta cuando se adquiere junto con un Título Turístico?", a:"b) Está incluido en el precio del título", opts:["a) Se paga por separado","b) Está incluido en el precio del título","c) Tiene un descuento del 50%","d) No se incluye en ningún caso"], tip:"Cuando se adquiere un Título Turístico, el coste de la tarjeta soporte está incluido en el precio total del título, sin cargo adicional."},
+  {cat:"tarifas", q:"¿Es posible cargar otros títulos en la tarjeta mientras está vigente el Título Turístico?", a:"d) No es posible", opts:["a) Sí, sin limitación","b) Solo títulos de la misma zona","c) Solo títulos de menor duración","d) No es posible"], tip:"Mientras el Título Turístico está activo en la tarjeta, no es posible cargar ningún otro título de transporte en esa misma tarjeta."},
+  {cat:"tarifas", q:"¿Es posible tener dos Títulos Turísticos distintos activos en una misma tarjeta?", a:"c) No, solo un tipo de Título Turístico", opts:["a) Sí, sin limitaciones","b) Solo si son de distinta duración","c) No, solo un tipo de Título Turístico","d) Solo en la zona A"], tip:"En una misma tarjeta solo puede haber activo un Título Turístico a la vez; no es posible acumular dos títulos turísticos distintos simultáneamente."},
+  {cat:"tarifas", q:"¿Quién puede establecer excepciones a las condiciones indicadas del Título Turístico?", a:"c) El Consorcio Regional de Transportes de Madrid", opts:["a) RENFE Operadora","b) El Ministerio de Transportes","c) El Consorcio Regional de Transportes de Madrid","d) Las empresas concesionarias"], tip:"Es el Consorcio Regional de Transportes de Madrid quien tiene la potestad de establecer excepciones o modificaciones a las condiciones del Título Turístico."},
+
+  // --- TEST 7 (Sistema general de títulos) ---
+  {cat:"tarifas", q:"¿Qué son los billetes en el Sistema de Transporte Público de Madrid?", a:"c) Títulos de transporte que permiten acceder al sistema", opts:["a) Documentos de identificación","b) Tarjetas bancarias","c) Títulos de transporte que permiten acceder al sistema","d) Contratos de movilidad"], tip:"Los billetes son títulos de transporte que permiten al usuario acceder al sistema de transporte público integrado de Madrid."},
+  {cat:"tarifas", q:"¿En función de qué se personalizan los abonos?", a:"d) De la edad y posibles descuentos", opts:["a) Del medio de transporte","b) Del horario","c) Del municipio","d) De la edad y posibles descuentos"], tip:"Los abonos se personalizan en función de la edad del titular y los descuentos aplicables (Joven, Normal, +65, Infantil), adaptando el precio a cada perfil."},
+  {cat:"tarifas", q:"¿Qué abono se carga en una tarjeta anónima?", a:"c) Abono turístico", opts:["a) Abono +65","b) Abono infantil","c) Abono turístico","d) Abono joven"], tip:"El Abono Turístico (Título Turístico) puede cargarse en tarjetas anónimas, a diferencia de los abonos personales que requieren tarjeta nominativa."},
+  {cat:"tarifas", q:"¿En qué tarjeta se carga el Abono Transporte general?", a:"a) Tarjeta Transporte Público Personal", opts:["a) Tarjeta Transporte Público Personal","b) Tarjeta anónima","c) Tarjeta bancaria","d) Tarjeta Multi"], tip:"El Abono Transporte (30 días) es un título personal que se carga exclusivamente en la Tarjeta de Transporte Público Personal, vinculada al titular."},
+  {cat:"tarifas", q:"¿Dónde se cargan los billetes de transporte?", a:"c) En las tarjetas de transporte", opts:["a) En documentos impresos","b) En aplicaciones móviles directamente","c) En las tarjetas de transporte","d) En validadores de abonos"], tip:"Los billetes (Sencillo, 10 Viajes) se cargan en las Tarjetas de Transporte Público, que actúan como soporte físico de los títulos."},
+  {cat:"tarifas", q:"¿Qué característica define el Abono Transporte?", a:"c) Es personal e intransferible", opts:["a) Es transferible","b) Es válido solo un día","c) Es personal e intransferible","d) Es exclusivo del Metro"], tip:"El Abono Transporte es personal e intransferible, lo que significa que solo puede ser utilizado por la persona a cuyo nombre está registrado."},
+  {cat:"tarifas", q:"¿Dónde se registran los datos del usuario para el abono?", a:"c) En el chip de la TTP Personal", opts:["a) En una base de datos online","b) En la app móvil","c) En el chip de la TTP Personal","d) En el billete físico"], tip:"Los datos personales del titular y sus abonos se registran en el chip de la Tarjeta de Transporte Público Personal, que actúa como soporte seguro."},
+  {cat:"tarifas", q:"¿De qué depende la variedad de títulos del sistema tarifario madrileño?", a:"d) Del número de viajes, zonas, modos y situación personal", opts:["a) Del operador de transporte","b) Del horario de uso","c) Del tipo de tarjeta bancaria","d) Del número de viajes, zonas, modos y situación personal"], tip:"La amplia variedad de títulos disponibles responde a los distintos factores: número de viajes, zonas geográficas, modos de transporte y situación personal del usuario."},
+  {cat:"tarifas", q:"¿Qué título permite realizar un número concreto de viajes cuando se quiera?", a:"b) Sencillos y 10 viajes", opts:["a) Abono mensual","b) Sencillos y 10 viajes","c) Abono +65","d) Abono infantil"], tip:"Los billetes Sencillo y de 10 Viajes permiten realizar un número fijo de viajes (1 o 10) cuando el usuario quiera, sin restricción temporal."},
+  {cat:"tarifas", q:"¿Qué tipo de títulos permiten viajes ilimitados durante un período determinado?", a:"a) Abonos", opts:["a) Abonos","b) Turísticos anuales","c) Sencillos","d) 10 viajes"], tip:"Los abonos (30 días, anual) permiten realizar viajes ilimitados dentro de su período de validez, siendo la opción más económica para usuarios habituales."},
+
+  // --- TEST 8 (Perfiles y abonos) ---
+  {cat:"tarifas", q:"¿Qué edad corresponde al perfil Joven de 15 a 25 años?", a:"a) 15 a 25", opts:["a) 15 a 25","b) Menores de 6","c) 7 a 14","d) 26 a 64"], tip:"El perfil Joven corresponde a usuarios de entre 15 y 25 años, quienes pueden beneficiarse de tarifas reducidas en los abonos de transporte."},
+  {cat:"tarifas", q:"¿Qué característica tiene el Abono +65?", a:"b) Es gratuito", opts:["a) Es de pago","b) Es gratuito","c) Es interzonal","d) Es anual solo en zona A"], tip:"El Abono +65 es completamente gratuito para los mayores de 65 años residentes en la Comunidad de Madrid, como medida de accesibilidad al transporte público."},
+  {cat:"tarifas", q:"¿Cuántos días naturales consecutivos permite el Abono +65?", a:"c) 365", opts:["a) 30","b) 180","c) 365","d) 480"], tip:"El Abono +65 tiene una validez de 365 días naturales consecutivos, renovándose anualmente de forma gratuita para los titulares que cumplan los requisitos."},
+  {cat:"tarifas", q:"¿Cuál es el perfil correspondiente a personas de 26 a 64 años?", a:"c) General", opts:["a) Joven","b) Más de 65","c) General","d) Infantil"], tip:"Las personas de entre 26 y 64 años corresponden al perfil General (también llamado Normal), que aplica la tarifa estándar sin descuentos por edad."},
+  {cat:"tarifas", q:"¿Hasta qué edad permite viajar el abono Infantil?", a:"b) Hasta el día que se cumplen 7 años", opts:["a) Hasta los 5 años","b) Hasta el día que se cumplen 7 años","c) Hasta los 10 años","d) Hasta los 11 años"], tip:"El Abono Infantil es válido hasta el día en que el niño cumple 7 años; a partir de ese momento debe utilizar otro título de transporte."},
+  {cat:"tarifas", q:"¿Cuántos días naturales consecutivos permite el Abono 30 días?", a:"d) 35", opts:["a) 28","b) 245","c) 31","d) 35"], tip:"Aunque se llama 'Abono 30 días', su validez real es de 35 días naturales consecutivos desde la primera utilización, dando un margen adicional al usuario."},
+  {cat:"tarifas", q:"¿Qué característica tiene el abono Infantil?", a:"d) Es gratuito", opts:["a) Es de pago","b) Es solo para zona A","c) Es transferible","d) Es gratuito"], tip:"El Abono Infantil es gratuito para niños menores de 7 años, garantizando la accesibilidad al transporte público desde la primera infancia."},
+  {cat:"tarifas", q:"¿En qué tarjeta se carga el Abono +65?", a:"b) Tarjeta Transporte Público Personal", opts:["a) Tarjeta Multi","b) Tarjeta Transporte Público Personal","c) Tarjeta Azul","d) Tarjeta Infantil"], tip:"El Abono +65 se carga en la Tarjeta de Transporte Público Personal del titular, que debe acreditar su edad y residencia en la Comunidad de Madrid."},
+  {cat:"tarifas", q:"¿Para qué perfiles está disponible el Abono 30 días?", a:"b) Normal o joven", opts:["a) Infantil y +65","b) Normal o joven","c) Solo general","d) Turístico"], tip:"El Abono 30 días está disponible para los perfiles Normal (26-64 años) y Joven (15-25 años), con tarifas diferenciadas según la edad."},
+  {cat:"tarifas", q:"¿Qué sucede con los menores de 4 años?", a:"a) Viajan gratis sin título", opts:["a) Viajan gratis sin título","b) Solo pueden usar Metro","c) Necesitan abono Infantil","d) Pagan tarifa reducida"], tip:"Los menores de 4 años viajan de forma completamente gratuita en todo el transporte público integrado de Madrid sin necesidad de ningún título."},
+
+  // --- TEST 9 (Abono Azul / Turístico) ---
+  {cat:"tarifas", q:"¿Qué duración tiene el Abono Azul?", a:"b) 30 días", opts:["a) Anual","b) 30 días","c) 15 días","d) 7 días"], tip:"El Abono Azul tiene una duración de 30 días naturales consecutivos desde su primera utilización, similar al Abono 30 días estándar."},
+  {cat:"tarifas", q:"¿En qué tarjeta se carga el abono turístico?", a:"c) Tarjeta Transporte Público Multi", opts:["a) Tarjeta Personal","b) Tarjeta Azul","c) Tarjeta Transporte Público Multi","d) Tarjeta Infantil"], tip:"El abono turístico (Título Turístico) se carga en la Tarjeta de Transporte Público Multi, que es una tarjeta anónima reutilizable apta para este tipo de títulos."},
+  {cat:"tarifas", q:"¿Qué cubre la zona A del abono turístico?", a:"b) Prácticamente el término municipal de Madrid", opts:["a) Toda la Comunidad de Madrid","b) Prácticamente el término municipal de Madrid","c) Hasta la zona E2","d) Castilla-La Mancha"], tip:"La zona A del abono turístico cubre prácticamente el término municipal de Madrid, incluyendo Metro, EMT y ML1."},
+  {cat:"tarifas", q:"¿Qué descuento se aplica a menores de 11 años en el abono turístico?", a:"b) 50%", opts:["a) 25%","b) 50%","c) 75%","d) No hay descuento"], tip:"Los menores de 11 años se benefician de un descuento del 50% en el precio del Título Turístico, tanto para la zona A como para la zona T."},
+  {cat:"tarifas", q:"¿Qué cubre la zona T del abono turístico?", a:"d) Toda la cobertura hasta la zona E2", opts:["a) Solo Madrid capital","b) Zona A y B1","c) Solo Metro","d) Toda la cobertura hasta la zona E2"], tip:"La zona T del Título Turístico abarca toda la red de transporte integrado hasta la zona E2, la más exterior del sistema tarifario madrileño."},
+  {cat:"tarifas", q:"¿Cuántas zonas existen para el abono turístico?", a:"b) Dos", opts:["a) Una","b) Dos","c) Tres","d) Cuatro"], tip:"El Título Turístico se estructura en dos zonas: la zona A (ámbito municipal de Madrid) y la zona T (toda la red hasta E2)."},
+  {cat:"tarifas", q:"¿En qué medios permite viajar el Abono Azul?", a:"c) Metro zona A, EMT y Metro Ligero ML1", opts:["a) Todos los transportes","b) Solo Cercanías","c) Metro zona A, EMT y Metro Ligero ML1","d) Autobuses interurbanos"], tip:"El Abono Azul es válido en Metro (zona A), EMT y Metro Ligero ML1, cubriendo los principales medios de transporte urbano de la ciudad de Madrid."},
+  {cat:"tarifas", q:"¿Qué ocurre con la venta de abonos anuales particulares desde 2023?", a:"b) Está suspendida", opts:["a) Se ha ampliado","b) Está suspendida","c) Solo se vende online","d) Es gratuita"], tip:"La venta de Abonos Anuales para particulares está suspendida desde 2023; únicamente se mantiene la comercialización para personas jurídicas (empresas)."},
+  {cat:"tarifas", q:"¿Para quién se mantiene la comercialización del abono anual?", a:"a) Personas jurídicas", opts:["a) Personas jurídicas","b) Familias numerosas","c) Jóvenes","d) Mayores de 65"], tip:"El Abono Anual solo se comercializa para personas jurídicas (empresas) que lo gestionan como beneficio para sus empleados."},
+  {cat:"tarifas", q:"¿Cuántos días puede durar el abono turístico?", a:"c) Entre 1 y 7 días naturales consecutivos", opts:["a) Solo 7 días","b) Entre 5 y 10 días","c) Entre 1 y 7 días naturales consecutivos","d) Un mes completo"], tip:"El Título Turístico puede adquirirse para 1, 2, 3, 4, 5 o 7 días naturales consecutivos, eligiendo la opción más adecuada según la duración de la visita."},
+
+  // --- TEST 10 (Abono 30 días cambio zona y detalles) ---
+  {cat:"tarifas", q:"¿Qué ocurre si se cambia un abono interzonal por uno del mismo precio?", a:"b) El cambio se realiza sin coste", opts:["a) Se paga una penalización","b) El cambio se realiza sin coste","c) Se renueva el período de validez","d) Se pierde el abono"], tip:"El cambio entre abonos interzonales del mismo precio se realiza sin coste adicional para el usuario, manteniendo la validez restante del abono original."},
+  {cat:"tarifas", q:"¿Qué ocurre al cambiar a una zona de precio superior?", a:"c) Se abona la diferencia entre las dos zonas completas", opts:["a) No se paga diferencia","b) Se renueva el abono","c) Se abona la diferencia entre las dos zonas completas","d) Se pierde la validez"], tip:"Al cambiar a un abono de zona superior se debe abonar la diferencia de precio entre el abono actual y el nuevo, calculada sobre el precio completo de ambos."},
+  {cat:"tarifas", q:"¿Dónde NO se puede realizar un cambio de zona del abono?", a:"a) App Tarjeta Transporte", opts:["a) App Tarjeta Transporte","b) Máquinas de autoventa","c) Estaciones","d) Intercanbiadores"], tip:"El cambio de zona del abono no puede realizarse a través de la App Tarjeta Transporte; debe hacerse en máquinas de autoventa, estaciones o intercambiadores."},
+  {cat:"tarifas", q:"¿Qué línea de EMT está excluida del abono?", a:"c) Exprés Aeropuerto", opts:["a) Línea Circular","b) Líneas nocturnas","c) Exprés Aeropuerto","d) Líneas secundarias"], tip:"La línea Exprés Aeropuerto (línea 203) de la EMT está excluida del abono de transporte, ya que requiere el pago de un suplemento específico."},
+  {cat:"tarifas", q:"¿Qué ocurre si no se valida el abono en los primeros 10 días tras la carga?", a:"a) La validez se activa tras esos 10 días", opts:["a) La validez se activa tras esos 10 días","b) Se anula","c) Se devuelve el importe","d) Se renueva automáticamente"], tip:"Si el usuario no activa el Abono 30 días en los 10 días siguientes a su carga, la validez comienza a contar automáticamente a partir del día 11."},
+  {cat:"tarifas", q:"¿Cuántos viajes permite el Abono 30 días?", a:"c) Ilimitados", opts:["a) 10","b) 30","c) Ilimitados","d) Según la zona"], tip:"El Abono 30 días permite realizar viajes ilimitados dentro de su zona de validez durante los 35 días naturales de vigencia."},
+  {cat:"tarifas", q:"¿Cuándo deja de ser válido un abono no validado tras la carga?", a:"c) A los 40 días desde la carga", opts:["a) A los 30 días","b) A los 35 días","c) A los 40 días desde la carga","d) A los 60 días"], tip:"Un abono no utilizado caduca a los 40 días desde su carga; si no se ha validado en ese plazo, el título pierde su validez automáticamente."},
+  {cat:"tarifas", q:"¿Cuál es la validez del Abono 30 días tras la primera utilización?", a:"b) 30 días naturales", opts:["a) 25 días","b) 30 días naturales","c) 40 días","d) Un mes natural fijo"], tip:"Una vez activado con la primera validación, el Abono 30 días tiene una validez de 30 días naturales consecutivos (no meses de calendario)."},
+  {cat:"tarifas", q:"¿Qué servicio NO admite el abono en zona A?", a:"d) Autobuses interurbanos", opts:["a) Metro","b) EMT","c) Cercanías","d) Autobuses interurbanos"], tip:"Los autobuses interurbanos no están incluidos en el abono de zona A; para usarlos se necesita un abono de zona más amplia que incluya el servicio interurbano."},
+  {cat:"tarifas", q:"¿Qué precio inicial se indica para el Abono 30 días?", a:"c) Desde 28,75 €", opts:["a) 25,00 €","b) 30,00 €","c) Desde 28,75 €","d) 35,00 €"], tip:"El precio inicial del Abono 30 días parte desde 28,75 €, correspondiente al perfil Joven en zona A, siendo el abono más económico del sistema."}
+,
+// --- TEST 11 (Abono 7-14) ---
+  {cat:"tarifas", q:"¿A partir de qué edad puede usarse el Abono Joven?", a:"b) 15 años", opts:["a) 14 años","b) 15 años","c) 16 años","d) 18 años"], tip:"El Abono Joven está disponible a partir de los 15 años, siendo el título de transporte específico para jóvenes hasta los 25 años."},
+  {cat:"tarifas", q:"¿Cuándo deja de ser válido un abono no validado tras la carga?", a:"c) A los 40 días desde la carga", opts:["a) A los 30 días","b) A los 25 días","c) A los 40 días desde la carga","d) A los 60 días"], tip:"Si un abono no se activa con la primera validación, caduca automáticamente a los 40 días desde su carga, sin posibilidad de reembolso."},
+  {cat:"tarifas", q:"¿Qué es necesario para adquirir el Abono 7-14?", a:"c) Tarjeta de Transporte Público Personal", opts:["a) Tarjeta Multi","b) Tarjeta Virtual","c) Tarjeta de Transporte Público Personal","d) DNI físico"], tip:"Para adquirir el Abono 7-14 se necesita la Tarjeta de Transporte Público Personal del menor, que almacena el título en su chip."},
+  {cat:"tarifas", q:"¿En qué soporte está disponible el Abono 7-14?", a:"d) Tarjeta de Transporte Público Personal", opts:["a) Tarjeta Multi","b) Tarjeta Virtual","c) Tarjeta Infantil","d) Tarjeta de Transporte Público Personal"], tip:"El Abono 7-14 se carga exclusivamente en la Tarjeta de Transporte Público Personal, que es el soporte oficial para este tipo de abono."},
+  {cat:"tarifas", q:"¿Qué ocurre si el abono no se valida en los 10 días posteriores a la carga?", a:"a) Empieza a contar el plazo de 30 días", opts:["a) Empieza a contar el plazo de 30 días","b) Se anula automáticamente","c) Se devuelve el importe","d) Se amplía su validez"], tip:"Si el Abono 30 días no se activa en los 10 primeros días tras la carga, la validez comienza a contar automáticamente a partir del día 11."},
+  {cat:"tarifas", q:"¿Cuál es el precio del Abono 7-14?", a:"c) Gratuito", opts:["a) 10 €","b) 5 €","c) Gratuito","d) 20 €"], tip:"El Abono 7-14 es completamente gratuito para los usuarios de entre 7 y 14 años residentes en la Comunidad de Madrid."},
+  {cat:"tarifas", q:"¿Hasta qué zonas permite viajar el Abono 7-14?", a:"a) Desde zona A hasta C2", opts:["a) Desde zona A hasta C2","b) Hasta zona B1","c) Hasta zona E2","d) Solo zona A"], tip:"El Abono 7-14 permite viajar desde la zona A hasta la zona C2, cubriendo así los principales municipios del área metropolitana de Madrid."},
+  {cat:"tarifas", q:"¿Dónde se puede cargar el Abono 7-14?", a:"b) En puntos de venta autorizados", opts:["a) Solo en oficinas de gestión","b) En puntos de venta autorizados","c) Solo en estaciones","d) Solo por correo"], tip:"El Abono 7-14 puede cargarse en los puntos de venta autorizados del sistema, incluyendo estaciones de Metro y Cercanías."},
+  {cat:"tarifas", q:"¿Cuántos viajes permite el Abono 7-14?", a:"d) Ilimitados", opts:["a) 30 viajes","b) 60 viajes","c) 15 viajes","d) Ilimitados"], tip:"El Abono 7-14, al igual que otros abonos del sistema, permite realizar viajes ilimitados dentro de su período de validez y su cobertura zonal."},
+  {cat:"tarifas", q:"¿Cuál es la duración del Abono 7-14?", a:"b) 30 días", opts:["a) 15 días","b) 30 días","c) 60 días","d) 365 días"], tip:"El Abono 7-14 tiene una duración de 30 días naturales consecutivos desde su primera utilización, renovándose mensualmente de forma gratuita."},
+
+  // --- TEST 12 (Abono +65, Joven, Infantil) ---
+  {cat:"tarifas", q:"¿Cuándo se activa la recarga del Abono +65?", a:"c) Al validarlo por primera vez", opts:["a) Al agotar la carga anterior","b) Al comprarlo","c) Al validarlo por primera vez","d) A los 15 días"], tip:"La recarga del Abono +65 se activa en el momento de la primera validación, iniciando así el nuevo período de 365 días de validez."},
+  {cat:"tarifas", q:"¿Por qué zonas permite viajar el Abono Joven de 15 a 25 años?", a:"c) De A a E2", opts:["a) De A a C2","b) Solo zona A","c) De A a E2","d) Zona T"], tip:"El Abono Joven permite viajar por todas las zonas del sistema, desde la zona A hasta la zona E2, con tarifa reducida respecto al perfil general."},
+  {cat:"tarifas", q:"¿Cuándo puede renovarse el Abono +65?", a:"b) Desde 10 días antes del vencimiento", opts:["a) El mismo día del vencimiento","b) Desde 10 días antes del vencimiento","c) 30 días antes","d) Después de caducar"], tip:"El Abono +65 puede renovarse a partir de los 10 días anteriores a su fecha de vencimiento, asegurando la continuidad del servicio sin interrupciones."},
+  {cat:"tarifas", q:"¿A qué edades está dirigido el Abono Infantil?", a:"b) De 4 a 6 años", opts:["a) De 0 a 3 años","b) De 4 a 6 años","c) De 5 a 7 años","d) De 4 a 9 años"], tip:"El Abono Infantil está dirigido a niños de 4 a 6 años; los menores de 4 años viajan gratis sin necesidad de ningún título."},
+  {cat:"tarifas", q:"¿Cuántos viajes permite el Abono Joven?", a:"d) Ilimitados", opts:["a) 10 viajes","b) 30 viajes","c) 60 viajes","d) Ilimitados"], tip:"El Abono Joven, al ser un abono mensual, permite realizar viajes ilimitados durante su período de validez en todas las zonas del sistema."},
+  {cat:"tarifas", q:"¿Hasta qué zona permite viajar el Abono +65?", a:"d) Zona C2", opts:["a) Zona A","b) Zona B2","c) Zona E2","d) Zona C2"], tip:"El Abono +65 cubre hasta la zona C2, lo que permite a los mayores de 65 años acceder a la mayor parte de los municipios del área metropolitana de Madrid."},
+  {cat:"tarifas", q:"¿Cuál es el precio del Abono Joven?", a:"c) 10 €", opts:["a) Gratuito","b) 20 €","c) 10 €","d) 15 €"], tip:"El Abono Joven tiene un precio de 10 € mensuales para usuarios de 15 a 25 años, independientemente de la zona de viaje."},
+  {cat:"tarifas", q:"¿Hasta qué edad es válido el Abono Joven?", a:"c) 26 años", opts:["a) 25 años","b) 30 años","c) 26 años","d) Sin límite"], tip:"El Abono Joven es válido hasta que el titular cumple 26 años; a partir de esa fecha debe pasarse al perfil Normal con la tarifa estándar."},
+  {cat:"tarifas", q:"¿Cuál es la validez del Abono +65?", a:"c) 365 días", opts:["a) 30 días","b) 90 días","c) 365 días","d) Ilimitada"], tip:"El Abono +65 tiene una validez de 365 días naturales desde su activación, renovándose de forma gratuita cada año para los titulares que cumplan los requisitos."},
+  {cat:"tarifas", q:"¿Puede usarse el Abono Joven en viajes internos de Castilla-La Mancha?", a:"c) No", opts:["a) Sí, siempre","b) Sí, con suplemento","c) No","d) Solo fines de semana"], tip:"El Abono Joven no es válido para viajes internos dentro de Castilla-La Mancha; solo cubre los desplazamientos dentro del sistema integrado de Madrid."},
+
+  // --- TEST 13 (Billete Turístico detalles) ---
+  {cat:"tarifas", q:"¿Cuál puede ser la duración del Billete Turístico?", a:"b) Entre 1 y 7 días", opts:["a) Solo 1 día","b) Entre 1 y 7 días","c) 7 y 14 días","d) 30 días"], tip:"El Billete Turístico puede adquirirse para 1, 2, 3, 4, 5 o 7 días naturales consecutivos, adaptándose a la duración de la visita."},
+  {cat:"tarifas", q:"¿En qué red NO es válido el Billete Turístico?", a:"a) Servicios Regionales de RENFE", opts:["a) Servicios Regionales de RENFE","b) Metro","c) EMT","d) Cercanías"], tip:"El Billete Turístico NO es válido en los Servicios Regionales de RENFE; sí lo es en Metro, EMT, Cercanías y Metro Ligero dentro de su zona."},
+  {cat:"tarifas", q:"¿Cuál es el precio del Abono Infantil?", a:"c) Gratuito", opts:["a) 1 €","b) 10 €","c) Gratuito","d) 1,50 €"], tip:"El Abono Infantil es completamente gratuito para niños de 4 a 6 años residentes en la Comunidad de Madrid."},
+  {cat:"tarifas", q:"¿En qué tarjeta se carga el Abono Infantil?", a:"c) Tarjeta de Transporte Público Infantil", opts:["a) Tarjeta Personal","b) Tarjeta Multi","c) Tarjeta de Transporte Público Infantil","d) Tarjeta Virtual"], tip:"El Abono Infantil se carga en la Tarjeta de Transporte Público Infantil, un soporte específico para niños de 4 a 6 años."},
+  {cat:"tarifas", q:"¿Hasta cuándo es válido el Abono Infantil?", a:"c) Hasta cumplir 7 años", opts:["a) Durante 08 días","b) Durante un año","c) Hasta cumplir 7 años","d) Hasta los 10 años"], tip:"El Abono Infantil es válido hasta el día en que el niño cumple 7 años; a partir de ese cumpleaños debe utilizar el Abono 7-14 u otro título."},
+  {cat:"tarifas", q:"¿Qué modalidades existen del Billete Turístico?", a:"d) Tarjeta Multi y Tarjeta Virtual", opts:["a) Personal y Infantil","b) Personal y Virtual","c) Solo Multi","d) Tarjeta Multi y Tarjeta Virtual"], tip:"El Billete Turístico está disponible en dos modalidades de soporte: cargado en una Tarjeta Multi física o en formato de Tarjeta Virtual (móvil)."},
+  {cat:"tarifas", q:"¿Qué tipo de viajes permite el Billete Turístico?", a:"c) Ilimitados", opts:["a) Limitados","b) 10 viajes","c) Ilimitados","d) Solo un trayecto"], tip:"El Billete Turístico permite realizar viajes ilimitados durante todos los días de validez del título, en todos los medios de transporte incluidos."},
+  {cat:"tarifas", q:"¿Cuántos trayectos permite un billete sencillo?", a:"c) Uno", opts:["a) Dos","b) Tres","c) Uno","d) Ilimitados"], tip:"El billete Sencillo permite realizar un único trayecto, que debe consumirse el mismo día de la compra."},
+  {cat:"tarifas", q:"¿Desde qué precio parte el Billete Turístico?", a:"b) 8,5 €", opts:["a) 7,00 €","b) 8,5 €","c) 10,5","d) 20 €"], tip:"El Billete Turístico parte desde 8,5 € para la opción de 1 día en zona A, siendo el precio más económico de la gama turística."},
+  {cat:"tarifas", q:"¿Cómo se puede solicitar la Tarjeta Infantil?", a:"a) Por web y Oficinas de Gestión", opts:["a) Por web y Oficinas de Gestión","b) Solo por correo","c) Solo en estaciones","d) En máquinas automáticas"], tip:"La Tarjeta de Transporte Público Infantil se solicita a través de la web del Consorcio o en las Oficinas de Gestión, presentando la documentación requerida."},
+
+  // --- TEST 14 (Suplemento Aeropuerto precios / TranvíaBUS) ---
+  {cat:"tarifas", q:"¿Es el Suplemento Aeropuerto válido por sí solo?", a:"a) No", opts:["a) No","b) Sí","c) Solo con Metro","d) Solo con Cercanías"], tip:"El Suplemento de Aeropuerto NO es válido por sí solo; debe combinarse siempre con un billete Sencillo o de 10 Viajes para acceder a las estaciones de aeropuerto."},
+  {cat:"tarifas", q:"¿Qué permite el billete TranvíaBUS?", a:"b) Transbordos durante 60 minutos", opts:["a) Un viaje único","b) Transbordos durante 60 minutos","c) Viajes ilimitados todo el día","d) Acceso al aeropuerto"], tip:"El billete TranvíaBUS permite realizar transbordos entre Metro Ligero y autobuses de la EMT durante 60 minutos desde la primera validación."},
+  {cat:"tarifas", q:"¿Los billetes de 10 viajes son multipersonales?", a:"c) No", opts:["a) Sí","b) Solo algunos","c) No","d) Solo fines de semana"], tip:"Los billetes de 10 Viajes NO son multipersonales; cada viaje solo puede ser utilizado por una persona, aunque la tarjeta pueda ser Multi."},
+  {cat:"tarifas", q:"¿En qué soportes se cargan los billetes de 10 viajes?", a:"b) Tarjeta Transporte Público", opts:["a) Solo Tarjeta Virtual","b) Tarjeta Transporte Público","c) Papel","d) Móvil obligatorio"], tip:"Los billetes de 10 Viajes se cargan en la Tarjeta de Transporte Público (Personal o Multi), que actúa como soporte electrónico del título."},
+  {cat:"tarifas", q:"¿Dónde se adquiere el billete sencillo EMT?", a:"a) A bordo del autobús", opts:["a) A bordo del autobús","b) En estaciones","c) En máquinas","d) En oficinas"], tip:"El billete sencillo de la EMT se adquiere directamente a bordo del autobús, pagando al conductor en el momento de subir."},
+  {cat:"tarifas", q:"¿Dónde se carga el billete sencillo de autobús?", a:"c) A bordo del autobús", opts:["a) En estaciones","b) En máquinas","c) A bordo del autobús","d) En la app"], tip:"El billete sencillo de los autobuses interurbanos se carga a bordo del propio autobús, en la máquina validadora del vehículo."},
+  {cat:"tarifas", q:"¿Qué colectivos pueden recibir descuentos generales?", a:"a) Discapacidad y Familias Numerosas", opts:["a) Discapacidad y Familias Numerosas","b) Turistas","c) Estudiantes","d) Usuarios ocasionales"], tip:"Los descuentos generales en el sistema tarifario de Madrid están dirigidos principalmente a personas con discapacidad y a miembros de familias numerosas."},
+  {cat:"tarifas", q:"¿Cuál es el coste total del TranvíBUS?", a:"c) 1,80 €", opts:["a) 1,50 €","b) 2,00 €","c) 1,80 €","d) 3,00 €"], tip:"El billete TranvíaBUS tiene un coste de 1,80 €, incluyendo el transbordo entre Metro Ligero y autobuses EMT durante 60 minutos."},
+  {cat:"tarifas", q:"¿Cuál es el precio del Suplemento Aeropuerto?", a:"d) 3,00 €", opts:["a) 1,50 €","b) 2,00 €","c) 2,50 €","d) 3,00 €"], tip:"El Suplemento de Aeropuerto tiene un precio fijo de 3,00 €, independientemente del tipo de billete con el que se combine."},
+  {cat:"tarifas", q:"¿Cuántos usos permite el Suplemento Aeropuerto?", a:"d) Un solo uso", opts:["a) Ilimitados","b) Dos","c) Diez","d) Un solo uso"], tip:"El Suplemento de Aeropuerto permite un único uso (un acceso a las estaciones de aeropuerto), y debe consumirse el mismo día de su adquisición."},
+
+  // --- TEST 15 (Bonificaciones extraordinarias) ---
+  {cat:"tarifas", q:"¿Hasta qué fecha se mantendrán las bonificaciones extraordinarias?", a:"d) 31 de diciembre de 2026", opts:["a) Junio de 2026","b) Diciembre de 2025","c) Enero de 2027","d) 31 de diciembre de 2026"], tip:"Las bonificaciones extraordinarias en las tarifas del transporte público de Madrid se mantendrán hasta el 31 de diciembre de 2026."},
+  {cat:"tarifas", q:"¿Qué descuento se aplica a personas con discapacidad ≥ 65%?", a:"b) 20%", opts:["a) 10%","b) 20%","c) 40%","d) 80%"], tip:"Las personas con un grado de discapacidad igual o superior al 65% tienen derecho a un descuento del 20% en los títulos de transporte del sistema."},
+  {cat:"tarifas", q:"¿Qué usuarios mantienen la gratuidad total?", a:"a) Menores de 7 a 14 años", opts:["a) Menores de 7 a 14 años","b) Mayores de 26 años","c) Turistas","d) Familias numerosas"], tip:"Los menores de entre 7 y 14 años mantienen la gratuidad total en el transporte público de Madrid mediante el Abono 7-14 gratuito."},
+  {cat:"tarifas", q:"¿Qué descuento tienen las Familias Numerosas Generales?", a:"c) 20%", opts:["a) 10%","b) 30%","c) 20%","d) 50%"], tip:"Las Familias Numerosas de categoría General tienen derecho a un descuento del 20% en los títulos de transporte del sistema integrado de Madrid."},
+  {cat:"tarifas", q:"¿Qué tarjeta es necesaria para aplicar descuentos personales?", a:"c) Tarjeta de Transporte Público Personal", opts:["a) Tarjeta Multi","b) Tarjeta Virtual","c) Tarjeta de Transporte Público Personal","d) Tarjeta Infantil"], tip:"Para que se apliquen los descuentos personales (discapacidad, familia numerosa, etc.) es imprescindible la Tarjeta de Transporte Público Personal nominativa."},
+  {cat:"tarifas", q:"¿Qué reducción se aplica a los billetes de 10 viajes?", a:"d) 50%", opts:["a) 40%","b) 30%","c) 20%","d) 50%"], tip:"Los billetes de 10 Viajes tienen una reducción del 50% respecto al precio individual de 10 billetes sencillos, incentivando el uso habitual del transporte."},
+  {cat:"tarifas", q:"¿Qué descuento tienen las Familias Numerosas Especiales?", a:"b) 50%", opts:["a) 25%","b) 50%","c) 60%","d) 75%"], tip:"Las Familias Numerosas de categoría Especial tienen derecho a un descuento del 50% en los títulos de transporte del sistema integrado de Madrid."},
+  {cat:"tarifas", q:"¿Qué títulos quedan excluidos de estas bonificaciones?", a:"c) Billetes sencillos y turísticos", opts:["a) Abonos mensuales","b) Billetes de 10 viajes","c) Billetes sencillos y turísticos","d) Abono Joven"], tip:"Los billetes sencillos y los títulos turísticos quedan excluidos de las bonificaciones extraordinarias, que se aplican principalmente a los abonos y billetes de 10 viajes."},
+  {cat:"tarifas", q:"¿Dónde se aplica el descuento al cargar la tarjeta?", a:"c) En el chip de la tarjeta", opts:["a) En el billete","b) En la máquina","c) En el chip de la tarjeta","d) En la app bancaria"], tip:"Los descuentos se aplican directamente en el chip de la Tarjeta de Transporte Público Personal en el momento de cargar el título, de forma automática."},
+  {cat:"tarifas", q:"¿Qué reducción se aplica al Abono Joven de 26 días?", a:"b) 90%", opts:["a) 30%","b) 90%","c) 40%","d) 60%"], tip:"El Abono Joven de 26 días tiene una reducción del 90% respecto al precio del abono estándar, haciendo el transporte prácticamente gratuito para los jóvenes."}
+,
+// --- TEST 16 (Tarjeta TTP Personal características) ---
+  {cat:"tarifas", q:"¿Qué tipo de tarjeta es intransferible?", a:"d) TTP Personal", opts:["a) TTP Multi","b) Tarjeta Virtual","c) Tarjeta Turística","d) TTP Personal"], tip:"La Tarjeta de Transporte Público Personal es intransferible porque está vinculada a los datos personales de su titular, lo que permite aplicar descuentos individualizados."},
+  {cat:"tarifas", q:"¿Qué función tienen las tarjetas de transporte?", a:"c) Servir como soporte para cargar billetes de transporte público", opts:["a) Identificar al usuario en estaciones","b) Sustituir al documento de identidad","c) Servir como soporte para cargar billetes de transporte público","d) Comprar servicios comerciales"], tip:"Las tarjetas de transporte actúan como soporte electrónico para cargar los distintos títulos de transporte del sistema integrado de Madrid."},
+  {cat:"tarifas", q:"¿De qué material está hecha la tarjeta física?", a:"a) Plástico", opts:["a) Plástico","b) Cartón","c) Metal","d) Silicona"], tip:"Las Tarjetas de Transporte Público son tarjetas de plástico rígido del mismo formato que las tarjetas bancarias estándar."},
+  {cat:"tarifas", q:"¿Qué tecnología utilizan las tarjetas de transporte para validar billetes?", a:"c) Tecnología sin contacto", opts:["a) Banda magnética","b) Código QR","c) Tecnología sin contacto","d) Conexión Bluetooth"], tip:"Las tarjetas de transporte de Madrid utilizan tecnología sin contacto (NFC/RFID), lo que permite validar el viaje acercando la tarjeta al lector."},
+  {cat:"tarifas", q:"¿Qué datos aparecen impresos en la TTP Personal?", a:"b) Nombre, número de identificación y fotografía", opts:["a) Dirección y firma","b) Nombre, número de identificación y fotografía","c) Tipo de billete cargado","d) Saldo disponible"], tip:"La TTP Personal lleva impresos el nombre del titular, su número de identificación y una fotografía, lo que garantiza su carácter personal e intransferible."},
+  {cat:"tarifas", q:"¿A partir de qué edad la opción estándar es la TTP Personal?", a:"b) 4 años", opts:["a) Más de 7 años","b) 4 años","c) 6 años","d) 14 años"], tip:"A partir de los 4 años el soporte estándar para los títulos de transporte es la TTP Personal; los menores de 4 años no necesitan ningún título."},
+  {cat:"tarifas", q:"¿Qué información se personaliza en el chip de la TTP Personal?", a:"b) Franja de edad y descuentos", opts:["a) Zona de residencia","b) Franja de edad y descuentos","c) Historial de viajes","d) Medio de pago"], tip:"En el chip de la TTP Personal se almacena la información de la franja de edad del titular y los descuentos a los que tiene derecho, personalizando así las tarifas."},
+  {cat:"tarifas", q:"¿Para qué sirven el chip y la antena de la tarjeta física?", a:"b) Para cargar billetes y validarlos al viajar", opts:["a) Para identificar al usuario visualmente","b) Para cargar billetes y validarlos al viajar","c) Para almacenar datos personales visibles","d) Para recargar saldo automáticamente"], tip:"El chip y la antena de la tarjeta son los componentes electrónicos que permiten cargar los títulos y comunicarse con los validadores al pasar por los tornos."},
+  {cat:"tarifas", q:"¿Qué formatos de tarjetas de transporte existen?", a:"d) Físicas y virtuales", opts:["a) Magnéticas y digitales","b) Temporales y permanentes","c) Personales y familiares","d) Físicas y virtuales"], tip:"Las tarjetas de transporte de Madrid existen en dos formatos: físicas (plástico) y virtuales (en el móvil mediante NFC), ofreciendo flexibilidad al usuario."},
+  {cat:"tarifas", q:"¿Qué elementos contiene la tarjeta física en su interior?", a:"b) Un chip y una antena", opts:["a) Un sensor y una batería","b) Un chip y una antena","c) Una memoria externa","d) Un código de barras"], tip:"El interior de la tarjeta física contiene un chip y una antena que trabajan conjuntamente para almacenar los títulos y comunicarse con los validadores sin contacto."},
+
+  // --- TEST 17 (Tarjeta Azul e Infantil) ---
+  {cat:"tarifas", q:"¿En qué servicios es válida la Tarjeta Azul?", a:"b) Metro de Madrid (zona A), EMT y Metros Ligeros ML1", opts:["a) En toda la Comunidad de Madrid","b) Metro de Madrid (zona A), EMT y Metros Ligeros ML1","c) Solo en autobuses interurbanos","d) En Cercanías"], tip:"La Tarjeta Azul es válida en Metro zona A, EMT (autobuses urbanos) y Metro Ligero ML1, cubriendo los principales servicios de transporte urbano de Madrid."},
+  {cat:"tarifas", q:"¿A quién va dirigida la Tarjeta Transporte Público Azul?", a:"a) A ciudadanos empadronados en Madrid con ciertos requisitos", opts:["a) A ciudadanos empadronados en Madrid con ciertos requisitos","b) A turistas","c) A menores de edad","d) A cualquier usuario del transporte público"], tip:"La Tarjeta Azul está dirigida a ciudadanos empadronados en Madrid que cumplan determinados requisitos económicos o sociales, siendo una tarjeta de acceso condicionado."},
+  {cat:"tarifas", q:"¿Para qué tipo de billetes es imprescindible la TTP Personal?", a:"c) Billetes vinculados a una persona concreta", opts:["a) Billetes turísticos","b) Billetes sencillos","c) Billetes vinculados a una persona concreta","d) Billetes de Cercanías"], tip:"La TTP Personal es imprescindible para los títulos que están vinculados a una persona concreta, como los abonos con descuentos por edad o condición personal."},
+  {cat:"tarifas", q:"¿Dónde se solicita la Tarjeta Azul?", a:"d) A través del Ayuntamiento de Madrid", opts:["a) En oficinas de Metro","b) En estaciones","c) En máquinas automáticas","d) A través del Ayuntamiento de Madrid"], tip:"La Tarjeta Azul se solicita a través del Ayuntamiento de Madrid, que gestiona el acceso a este beneficio social para los ciudadanos que cumplen los requisitos."},
+  {cat:"tarifas", q:"¿Cuál es la validez de los títulos cargados en la Tarjeta Azul?", a:"a) 30 días naturales y consecutivos", opts:["a) 30 días naturales y consecutivos","b) 15 días","c) 40 días","d) Un año"], tip:"Los títulos cargados en la Tarjeta Azul tienen una validez de 30 días naturales y consecutivos desde su primera utilización."},
+  {cat:"tarifas", q:"¿Cuántos billetes no personales puede contener una TTP Personal junto a un abono personal?", a:"a) Uno", opts:["a) Uno","b) Tres","c) Dos","d) Cuatro"], tip:"Una TTP Personal puede contener simultáneamente un abono personal y un billete no personal (como un Sencillo o 10 Viajes), pero solo uno de cada tipo."},
+  {cat:"tarifas", q:"¿A qué edades está dirigida la Tarjeta Transporte Público Infantil?", a:"b) De 4 a 6 años", opts:["a) De 0 a 3 años","b) De 4 a 6 años","c) De 6 a 9 años","d) De 7 a 12 años"], tip:"La Tarjeta de Transporte Público Infantil está diseñada específicamente para niños de entre 4 y 6 años, soporte del Abono Infantil gratuito."},
+  {cat:"tarifas", q:"¿Hasta cuándo es válida la Tarjeta Infantil?", a:"c) Hasta que el menor cumpla 7 años", opts:["a) Durante un año","b) Hasta los 10 años","c) Hasta que el menor cumpla 7 años","d) Mientras se renueve anualmente"], tip:"La Tarjeta de Transporte Público Infantil es válida hasta el día en que el niño cumple 7 años, momento en que debe solicitar la TTP Personal estándar."},
+  {cat:"tarifas", q:"¿Qué otros tipos de TTP Personal existen?", a:"c) Virtual y Multi", opts:["a) Joven y Senior","b) Turística y Familiar","c) Virtual y Multi","d) Infantil y Azul"], tip:"Además de la TTP Personal física estándar, existen las variantes Virtual (en el móvil) y Multi (anónima y reutilizable), cubriendo diferentes necesidades de los usuarios."},
+  {cat:"tarifas", q:"¿Cuál es el coste de la Tarjeta Transporte Público Infantil?", a:"b) 4 euros", opts:["a) 2 euros","b) 4 euros","c) 6 euros","d) Es gratuita"], tip:"La Tarjeta de Transporte Público Infantil tiene un coste de emisión de 4 euros, aunque el Abono Infantil que se carga en ella es completamente gratuito."},
+
+  // --- TEST 18 (TTP Personal, Tarjeta Azul detalles) ---
+  {cat:"tarifas", q:"¿Cuántos títulos diferentes pueden cargarse simultáneamente en una TTP Personal?", a:"b) Tres", opts:["a) Dos","b) Tres","c) Cuatro","d) Ilimitados"], tip:"En una TTP Personal pueden cargarse hasta tres títulos diferentes de forma simultánea, permitiendo tener por ejemplo un abono y billetes adicionales."},
+  {cat:"tarifas", q:"¿Cuál es el período de garantía de la Tarjeta Azul?", a:"c) Tres años", opts:["a) Un año","b) Dos años","c) Tres años","d) Cinco años"], tip:"La Tarjeta Azul tiene un período de garantía de tres años desde su emisión, tras el cual debe renovarse si continúa siendo necesaria."},
+  {cat:"tarifas", q:"¿Puede usarse una TTP Personal para varios pasajeros?", a:"b) No, nunca", opts:["a) Sí, validando varias veces seguidas","b) No, nunca","c) Solo en Metro","d) Solo con billetes turísticos"], tip:"La TTP Personal es estrictamente personal e intransferible; no puede usarse para pagar el viaje de varios pasajeros a la vez."},
+  {cat:"tarifas", q:"¿Qué título se utiliza primero al haber un abono y un billete de 10 viajes válidos para la misma zona?", a:"d) El abono", opts:["a) El de 10 viajes","b) El último cargado","c) El más antiguo","d) El abono"], tip:"Cuando coexisten un abono y un billete de 10 viajes para la misma zona, el sistema utiliza primero el abono, preservando los viajes del billete de 10."},
+  {cat:"tarifas", q:"¿Cada cuánto tiempo debe volver a solicitarse la Tarjeta Azul para verificar requisitos?", a:"a) Cada 5 años", opts:["a) Cada 5 años","b) Cada 3 años","c) Cada 10 años","d) Nunca"], tip:"La Tarjeta Azul debe renovarse y verificar los requisitos cada 5 años para comprobar que el titular sigue cumpliendo las condiciones de acceso al beneficio."},
+  {cat:"tarifas", q:"¿Cuánto cuesta emitir una nueva Tarjeta Azul tras la garantía o por deterioro?", a:"b) 6 euros", opts:["a) 4 euros","b) 6 euros","c) 2,50 euros","d) 10 euros"], tip:"Tras el período de garantía o en caso de deterioro, emitir una nueva Tarjeta Azul tiene un coste de 6 euros para el titular."},
+  {cat:"tarifas", q:"¿Qué tipo de tarjeta es la TTP Multi?", a:"c) Anónima", opts:["a) Personalizada","b) Virtual","c) Anónima","d) Infantil"], tip:"La Tarjeta de Transporte Público Multi es una tarjeta anónima y reutilizable que no está vinculada a ninguna persona concreta, ideal para uso ocasional o turístico."},
+  {cat:"tarifas", q:"¿Dónde puede comprobarse el saldo de la Tarjeta Azul?", a:"a) En la app móvil", opts:["a) En la app móvil","b) En oficinas de gestión","c) En las máquinas automáticas de carga","d) En los tornos de entrada"], tip:"El saldo y los títulos cargados en la Tarjeta Azul pueden consultarse a través de la app oficial del Consorcio Regional de Transportes de Madrid."},
+  {cat:"tarifas", q:"¿Cuánto cuesta la emisión inicial de la TTP Personal?", a:"a) 2,50 euros", opts:["a) 2,50 euros","b) 4 euros","c) 6 euros","d) Es gratuita"], tip:"La emisión inicial de la Tarjeta de Transporte Público Personal tiene un coste de 2,50 euros, en concepto de depósito recuperable al devolver la tarjeta."},
+  {cat:"tarifas", q:"¿Qué documento es obligatorio aportar para obtener la TTP Personal?", a:"b) Documento de identidad", opts:["a) Tarjeta sanitaria","b) Documento de identidad","c) Certificado de empadronamiento","d) Justificante bancario"], tip:"Para obtener la TTP Personal es obligatorio presentar el documento de identidad (DNI, NIE o pasaporte) que acredite la identidad del titular."},
+
+  // --- TEST 19 (TTP Multi y Virtual) ---
+  {cat:"tarifas", q:"¿Qué título debe consumirse el mismo día de la compra?", a:"c) Billete sencillo de Metro", opts:["a) Abono transporte","b) Bonobús","c) Billete sencillo de Metro","d) Billete turístico"], tip:"El billete Sencillo de Metro debe consumirse el mismo día de su compra, ya que caduca al final del servicio de ese día."},
+  {cat:"tarifas", q:"¿Cuál es el precio de la Tarjeta Transporte Público Multi?", a:"b) 2,50 euros", opts:["a) 4 euros","b) 2,50 euros","c) 6 euros","d) Incluido siempre en el billete"], tip:"La Tarjeta de Transporte Público Multi tiene un precio de 2,50 euros, en concepto de depósito que se recupera al devolver la tarjeta en buen estado."},
+  {cat:"tarifas", q:"¿A qué tarjeta es similar la Tarjeta Transporte Virtual?", a:"c) TTP Multi", opts:["a) TTP Personal","b) Tarjeta Azul","c) TTP Multi","d) Tarjeta Infantil"], tip:"La Tarjeta Transporte Virtual es el equivalente digital de la TTP Multi; funciona igual pero está integrada en el dispositivo móvil mediante tecnología NFC."},
+  {cat:"tarifas", q:"¿Puede la TTP Multi ser utilizada por varios usuarios?", a:"c) Sí, incluso simultáneamente si lo hacen en el mismo trayecto", opts:["a) No","b) Solo familiares","c) Sí, incluso simultáneamente si lo hacen en el mismo trayecto","d) Solo de forma alterna"], tip:"La TTP Multi puede ser utilizada por varias personas, e incluso simultáneamente si todos hacen el mismo trayecto, ya que es una tarjeta anónima y compartible."},
+  {cat:"tarifas", q:"¿Cuántos billetes puede contener como máximo la TTP Multi?", a:"c) Tres", opts:["a) Uno","b) Dos","c) Tres","d) Cuatro"], tip:"La TTP Multi puede almacenar hasta tres títulos de transporte de forma simultánea, como por ejemplo tres billetes de 10 viajes de distinta zona."},
+  {cat:"tarifas", q:"¿Cuánto dura la Tarjeta Transporte Público Multi?", a:"c) 10 años", opts:["a) 3 años","b) 5 años","c) 10 años","d) Indefinidamente"], tip:"La Tarjeta de Transporte Público Multi tiene una vida útil de 10 años desde su emisión, tras los cuales debe sustituirse por una nueva."},
+  {cat:"tarifas", q:"¿Qué títulos pueden adquirirse con la Tarjeta Transporte Virtual?", a:"b) Billetes de 10 viajes o turísticos", opts:["a) Abonos personales","b) Billetes de 10 viajes o turísticos","c) Billetes sencillos de autobús","d) Billetes de Cercanías"], tip:"La Tarjeta Transporte Virtual permite cargar billetes de 10 viajes y títulos turísticos, al ser el equivalente virtual de la TTP Multi (anónima)."},
+  {cat:"tarifas", q:"¿Qué tipo de tarjeta funciona integrada en el dispositivo móvil?", a:"d) Tarjeta Transporte Virtual", opts:["a) TTP Personal","b) TTP Multi","c) Tarjeta Azul","d) Tarjeta Transporte Virtual"], tip:"La Tarjeta Transporte Virtual está integrada en el dispositivo móvil y utiliza la tecnología NFC del teléfono para validar los viajes acercándolo al lector."},
+  {cat:"tarifas", q:"¿Qué ocurre si se pierde o sustrae una TTP Multi?", a:"a) No hay reembolso ni medición", opts:["a) No hay reembolso ni medición","b) Se repone gratuitamente","c) Se devuelve el saldo","d) Se bloquea automáticamente"], tip:"Al ser anónima, si se pierde o sustrae una TTP Multi no hay posibilidad de bloqueo ni reembolso del saldo, a diferencia de la TTP Personal que sí puede bloquearse."},
+  {cat:"tarifas", q:"¿Dónde se puede adquirir la TTP Multi?", a:"d) Máquinas automáticas y estancos autorizados", opts:["a) Oficinas de gestión","b) Online","c) En el Ayuntamiento","d) Máquinas automáticas y estancos autorizados"], tip:"La TTP Multi se puede adquirir en las máquinas automáticas de las estaciones de Metro y en los estancos y puntos de venta autorizados del sistema."},
+
+  // --- TEST 20 (Zonas tarifarias) ---
+  {cat:"tarifas", q:"¿Qué dos tipologías de billetes existen como zonas tarifarias?", a:"d) Billetes de zona e interzonales", opts:["a) Sencillos y combinados","b) Turísticos y normales","c) Urbanos e interurbanos","d) Billetes de zona e interzonales"], tip:"El sistema tarifario distingue entre billetes de zona (válidos en una zona concreta) e interzonales (válidos en varias zonas entre dos puntos)."},
+  {cat:"tarifas", q:"¿Cuántas zonas tarifarias pertenecen a Castilla-La Mancha?", a:"b) 2", opts:["a) 1","b) 2","c) 3","d) 4"], tip:"Dos zonas tarifarias del sistema integrado de Madrid pertenecen a Castilla-La Mancha (zonas E1 y E2), lo que permite la interoperabilidad con municipios limítrofes."},
+  {cat:"tarifas", q:"¿Cuántas zonas tarifarias existen en total?", a:"c) 8", opts:["a) 6","b) 9","c) 8","d) 10"], tip:"El sistema tarifario integrado de Madrid se organiza en 8 zonas tarifarias: A, B1, B2, B3, C1, C2, E1 y E2, ordenadas de interior a exterior."},
+  {cat:"tarifas", q:"¿Dónde debe utilizarse siempre un billete de transporte?", a:"b) Dentro de su zona de validez", opts:["a) En cualquier zona","b) Dentro de su zona de validez","c) En la zona más cercana","d) Solo en la zona A"], tip:"Los billetes de transporte deben utilizarse siempre dentro de la zona o zonas para las que son válidos; usarlos fuera de ese ámbito constituye una irregularidad."},
+  {cat:"tarifas", q:"¿Entre qué estaciones es válido Cercanías Renfe en la zona A?", a:"d) Entre las estaciones que se incluyen en esta zona", opts:["a) Entre todas las estaciones","b) Solo estaciones centrales","c) Solo estaciones de Metro","d) Entre las estaciones que se incluyen en esta zona"], tip:"Cercanías Renfe es válido en la zona A únicamente entre las estaciones que están incluidas en esa zona, no en toda la red de Cercanías."},
+  {cat:"tarifas", q:"¿Cuántas zonas tarifarias se encuentran dentro de la Comunidad de Madrid?", a:"c) 6", opts:["a) 5","b) 7","c) 6","d) 8"], tip:"Dentro de la Comunidad de Madrid se encuentran 6 zonas tarifarias (A, B1, B2, B3, C1 y C2); las zonas E1 y E2 corresponden a Castilla-La Mancha."},
+  {cat:"tarifas", q:"¿Qué municipio está incluido en la zona B1?", a:"b) Alcobendas", opts:["a) Aranjuez","b) Alcobendas","c) Navalcarnero","d) Cercedilla"], tip:"Alcobendas es uno de los municipios incluidos en la zona B1 del sistema tarifario integrado de Madrid, siendo uno de los más cercanos a la capital."},
+  {cat:"tarifas", q:"¿Qué zonas permite utilizar un abono de zona B2?", a:"c) A, B1 y B2", opts:["a) Solo B2","b) B1 y B2","c) A, B1 y B2","d) A y B2"], tip:"Un abono de zona B2 permite viajar por las zonas A, B1 y B2, ya que el sistema es acumulativo: cada zona incluye todas las interiores."},
+  {cat:"tarifas", q:"¿Qué zonas cubre un abono Interzonal B1-B3?", a:"a) B1, B2 y B3", opts:["a) B1, B2 y B3","b) B1 y B3","c) A, B1 y B3","d) B2 y B3"], tip:"El abono Interzonal B1-B3 cubre las zonas B1, B2 y B3, permitiendo viajar entre estos municipios sin necesidad de un abono de zona completo."},
+  {cat:"tarifas", q:"¿Qué transporte se incluye en la zona A del Metro Ligero?", a:"c) ML1", opts:["a) ML2","b) ML3","c) ML1","d) Todas las líneas"], tip:"En la zona A del Metro Ligero solo se incluye la línea ML1 (Pinar de Chamartín - Las Tablas), ya que es la única que circula dentro del término municipal de Madrid."}
+];
+
+var BLOCK_SIZE = 30;
+var bloques = [];
+var totalQ = db.length;
+for (var i = 0; i < totalQ; i += BLOCK_SIZE) {
+    bloques.push(db.slice(i, i + BLOCK_SIZE));
+}
+
+var currentBlock = null;
+var questions = [];
+var currentIdx = 0;
+var hits = 0;
+var fails = [];
+
+function buildMenu() {
+    var grid = document.getElementById('menu-grid');
+    grid.innerHTML = '';
+    bloques.forEach(function(bloque, i) {
+        var desde = i * BLOCK_SIZE + 1;
+        var hasta = Math.min((i + 1) * BLOCK_SIZE, totalQ);
+        var btn = document.createElement('button');
+        btn.className = 'menu-btn';
+        btn.innerHTML = '<div><div class="label">Bloque ' + (i+1) + '</div><div class="meta">Preguntas ' + desde + ' &ndash; ' + hasta + ' &middot; ' + bloque.length + ' preguntas</div></div><span class="arrow">&#x203A;</span>';
+        btn.onclick = (function(idx){ return function(){ startBlock(idx); }; })(i);
+        grid.appendChild(btn);
+    });
+    var btnAll = document.createElement('button');
+    btnAll.className = 'menu-btn menu-btn-all';
+    btnAll.innerHTML = '<div><div class="label">&#x1F500; Todas las preguntas</div><div class="meta">' + totalQ + ' preguntas mezcladas</div></div><span class="arrow">&#x203A;</span>';
+    btnAll.onclick = startAll;
+    grid.appendChild(btnAll);
+}
+
+function startBlock(idx) { currentBlock = idx; questions = bloques[idx].slice().sort(function(){ return Math.random()-0.5; }); beginQuiz(); }
+function startAll() { currentBlock = null; questions = db.slice().sort(function(){ return Math.random()-0.5; }); beginQuiz(); }
+function volverMenu() { document.getElementById('menu-screen').classList.remove('hidden'); document.getElementById('quiz-screen').classList.add('hidden'); document.getElementById('results-screen').classList.add('hidden'); }
+function repetirBloque() { if (currentBlock !== null) startBlock(currentBlock); else startAll(); }
+
+function beginQuiz() {
+    currentIdx = 0; hits = 0; fails = [];
+    document.getElementById('menu-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    showQuestion();
+}
+
+function showQuestion() {
+    var q = questions[currentIdx];
+    document.getElementById('progreso-texto').innerText = 'Pregunta ' + (currentIdx+1) + '/' + questions.length;
+    document.getElementById('progress-fill').style.width = ((currentIdx / questions.length) * 100) + '%';
+    document.getElementById('question-text').innerText = q.q;
+    document.getElementById('btn-next').classList.remove('show');
+    var tipBox = document.getElementById('tip-box');
+    tipBox.classList.remove('show'); tipBox.innerText = '';
+    var container = document.getElementById('options-container');
+    container.innerHTML = '';
+    var shuffled = q.opts.slice().sort(function(){ return Math.random()-0.5; });
+    shuffled.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'opt-btn'; btn.innerText = opt;
+        btn.onclick = (function(b,o){ return function(){ checkAnswer(b,o,q.a,q.tip); }; })(btn,opt);
+        container.appendChild(btn);
+    });
+}
+
+function checkAnswer(btn, selected, correct, tip) {
+    document.querySelectorAll('.opt-btn').forEach(function(b){ b.disabled=true; });
+    var tipBox = document.getElementById('tip-box');
+    tipBox.innerText = tip; tipBox.classList.add('show');
+    if (selected === correct) {
+        btn.classList.add('correct'); hits++;
+    } else {
+        btn.classList.add('wrong');
+        fails.push({ q: questions[currentIdx].q, a: correct });
+        guardarFallo(questions[currentIdx].q, questions[currentIdx].opts, correct, 'Tarifas');
+        document.querySelectorAll('.opt-btn').forEach(function(b){ if (b.innerText === correct) b.classList.add('reveal'); });
+    }
+    document.getElementById('btn-next').classList.add('show');
+}
+
+function nextQuestion() { currentIdx++; if (currentIdx < questions.length) showQuestion(); else showResults(); }
+
+function showResults() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.remove('hidden');
+    var percent = Math.round((hits / questions.length) * 100);
+    document.getElementById('score-percent').innerText = percent + '%';
+    document.getElementById('score-text').innerText = 'Has acertado ' + hits + ' de ' + questions.length;
+    var review = document.getElementById('failed-review');
+    review.innerHTML = fails.length > 0
+        ? '<strong>Tus errores:</strong><br><br>' + fails.map(function(f){ return '<div class="result-item">&bull; ' + f.q + '<br><span style="color:var(--correct)">&#x2714; ' + f.a + '</span></div>'; }).join('')
+        : '&#x1F389; Sin ning&uacute;n fallo. &iexcl;Perfecto!';
+}
+
+function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+    try {
+        var lista = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+        if (!lista.find(function(f){ return f.q === pregunta; })) {
+            lista.push({ id:Date.now(), modulo:modulo, q:pregunta, opts:opciones, a:respuestaCorrecta });
+            localStorage.setItem('mis_fallos', JSON.stringify(lista));
+        }
+    } catch(e) {}
+}
+
+buildMenu();
+</script>
+</body>
+</html>
