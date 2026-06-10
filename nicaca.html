@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIC - Definiciones</title>
+    <style>
+        :root { --bg:#121212; --card:#1e1e1e; --accent:#27ae60; --correct:#009543; --wrong:#ff3b30; --text:#ffffff; --muted:#888; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); display:flex; justify-content:center; min-height:100vh; }
+        .container { width:100%; max-width:500px; padding:20px; }
+
+        /* ── MENÚ ── */
+        .menu-title { text-align:center; font-size:1.3rem; font-weight:700; margin-bottom:4px; margin-top:8px; }
+        .menu-subtitle { text-align:center; color:var(--muted); font-size:13px; margin-bottom:18px; }
+        .btn-salir { background:none; border:1px solid #444; color:#ccc; padding:5px 12px; border-radius:5px; cursor:pointer; font-size:13px; margin-bottom:18px; display:inline-block; }
+        .btn-salir:hover { border-color:#888; color:#fff; }
+
+        /* Separador de sección */
+        .section-sep {
+            display:flex; align-items:center; gap:10px;
+            margin:18px 0 12px;
+        }
+        .section-sep span {
+            font-size:11px; font-weight:700; text-transform:uppercase;
+            letter-spacing:.08em; white-space:nowrap; padding:3px 10px;
+            border-radius:99px;
+        }
+        .section-sep.def span { background:#1a3a1a; color:#7de87d; }
+        .section-sep.resto span { background:#1a2a3a; color:#7db8e8; }
+        .section-sep::after { content:''; flex:1; height:1px; background:#2a2a2a; }
+
+        .menu-grid { display:flex; flex-direction:column; gap:10px; }
+        .menu-btn {
+            background:var(--card); border:1px solid #333; color:var(--text);
+            padding:16px 18px; border-radius:14px; text-align:left;
+            cursor:pointer; transition:0.2s; display:flex;
+            justify-content:space-between; align-items:center;
+        }
+        .menu-btn:hover { background:#2a2a2a; border-color:var(--accent); }
+        .menu-btn .label { font-size:15px; font-weight:600; }
+        .menu-btn .meta { font-size:12px; color:var(--muted); margin-top:3px; }
+        .menu-btn .arrow { color:var(--accent); font-size:20px; flex-shrink:0; margin-left:10px; }
+        .menu-btn-all { background:var(--accent); border-color:var(--accent); margin-top:6px; }
+        .menu-btn-all:hover { opacity:.9; }
+        .menu-btn-all-resto { background:#1a4a7a; border-color:#1a4a7a; margin-top:6px; }
+        .menu-btn-all-resto:hover { opacity:.9; }
+
+        /* ── QUIZ ── */
+        .quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        #progreso-texto { font-size:14px; color:var(--muted); }
+        .progress-bar { width:100%; height:6px; background:#333; border-radius:10px; margin-bottom:22px; overflow:hidden; }
+        .progress-fill { height:100%; background:var(--accent); width:0%; transition:width .3s; }
+        .question-card { background:var(--card); padding:24px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+        .cat-badge { display:inline-block; font-size:11px; padding:3px 10px; border-radius:99px; margin-bottom:12px; text-transform:uppercase; letter-spacing:.06em; }
+        .cat-badge.def  { background:#1a3a1a; color:#7de87d; }
+        .cat-badge.resto { background:#1a2a3a; color:#7db8e8; }
+        h2 { font-size:1rem; line-height:1.55; margin-bottom:18px; margin-top:0; }
+        .options-grid { display:flex; flex-direction:column; gap:10px; }
+        .opt-btn { background:#2a2a2a; border:1px solid #333; color:white; padding:13px 14px; border-radius:12px; text-align:left; font-size:13px; cursor:pointer; transition:0.18s; line-height:1.4; }
+        .opt-btn:hover:not(:disabled) { background:#333; border-color:#555; }
+        .opt-btn.correct { background:var(--correct) !important; border-color:var(--correct); }
+        .opt-btn.wrong   { background:var(--wrong)   !important; border-color:var(--wrong); }
+        .opt-btn.reveal  { background:#005a28 !important; border-color:var(--correct); opacity:.85; }
+        .tip-box { display:none; margin-top:14px; padding:13px; background:#252525; border-left:3px solid var(--accent); border-radius:8px; font-size:13px; line-height:1.6; color:#ccc; }
+        .tip-box.show { display:block; }
+        .btn-next { width:100%; background:var(--accent); color:white; border:none; padding:14px; border-radius:10px; font-weight:bold; margin-top:14px; cursor:pointer; display:none; font-size:15px; }
+        .btn-next.show { display:block; }
+
+        /* ── RESULTADOS ── */
+        .results-list { text-align:left; background:#000; padding:15px; border-radius:10px; font-size:13px; max-height:300px; overflow-y:auto; margin-top:14px; }
+        .result-item { margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px; }
+        .hidden { display:none; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ════════ MENÚ ════════ -->
+    <div id="menu-screen">
+        <div class="menu-title">📋 Test NIC</div>
+        <div class="menu-subtitle">Elige un bloque de estudio</div>
+        <button class="btn-salir" onclick="window.location.href='academia.html'">← Volver al menú NIC</button>
+
+        <!-- SECCIÓN DEFINICIONES -->
+        <div class="section-sep def"><span>📖 Definiciones</span></div>
+        <div class="menu-grid" id="grid-def"></div>
+
+        <!-- SECCIÓN RESTO -->
+        <div class="section-sep resto"><span>📚 Resto NIC</span></div>
+        <div class="menu-grid" id="grid-resto"></div>
+    </div>
+
+    <!-- ════════ QUIZ ════════ -->
+    <div id="quiz-screen" class="hidden">
+        <div class="quiz-header">
+            <div id="progreso-texto">Pregunta 1/30</div>
+            <button class="btn-salir" onclick="volverMenu()">✕ Salir</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="question-card">
+            <div id="cat-badge" class="cat-badge def">Definiciones</div>
+            <h2 id="question-text">Cargando...</h2>
+            <div id="options-container" class="options-grid"></div>
+            <div id="tip-box" class="tip-box"></div>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE →</button>
+        </div>
+    </div>
+
+    <!-- ════════ RESULTADOS ════════ -->
+    <div id="results-screen" class="hidden">
+        <div class="question-card" style="text-align:center;">
+            <h1 id="score-percent" style="font-size:52px;margin:10px 0">0%</h1>
+            <p id="score-text" style="color:var(--muted);font-size:14px;margin-bottom:4px"></p>
+            <div id="failed-review" class="results-list"></div>
+            <button class="btn-next show" onclick="repetirBloque()">🔄 REPETIR BLOQUE</button>
+            <button class="btn-next show" style="background:#444;margin-top:10px;" onclick="volverMenu()">🏠 ELEGIR OTRO BLOQUE</button>
+        </div>
+    </div>
+
+</div>
+<script>
+// ════════════════════════════════════════════
+//  DB — DEFINICIONES (bloques 1-3, cat:"def")
+// ════════════════════════════════════════════
+var dbDef = [
+  // ── BLOQUE 1: Andén, Áreas, Sistemas ──
+  {b:1,cat:"def",q:"¿Qué comprende la Franja de la zona A (franja del andén de aproximadamente 80 cm)?",a:"d) El comienzo de la banda azul existente en el andén, hasta el borde del mismo que delimita el inicio de la plataforma de vía.",opts:["a) El comienzo de la banda azul existente en el andén, hasta el fondo del mismo que delimita el final de la plataforma de vía.","b) El comienzo de la banda azul del mismo que delimita el final de la plataforma de vía.","c) El comienzo de la banda azul existente en el andén, hasta el borde del mismo que delimita el inicio de la plataforma de vía.","d) El comienzo de la banda azul existente en el andén, hasta el borde del mismo que delimita el inicio de la plataforma de vía."],tip:"La Franja de la zona A comprende desde el inicio de la banda azul hasta el borde del andén que delimita el inicio de la plataforma de vía."},
+  {b:1,cat:"def",q:"¿Qué medios definen los límites del andén?",a:"c) Los pílones de entrada y salida.",opts:["a) Los pílones de entrada.","b) Los pílones de salida.","c) Los pílones de entrada y salida.","d) Los pílones centrales de vía."],tip:"Los límites del andén quedan definidos por los pílones de entrada y salida."},
+  {b:1,cat:"def",q:"A efectos de la NIC, se denomina 'Franja del andén'. ¿Qué norma describe estas zonas?",a:"a) Zona A — Franja de borde de andén; Zona 1 — Es todo el andén excluyendo la Zona A.",opts:["a) Zona A — Franja de borde de andén; Zona 1 — Es todo el andén excluyendo la Zona A.","b) Zona 1 — Franja de borde de andén; Zona 1 — Es todo el andén excluyendo la Zona 1.","c) Zona 1 — Franja de borde de andén; Zona 2 — Es todo el andén incluyendo la Zona A.","d) Zona 1 — Franja de borde de andén; Zona 1 — Es todo el andén incluyendo la Zona 1."],tip:"La normativa distingue: Zona A (franja de ~80 cm junto al borde) y Zona 1 (el resto del andén)."},
+  {b:1,cat:"def",q:"¿Qué tamaño tiene la Franja de borde del andén (Zona A)?",a:"d) 80 cm",opts:["a) 35 cm","b) 50 cm","c) 70 cm","d) 80 cm"],tip:"La franja de borde del andén (Zona A) tiene una anchura de 80 cm."},
+  {b:1,cat:"def",q:"¿Qué sistema protege la circulación cuando un tren ocupa la vía sin garantizar el correcto shuntado?",a:"b) Acantonamiento",opts:["a) Bloqueo automático","b) Acantonamiento","c) CPC","d) Auto-Blunt"],tip:"El Acantonamiento protege la circulación cuando un tren no garantiza el correcto shuntado del circuito de vía."},
+  {b:1,cat:"def",q:"¿Cómo se denomina la zona a cada lado del área de trabajo que protege al personal en plataforma?",a:"d) Área de Seguridad",opts:["a) Área Real","b) Área de trabajo","c) Área PCP","d) Área de Seguridad"],tip:"El Área de Seguridad es la zona a cada lado del área de trabajo que garantiza la seguridad del personal frente a circulaciones."},
+  {b:1,cat:"def",q:"En los andenes centrales, ¿cuántas franjas de borde de andén existen?",a:"a) Dos franjas de borde de andén, una por cada lado.",opts:["a) Dos franjas de borde de andén, una por cada lado.","b) Cuatro franjas de borde de andén, dos por cada lado.","c) Dos franjas de borde de andén, dos por cada lado.","d) Ocho franjas de borde de andén, dos por cada lado."],tip:"En andenes centrales (entre dos vías) existen dos franjas de borde, una a cada lado."},
+  {b:1,cat:"def",q:"¿Cómo se conoce la zona de la estación a lo largo de la vía, de anchura variable, que facilita el acceso a los trenes?",a:"a) Andén",opts:["a) Andén","b) Vestíbulo","c) Túnel","d) Pasillo de intercambio"],tip:"El Andén es la zona de la estación de anchura variable y desnivel adecuado para el acceso a los trenes."},
+  {b:1,cat:"def",q:"¿Qué es el modo Blurt?",a:"d) Modo de moverse del tren, que se realiza en el proceso de evaluación ATG, cumpliéndose en cualquier línea de clase nominal del Metro.",opts:["a) Mecanismo de movimiento de marcha, nunca en modo ATG, siempre en las dos vías de modo nominal máximas.","b) Modo de moverse del tren en el proceso de evaluación ATG, en cualquier línea de forma automática.","c) Mecanismo de moverse del tren en el proceso de evaluación ATG en cualquier vía con dos modos automáticos.","d) Modo de moverse del tren, que se realiza en el proceso de evaluación ATG, cumpliéndose en cualquier línea de clase nominal del Metro."],tip:"El modo Blurt es el modo de movimiento del tren durante el proceso de evaluación ATG, aplicable en cualquier línea nominal."},
+  {b:1,cat:"def",q:"¿Cómo se conoce la inversión de marcha ATG automática en cualquier modo de conducción?",a:"a) Auto-Blurt",opts:["a) Auto-Blurt","b) Acantonamiento","c) Autónomo","d) Remesa"],tip:"El Auto-Blurt es la inversión de marcha automática en modo ATG."},
+  {b:1,cat:"def",q:"¿Cómo se denominan los límites a partir del cual el conductor puede acceder manualmente a la estación de línea?",a:"a) Frente Filares",opts:["a) Frente Filares","b) Frente Central","c) Frente Dragón","d) Sistema de forma Portátil de Vehículo (S.A.P.V)"],tip:"El Frente Filares es el límite a partir del cual el conductor puede acceder manualmente a la estación de línea."},
+  {b:1,cat:"def",q:"¿Cuáles de estos es el frente identificado y normalizado, con marcas puntuales?",a:"d) Frente de estacionamiento",opts:["a) Frente de emergencia","b) Frente Neurológico","c) Frente de Apoyo","d) Frente de estacionamiento"],tip:"El Frente de estacionamiento es el tipo de frente normalizado con marcas puntuales para el estacionamiento del tren."},
+
+  // ── BLOQUE 2: CTC, Zonas, Períodos ──
+  {b:2,cat:"def",q:"¿Cómo se conoce el sistema que permite la visualización de la línea y el tratamiento de incidencias de Metro?",a:"a) Control de Tráfico Centralizado (CTC)",opts:["a) Control de Tráfico Centralizado (CTC)","b) Control de Tráfico Descentralizado (CTD)","c) Control de Tráfico Normalizado (CTN)","d) Control de los Descentralizados (CAD)"],tip:"El CTC (Control de Tráfico Centralizado) permite la visualización y gestión de la línea y las incidencias."},
+  {b:2,cat:"def",q:"¿Qué es el Control de Tráfico Centralizado (CTC)?",a:"d) El Sistema que posibilita la actualización de la línea y el destino de la línea y el tratamiento de las incidencias.",opts:["a) El Sistema que permite la actualización de la línea y la puesta de la línea.","b) El Sistema que posibilita la actualización de la línea y el control de señales.","c) El Sistema que posibilita la actualización de la línea y las incidencias de control.","d) El Sistema que posibilita la actualización de la línea y el destino de la línea y el tratamiento de las incidencias."],tip:"El CTC posibilita la actualización del estado de la línea y el tratamiento centralizado de todas las incidencias."},
+  {b:2,cat:"def",q:"¿Cómo se denomina el lugar donde se almacenan, reparan, limpian y restablecen los trenes?",a:"a) Depósito / Cocheras",opts:["a) Depósito / Cocheras","b) Almacén / Parking","c) Parking / Parking","d) Depósito / Parking"],tip:"El Depósito/Cocheras es el lugar de estacionamiento y mantenimiento de trenes fuera del servicio en línea."},
+  {b:2,cat:"def",q:"¿Cuál es la definición correcta de 'Marcha a la vista'?",a:"a) Conducción manual del tren, que permite al conductor avanzar a una velocidad tal que le permita detenerse en cualquier punto. Puede ser a velocidad reducida desde la estación de origen o desde otro punto.",opts:["a) Conducción manual del tren, que permite al conductor avanzar a una velocidad tal que le permita detenerse en cualquier punto. Puede ser a velocidad reducida desde la estación de origen o desde otro punto.","b) Conducción automática del tren, que permite al conductor avanzar a velocidad regulada por el sistema ATG.","c) Conducción manual del tren con las responsabilidades del conductor según la guía de maniobra.","d) Conducción automática del tren que no permite al conductor conducir desde la estación sin detener el tren."],tip:"La Marcha a la Vista es la conducción manual a velocidad reducida que garantiza poder detenerse ante cualquier obstáculo."},
+  {b:2,cat:"def",q:"¿Cuál es la definición correcta de 'Período Fuera de Servicio'?",a:"d) El período comprendido desde la finalización del período de servicio hasta el inicio del período de servicio siguiente, normalmente utilizado para la realización de trabajos nocturnos.",opts:["a) El período comprendido desde la instalación del servicio hasta el inicio del período siguiente.","b) El período comprendido desde la finalización del servicio hasta el inicio del siguiente, utilizado para la finalización del servicio.","c) El período comprendido desde la finalización del servicio hasta el inicio del siguiente, utilizado para trabajos diurnos.","d) El período comprendido desde la finalización del período de servicio hasta el inicio del período de servicio siguiente, normalmente utilizado para la realización de trabajos nocturnos."],tip:"El Período Fuera de Servicio va desde el fin de un servicio hasta el inicio del siguiente, aprovechado para trabajos nocturnos."},
+  {b:2,cat:"def",q:"¿Cuál es la definición correcta de 'rampa'?",a:"d) Plano inclinado de la vía en sentido descendente.",opts:["a) Plano horizontal de la vía en sentido ascendente.","b) Plano plano de la vía en sentido ascendente.","c) Plano plano de la vía en sentido descendente.","d) Plano inclinado de la vía en sentido descendente."],tip:"La rampa es el plano inclinado de la vía en sentido descendente, por oposición a la pendiente ascendente."},
+  {b:2,cat:"def",q:"¿Cómo se conoce el período comprendido desde la apertura del servicio hasta la apertura del servicio del día siguiente?",a:"a) Período de servicio",opts:["a) Período de servicio","b) Período Basuro","c) Período técnico","d) Período Cantones"],tip:"El Período de servicio es el tiempo desde la apertura hasta el cierre del servicio de cada día."},
+
+  // ── BLOQUE 3: Plataforma de vía, Pílón ──
+  {b:3,cat:"def",q:"¿Cuál es la definición correcta de 'Plataformas de vía'?",a:"b) Es la estructura de una estación con todas sus vías, andenes, calzones, etc.",opts:["a) Es la estructura donde se asientan las vías.","b) Es la estructura de una estación con todas sus vías, andenes, calzones, etc.","c) Es la estructura desde donde se asientan los trenes.","d) Es la estructura por la que circulan los reposos."],tip:"La Plataforma de vía es la estructura de la estación que incluye vías, andenes y demás elementos de la infraestructura."},
+  {b:3,cat:"def",q:"¿Cómo se conoce el punto donde finaliza el andén y comienza la Información?",a:"b) Pílón",opts:["a) Fila","b) Pílón","c) Alveados","d) Normal"],tip:"El Pílón es el punto exacto donde finaliza el andén y comienza la zona de información."},
+  {b:3,cat:"def",q:"¿Cómo se conoce el período comprendido desde la finalización del período de servicio hasta el inicio del siguiente, normalmente utilizado para trabajos nocturnos?",a:"a) Período fuera de servicio",opts:["a) Período fuera de servicio","b) Período de servicio","c) Período de descanso","d) Período técnico"],tip:"El Período Fuera de Servicio es el tiempo entre el fin de un servicio y el inicio del siguiente, para mantenimiento nocturno."},
+  {b:3,cat:"def",q:"¿Cuál es la definición correcta de 'Pílón'?",a:"d) Es el punto donde finaliza el andén y comienza la información. En las estaciones donde hay una puerta que obstaculiza el paso a la información, se considera pílón a este punto.",opts:["a) Es el punto donde inicia el andén y finaliza la información.","b) Es el punto donde finaliza el andén y comienza la información, sin puertas.","c) Es el punto donde finaliza el andén y finaliza la información.","d) Es el punto donde finaliza el andén y comienza la información. En las estaciones donde hay una puerta que obstaculiza el paso a la información, se considera pílón a este punto."],tip:"El Pílón es donde finaliza el andén y comienza la información. Si hay puerta, ese punto con la puerta es el pílón."},
+  {b:3,cat:"def",q:"La plataforma de vía, ¿será de aplicación en el interior de las naves de depósitos y cocheras?",a:"a) Verdadero — No se aplica",opts:["a) Verdadero — No se aplica","b) Falso — Sí se aplica"],tip:"Verdadero. El concepto de plataforma de vía NO se aplica en el interior de las naves de depósitos y cocheras."},
+  {b:3,cat:"def",q:"¿Qué zona tendrá consideración de plataforma de vía cuando el acceso al túnel está delimitado por un cerramiento (vallas, separadores, etc.)?",a:"a) La zona de túnel hasta dicho cerramiento.",opts:["a) La zona de túnel hasta dicho cerramiento.","b) La zona de túnel completa.","c) Si está delimitado por cerramiento, no se considera plataforma de vía.","d) La zona de túnel anterior al cerramiento hasta la estación siguiente."],tip:"Con cerramiento, solo tiene consideración de plataforma de vía la zona hasta dicho cerramiento."},
+  {b:3,cat:"def",q:"¿Qué comprende la plataforma de vía en las estaciones?",a:"c) La zona comprendida entre los andenes o entre el andén y el paramento lateral de la estación.",opts:["a) Únicamente la zona comprendida entre los andenes.","b) Únicamente la zona entre el andén y el paramento lateral.","c) La zona comprendida entre los andenes o entre el andén y el paramento lateral de la estación.","d) Una zona ampliada en 8 metros desde los carriles exteriores."],tip:"En estaciones, la plataforma de vía comprende entre andenes, o entre el andén y el paramento lateral."},
+  {b:3,cat:"def",q:"¿Cómo está comprendida la plataforma de vía en los tramos a cielo abierto?",a:"d) Por una zona que abarca a todas las vías, ampliada en 3 metros desde los carriles exteriores, salvo que haya elemento separador.",opts:["a) Ampliada en 1 metro desde los carriles exteriores.","b) Ampliada en 6 metros desde los carriles exteriores.","c) Ampliada en 5 metros desde los carriles exteriores.","d) Por una zona que abarca a todas las vías, ampliada en 3 metros desde los carriles exteriores, salvo que haya elemento separador."],tip:"En tramos a cielo abierto: todas las vías + 3 metros desde carriles exteriores, salvo elemento físico separador."},
+  {b:3,cat:"def",q:"En el caso de un recinto cuyo acceso al túnel no estuviera delimitado, ¿qué zona tendrá consideración de plataforma de vía?",a:"c) La zona de túnel hasta tres metros hacia el interior del recinto.",opts:["a) La zona de túnel hasta un metro hacia el interior del recinto.","b) La zona de túnel hasta dos metros hacia el interior del recinto.","c) La zona de túnel hasta tres metros hacia el interior del recinto.","d) La zona de túnel hasta cinco metros hacia el interior del recinto."],tip:"Sin delimitación, la plataforma de vía se extiende hasta 3 metros hacia el interior del recinto."}
+];
+
+// ════════════════════════════════════════════
+//  DB — RESTO NIC (bloques 4-6, cat:"resto")
+// ════════════════════════════════════════════
+var dbResto = [
+  // ── BLOQUE 4: Obligaciones, PCC, Comunicaciones (NIC 10) ──
+  {b:4,cat:"resto",q:"Si por causas de fuerza mayor un trabajador tuviese que abandonar el servicio sin autorización, deberá…",a:"d) No lo hará hasta después de haber adoptado las medidas necesarias que garanticen la seguridad",opts:["a) Deberá siempre tener autorización del PCC","b) Lo realizará con tranquilidad, asegurándose de que no queda ninguna persona en las inmediaciones","c) Deberá siempre tener autorización de su superior jerárquico","d) No lo hará hasta después de haber adoptado las medidas necesarias que garanticen la seguridad"],tip:"Art. 2.4.2: El trabajador no abandonará el servicio hasta haber adoptado las medidas necesarias que garanticen la seguridad."},
+  {b:4,cat:"resto",q:"Cualquier falta o deficiencia que un trabajador detecte en su equipo de trabajo, deberá comunicárselo a:",a:"a) Su superior inmediato",opts:["a) Su superior inmediato","b) Tanto a su superior inmediato como al PCC","c) Tanto al PCC como al personal de Seguridad e Higiene","d) Al personal designado en materia de Seguridad Laboral"],tip:"Art. 2.4.5: Las deficiencias en el equipo se comunican al superior inmediato."},
+  {b:4,cat:"resto",q:"Los trabajadores con funciones en la circulación prestarán la debida atención en el desempeño de sus cometidos:",a:"c) Cuando se encuentren en cabinas de conducción y en otras dependencias no relacionadas con la circulación",opts:["a) Cuando se encuentren en cabinas de conducción","b) Cuando se encuentren en otras dependencias no relacionadas con la circulación","c) Cuando se encuentren en cabinas de conducción y en otras dependencias no relacionadas con la circulación","d) Cuando se encuentren dentro de su horario laboral"],tip:"Art. 2.4.3: La atención debida se presta tanto en cabinas como en otras dependencias."},
+  {b:4,cat:"resto",q:"La NIC será de obligado cumplimiento para…",a:"d) para todos los trabajadores de Metro y Metro Ligero (salvo ML2 y ML3)",opts:["a) para todos los trabajadores de Metro y ML1, ML2 y ML3","b) para todos los trabajadores de Metro y Renfe","c) para todos los trabajadores de Metro","d) para todos los trabajadores de Metro y Metro Ligero (salvo ML2 y ML3)"],tip:"Art. 1.1.2: La NIC es de obligado cumplimiento para Metro y Metro Ligero, salvo ML2 y ML3."},
+  {b:4,cat:"resto",q:"Las comunicaciones entre el PCC y los conductores se realizarán prioritariamente…",a:"b) A través de radiotelefonía de trenes",opts:["a) A través de impresos establecidos al efecto","b) A través de radiotelefonía de trenes","c) Por comunicación escrita","d) A través de telefonía móvil"],tip:"Art. 2.3.1: La comunicación prioritaria entre PCC y conductores es por radiotelefonía de trenes."},
+  {b:4,cat:"resto",q:"Todas las comunicaciones por vía telefónica o radiodifusión se realizarán siguiendo los protocolos establecidos en:",a:"a) El Manual de estilo para las comunicaciones en vigor",opts:["a) El Manual de estilo para las comunicaciones en vigor","b) El Manual de Normativa de Circulación en vigor","c) El Manual de comunicaciones de personal en vigor","d) El Manual de comunicaciones internas en vigor"],tip:"Art. 2.3.2: Las comunicaciones siguen los protocolos del Manual de estilo para las comunicaciones en vigor."},
+  {b:4,cat:"resto",q:"Es obligación de los mandos…",a:"d) Todas correctas",opts:["a) Asesorar al personal en la interpretación de la NIC","b) Vigilar las actuaciones del personal en la interpretación correcta de las normas","c) Vigilar el buen uso y conservación del material móvil","d) Todas correctas"],tip:"Art. 2.2.2: Los mandos tienen todas esas obligaciones."},
+  {b:4,cat:"resto",q:"¿Quién es el máximo responsable de la explotación del servicio?",a:"a) PCC",opts:["a) PCC","b) PPC","c) PRC","d) PCR"],tip:"Art. 2.1.1: El PCC (Puesto de Control Central) es el máximo responsable de la explotación del servicio."},
+  {b:4,cat:"resto",q:"¿De quién es competencia velar por el cumplimiento de la NIC en una situación normalizada desde la perspectiva de seguridad?",a:"a) Del PCC",opts:["a) Del PCC","b) Del Jefe de Estación","c) Del conductor de tren","d) Del Consejo de Seguridad Laboral"],tip:"Art. 2.1.2: Es competencia del PCC velar por el cumplimiento de la NIC en situación normalizada."},
+  {b:4,cat:"resto",q:"En los cuartos técnicos podrán permanecer:",a:"a) Personal expresamente autorizado",opts:["a) Personal expresamente autorizado","b) El PCC","c) El personal en materia de Seguridad Laboral","d) Maquinistas y Jefes de Estación"],tip:"Art. 2.4.6: Solo puede permanecer en cuartos técnicos el personal expresamente autorizado."},
+  {b:4,cat:"resto",q:"¿Quién asegurará la distribución y entrega de la NIC?",a:"c) La Dirección, a través de las distintas jefaturas",opts:["a) El jefe de Estación","b) Recursos Humanos","c) La Dirección, a través de las distintas jefaturas","d) El departamento Informático"],tip:"Art. 1.2.2: La Dirección, a través de las distintas jefaturas, asegura la distribución y entrega de la NIC."},
+  {b:4,cat:"resto",q:"Las comunicaciones entre el PCC y los conductores, en defecto de radiotelefonía, podrán ser utilizados medios alternativos como:",a:"d) Telefonía móvil y aplicaciones de mensajería instantánea",opts:["a) Telefonía móvil","b) Por escrito","c) Aplicaciones de mensajería instantánea","d) Telefonía móvil y aplicaciones de mensajería instantánea"],tip:"Art. 2.3.1: Los medios alternativos son telefonía móvil y aplicaciones de mensajería instantánea."},
+  {b:4,cat:"resto",q:"La NIC se publica por el sistema de hojas intercambiables para facilitar su sustitución por otras que...",a:"d) recojan las rectificaciones, anulaciones o ampliaciones",opts:["a) recojan las rectificaciones, anulaciones y comprobaciones","b) recojan las rectificaciones","c) recojan las rectificaciones, anulaciones","d) recojan las rectificaciones, anulaciones o ampliaciones"],tip:"Art. 1.2.2: Las hojas intercambiables recogen rectificaciones, anulaciones o ampliaciones."},
+  {b:4,cat:"resto",q:"OBJETO DEL NIC:",a:"d) Regular la circulación de manera eficaz y segura por la Red principal de Metro de Madrid como por la secundaria de Metro Ligero",opts:["a) Regular la circulación de manera eficaz y segura por la Red principal de Metro de Madrid como por la secundaria","b) Regular la circulación de manera eficaz y segura por la Red principal de EMT como por la secundaria de Metro","c) Regular la circulación de manera eficaz y segura por la Red principal de RENFE como por la secundaria de Metro","d) Regular la circulación de manera eficaz y segura por la Red principal de Metro de Madrid como por la secundaria de Metro Ligero"],tip:"Art. 1.1.1: El objeto de la NIC es regular la circulación en la Red de Metro de Madrid y Metro Ligero."},
+  {b:4,cat:"resto",q:"La normativa de la NIC debe ser cumplida por…",a:"d) Todo trabajador que intervenga en una determinada operación",opts:["a) Todos los trabajadores","b) Todos los conductores de trenes","c) Conductores de trenes que intervengan en una determinada operación, exclusivamente","d) Todo trabajador que intervenga en una determinada operación"],tip:"Art. 2.2.1: Debe ser cumplida por todo trabajador que intervenga en una determinada operación."},
+  {b:4,cat:"resto",q:"SIGNIFICADO 'NIC':",a:"a) Normativa Interna de Circulación de Metro de Madrid",opts:["a) Normativa Interna de Circulación de Metro de Madrid","b) Nomenclatura Interna de Circulación de Metro de Madrid","c) Normativa Independiente de Circulación de Metro de Madrid","d) Normativa Interior de Circulación de Metro de Madrid"],tip:"NIC = Normativa Interna de Circulación de Metro de Madrid."},
+  {b:4,cat:"resto",q:"¿Son delegables las funciones de circulación que afecten a la seguridad?",a:"b) No, nunca",opts:["a) Sí, siempre","b) No, nunca","c) Sí, si está expresamente autorizado por orden superior","d) Sí, por indisponibilidad de tres o más trabajadores y autorizado por el PCC"],tip:"Art. 2.2.3: Las funciones de circulación que afectan a la seguridad NO son delegables, nunca."},
+  {b:4,cat:"resto",q:"Todo trabajador tiene obligación de comunicar lo antes posible los posibles defectos en la aplicación de las normas de la NIC a…",a:"a) Su superior inmediato",opts:["a) Su superior inmediato","b) Al PCC","c) Al jefe de estación","d) Varias correctas"],tip:"Art. 2.2.1: Se comunica al superior inmediato."},
+  {b:4,cat:"resto",q:"Cuando el PCC no pueda asumir la autoridad conferida por la NIC, esta será asumida en primer lugar por…",a:"a) Responsables operativos",opts:["a) Responsables operativos","b) Jefe de Estación","c) Conductor de tren","d) Mando inmediato superior"],tip:"Art. 2.1.3: La autoridad delegada del PCC recae primero en los responsables operativos."},
+  {b:4,cat:"resto",q:"¿Qué conversaciones con el PCC serán grabadas?",a:"d) Todas correctas",opts:["a) Las que se realicen por radiotelefonía","b) Las que se realicen por telefonía selectiva","c) Las que se realicen por telefonía automática","d) Todas correctas"],tip:"Art. 2.3.1: Se graban todas las conversaciones con el PCC (radiotelefonía, telefonía selectiva y automática)."},
+  {b:4,cat:"resto",q:"La modificación de la NIC podrá únicamente modificar o ampliar mediante…",a:"b) Por Circulares de Dirección",opts:["a) El PCC","b) Por Circulares de Dirección","c) Por Solidaridad Obrera de Metro","d) Por Consejero de Transportes"],tip:"Art. 1.2.1: La NIC solo puede modificarse o ampliarse mediante Circulares de Dirección."},
+
+  // ── BLOQUE 5: Señales y Carteles (NIC 11) ──
+  {b:5,cat:"resto",q:"El aspecto verde (foco luciendo en color verde) indica:",a:"b) Vía libre. Autoriza el rebase de la señal",opts:["a) Anuncio de parada por encontrarse la próxima señal con aspecto rojo.","b) Vía libre. Autoriza el rebase de la señal","c) Autoriza el rebase con precaución en marcha a la vista por entrada a zona sin señalización.","d) Circulación en las mismas condiciones que si fuese un foco amarillo"],tip:"Art. 3.3.3: Verde = Vía libre, autoriza el rebase de la señal."},
+  {b:5,cat:"resto",q:"El aspecto amarillo (foco luciendo en color amarillo) indica:",a:"a) Anuncio de parada por encontrarse la próxima señal con aspecto rojo. Autoriza el rebase de la señal con prevención.",opts:["a) Anuncio de parada por encontrarse la próxima señal con aspecto rojo. Autoriza el rebase de la señal con prevención.","b) Parada absoluta para aquellos trenes que no circulan en modo ATO o M+ATP.","c) Autoriza el rebase con precaución en marcha a la vista por entrada a zona sin señalización.","d) Circulación en las mismas condiciones que si fuese un foco verde"],tip:"Art. 3.3.3: Amarillo = Anuncio de parada. Autoriza el rebase con prevención."},
+  {b:5,cat:"resto",q:"El objetivo de la señalización es:",a:"d) Todas son correctas",opts:["a) Informar a los conductores de la circulación de trenes.","b) Regular la circulación de trenes con seguridad","c) Ordenar la circulación de trenes","d) Todas son correctas"],tip:"Art. 3.1.1: La señalización informa, regula y ordena la circulación de trenes."},
+  {b:5,cat:"resto",q:"Si hubiera discordancia entre las señales ferroviarias y los sistemas de protección (ATP), prevalecerá:",a:"b) La indicación de los sistemas de protección (ATP).",opts:["a) La indicación del responsable operativo","b) La indicación de los sistemas de protección (ATP).","c) La indicación de las señales ferroviarias.","d) La indicación del PCC"],tip:"Art. 3.3.4: En caso de discordancia, siempre prevalece el ATP sobre la señal ferroviaria."},
+  {b:5,cat:"resto",q:"La función de la señal indicadora de posición de agujas es:",a:"c) Informar de la posición de la aguja que va a tomarse de punta",opts:["a) Autorizar al conductor a rebasar la señal cuando la aguja está al desvío.","b) Autorizar al conductor a rebasar la señal cuando la aguja está a la recta.","c) Informar de la posición de la aguja que va a tomarse de punta","d) Informar de la trayectoria que debe seguir el tren por emergencia"],tip:"Art. 3.3.2: La señal indicadora de posición de agujas informa de la posición de la aguja que se tomará de punta."},
+  {b:5,cat:"resto",q:"El orden de prioridad entre los distintos tipos de señales y carteles es:",a:"b) 1º Señales gestuales de emergencia, 2º señalización circunstancial, 3º señales fijas ferroviarias y de limitación de velocidad.",opts:["a) 1º Señales fijas ferroviarias y de limitación de velocidad, 2º gestuales de emergencia, 3º señalización circunstancial.","b) 1º Señales gestuales de emergencia, 2º señalización circunstancial, 3º señales fijas ferroviarias y de limitación de velocidad.","c) 1º Señalización circunstancial, 2º señales fijas ferroviarias y de limitación de velocidad, 3º gestuales de emergencia.","d) 1º Señalización circunstancial, 2º gestuales de emergencia, 3º señales fijas ferroviarias."],tip:"Art. 3.1.4: Prioridad: 1º gestuales de emergencia, 2º señalización circunstancial, 3º señales fijas."},
+  {b:5,cat:"resto",q:"Si un conductor encuentra varias señales en un mismo lugar con órdenes contradictorias:",a:"b) Obedecerá la indicación más restrictiva",opts:["a) Las obedecerá todas.","b) Obedecerá la indicación más restrictiva","c) Permanecerá detenido e informará inmediatamente al PCC.","d) Obedecerá la indicación más permisiva"],tip:"Art. 3.1.5: Con órdenes contradictorias, se obedece la más restrictiva."},
+  {b:5,cat:"resto",q:"Si un conductor encuentra varias señales en un mismo lugar con órdenes compatibles:",a:"a) Las obedecerá todas",opts:["a) Las obedecerá todas","b) Obedecerá la indicación más restrictiva","c) Permanecerá detenido e informará inmediatamente al PCC.","d) Obedecerá la indicación más permisiva"],tip:"Art. 3.1.5: Con órdenes compatibles, se obedecen todas."},
+  {b:5,cat:"resto",q:"El aspecto rojo (foco luciendo en color rojo) indica:",a:"a) Parada absoluta",opts:["a) Parada absoluta","b) Parada absoluta para aquellos trenes que no circulan en modo ATO o M+ATP.","c) Anuncio de parada próxima por estar la siguiente señal apagada","d) Autoriza el rebase a los trenes que circulan en ATO o M+ATP"],tip:"Art. 3.3.3: Rojo = Parada absoluta."},
+  {b:5,cat:"resto",q:"El aspecto morado (foco luciendo en color morado o azul) indica:",a:"c) Autoriza el rebase de la señal e indica la existencia en la vía de una aguja de punta, curva pronunciada o cercanía de estación.",opts:["a) Autoriza el rebase con precaución en marcha a la vista por entrada a zona sin señalización.","b) Anuncio de parada por encontrarse la próxima señal con aspecto rojo","c) Autoriza el rebase de la señal e indica la existencia en la vía de una aguja de punta, curva pronunciada o cercanía de estación.","d) Parada absoluta para trenes que no circulan en modo ATO o M+ATP."],tip:"Art. 3.3.3: Morado = Autoriza el rebase e indica aguja de punta, curva pronunciada o cercanía de estación."},
+  {b:5,cat:"resto",q:"Una señal repetidora es:",a:"c) Una señal informativa que repite la información de una señal automática o mandada, antes de llegar a ella, cuando no tiene suficiente distancia de visibilidad.",opts:["a) Una señal que indica parada absoluta y que no debe ser rebasada salvo con autorización del PCC.","b) Una señal informativa que indica la posición de una aguja que va a tomarse de punta.","c) Una señal informativa que repite la información de una señal automática o mandada, antes de llegar a ella, cuando no tiene suficiente distancia de visibilidad.","d) Una señal que consta de un solo foco rojo y que repite la información de una señal automática."],tip:"Art. 3.3.2: La señal repetidora repite la información de otra señal cuando la visibilidad es insuficiente."},
+  {b:5,cat:"resto",q:"Las señales fijas ferroviarias en relación con su funcionamiento pueden ser:",a:"a) Automáticas, mandadas, repetidoras, no rebasables y de indicación de posición de agujas.",opts:["a) Automáticas, mandadas, repetidoras, no rebasables y de indicación de posición de agujas.","b) De estación, intermedias y de maniobra.","c) Verticales, triangulares y en 'L' invertida.","d) Horizontales, verticales y en 'L' invertida."],tip:"Art. 3.3.1: Por funcionamiento son: automáticas, mandadas, repetidoras, no rebasables y de posición de agujas."},
+  {b:5,cat:"resto",q:"El aspecto M-Roja (letra M luciendo en color rojo sobre fondo negro) indica:",a:"b) Parada absoluta para aquellos trenes que no circulan en el modo de conducción ATO o M+ATP.",opts:["a) Parada absoluta.","b) Parada absoluta para aquellos trenes que no circulan en el modo de conducción ATO o M+ATP.","c) Anuncio de parada próxima por estar la siguiente señal apagada.","d) Deberemos parar en la siguiente parada por estar la señal roja iluminada"],tip:"Art. 3.3.3: M-Roja = Parada absoluta solo para trenes que NO circulan en ATO o M+ATP."},
+  {b:5,cat:"resto",q:"Las señales mandadas son:",a:"b) Las que además de abrir o cerrar condicionadas por la situación de los trenes, pueden ser mandadas desde el CTC o desde un mando local.",opts:["a) Las que abren o cierran condicionadas por la situación de los trenes o por el estado de la siguiente señal.","b) Las que además de abrir o cerrar condicionadas por la situación de los trenes, pueden ser mandadas desde el CTC o desde un mando local.","c) Las que abren o cierran solo al ser telemandadas automáticamente.","d) Las que abren o cierran y se identifican con la letra A y un código alfanumérico"],tip:"Art. 3.3.2: Las señales mandadas también pueden ser accionadas desde el CTC o mando local."},
+  {b:5,cat:"resto",q:"¿Cómo debe actuar todo trabajador respecto a las órdenes de la señalización, salvo excepciones indicadas en la NIC o las que pueda establecer el PCC?",a:"a) Deberá obedecerlas estrictamente y de inmediato.",opts:["a) Deberá obedecerlas estrictamente y de inmediato.","b) Deberá interpretarlas y actuar según su criterio","c) Deberá obviarlas cuando sean contradictorias","d) Deberá obedecerlas salvo en determinados casos"],tip:"Art. 3.1.2: Las órdenes de señalización deben obedecerse estrictamente y de inmediato."},
+  {b:5,cat:"resto",q:"Una señal repetidora se identifica con una placa en la que figura:",a:"b) La letra 'R' y el código alfanumérico de la señal de la que es repetidora.",opts:["a) Las letras 'NR' y el código alfanumérico de la señal de la que es repetidora.","b) La letra 'R' y el código alfanumérico de la señal de la que es repetidora.","c) Las letras 'SR' y el código alfanumérico de la señal de la que es repetidora.","d) Las letras 'SN' y el código alfanumérico de la señal que es repetidora."],tip:"Art. 3.3.2: La placa de la repetidora lleva la letra 'R' y el código alfanumérico de la señal original."},
+
+  // ── BLOQUE 6: Conducción, Vía, Señalización Mixta (NIC 12, 13, PROFE, T1-T2) ──
+  {b:6,cat:"resto",q:"Indica qué es una vía de pruebas:",a:"c) Es aquella que se utiliza de forma secundaria, dotada de las condiciones técnicas para la realización de pruebas dinámicas con los trenes. Deberá estar permanentemente señalizada con las combinaciones con las vías de las mismas.",opts:["a) Vía que permite la circulación de los trenes en una u otra dirección, que permite la circulación de los trenes en una y otra dirección simultáneamente.","b) Vía que permite la circulación de los trenes en una u otra dirección, que permite la circulación de los trenes en una y otra dirección simultáneamente.","c) Es aquella que se utiliza de forma secundaria, dotada de las condiciones técnicas para la realización de pruebas dinámicas con los trenes. Deberá estar permanentemente señalizada con las combinaciones con las vías de las mismas.","d) Es el menor de los trenes en el que se encuentra Trabajando en plataforma de vía."],tip:"Una vía de pruebas es aquella utilizada de forma secundaria para pruebas dinámicas con trenes, permanentemente señalizada."},
+  {b:6,cat:"resto",q:"¿Qué es una vía banalizada?",a:"d) Vía de señalización y enclavamiento, que permite la circulación de los trenes en una u otra dirección, simultáneamente.",opts:["a) Aquella que se utiliza para el transporte de materiales y el trabajo de los trenes incluidos destinados habitualmente al transporte de viajeros.","b) Son aquellos que se utilizan específicamente para el transporte de materiales, incluyendo el transporte habitualmente circular por vías secundarias.","c) Son aquellas que solo pueden usarse por vías salidas y por vías secundarias.","d) Vía de señalización y enclavamiento, que permite la circulación de los trenes en una u otra dirección, simultáneamente."],tip:"Vía banalizada: con señalización y enclavamiento que permite circular en ambos sentidos simultáneamente."},
+  {b:6,cat:"resto",q:"Según la NIC, ¿qué es un saco de maniobras?",a:"b) Es la bifurcación del trazado de las dos carriles de un tren, que permite el tren circular por la bifurcación de las vías secundariamente.",opts:["a) Aquella que se utiliza para el transporte de materiales.","b) Es la bifurcación del trazado de las dos carriles de un tren, que permite el tren circular por la bifurcación de las vías secundariamente.","c) Aquella específicamente para materiales, incluyendo el transporte circular por vías secundarias.","d) Son aquellas que solo pueden usarse por vías salidas y por vías secundarias."],tip:"El saco de maniobras es la bifurcación del trazado que permite al tren circular secundariamente por las vías."},
+  {b:6,cat:"resto",q:"¿A qué se refiere la definición de conducción Auto Blurt?",a:"d) Maniobra de inversión de marcha que permite al sistema ATO temporalmente el control de la circulación ATG, manteniendo el control ATO, garantizando el control de todos los sistemas del tren.",opts:["a) Es uno de los modos de conducción que permite un tren en un sentido.","b) Conducción de marcha adelante del tren en un sentido, con conductor en la cabina del tren.","c) Maniobra de conducción de marcha, para garantizar la circulación de la vía y el enclavamiento de vía.","d) Maniobra de inversión de marcha que permite al sistema ATO temporalmente el control de la circulación ATG, manteniendo el control ATO, garantizando el control de todos los sistemas del tren."],tip:"Auto Blurt: maniobra de inversión de marcha donde el ATO temporalmente controla la circulación ATG."},
+  {b:6,cat:"resto",q:"¿Qué es el Control de Tráfico Centralizado (CTC)? (según NIC_PROFE)",a:"b) Es parte de las áreas que supervisan la explotación de la línea a través del Puesto de control central (PCC)",opts:["a) Es parte de las áreas que supervisan la explotación de la línea a través del Puesto de control central (PCC)","b) Es parte de las áreas que supervisan la explotación de la línea a través del Puesto de control central (PCC)","c) Es un sistema electromagnético de seguridad que supervisa permanentemente el estado de los enclavamientos de señales.","d) Es un departamento de Metro que se encarga del control del tráfico de trenes de cada una de las líneas."],tip:"El CTC supervisa la explotación de la línea a través del PCC."},
+  {b:6,cat:"resto",q:"Según la NIC, ¿qué es un encadenamiento de señales?",a:"c) Sistema de bloqueo por respecto, que protege la circulación de trenes ante la presencia de un tren que no garantiza el correcto shuntado de la vía.",opts:["a) Sistema que garantiza la actualización de la señalización de la línea y el tratamiento de los enclavamientos de señales.","b) Sistema electromagnético de seguridad que supervisa permanentemente el estado de la vía, señales, agujas y otros elementos.","c) Sistema de bloqueo por respecto, que protege la circulación de trenes ante la presencia de un tren que no garantiza el correcto shuntado de la vía.","d) Sistema que avanza las señales y la circulación y la señalización del personal de circulación ATG."],tip:"El encadenamiento de señales es el sistema de bloqueo que protege la circulación cuando no se garantiza el correcto shuntado."},
+  {b:6,cat:"resto",q:"¿Qué es un circuito de vía según la NIC?",a:"d) Método tramo en que se divide la vía, controlado por los señales, para la detección de trenes cuando circula por él el equipo.",opts:["a) Tren de vía compatible con uno o varios tramos, compatible con un sentido.","b) Tren de vía compatible con uno o varias tramas, compatible con el enclavamiento adecuado a la línea por la que se circula.","c) Tren de vía solo actúa cuando los enclavamientos solo pueden producirse en todos los casos.","d) Método tramo en que se divide la vía, controlado por los señales, para la detección de trenes cuando circula por él el equipo."],tip:"El circuito de vía es el tramo en que se divide la vía para detectar la presencia de trenes mediante señales."},
+  {b:6,cat:"resto",q:"Según la NIC art. 1.1.1, ¿cuál es el objeto de la Normativa Interna de Circulación de Metro de Madrid?",a:"b) Es un conjunto de normas necesarias para regular la circulación de manera eficaz y segura tanto por la vía principal del Metro como por sus instalaciones, como para el personal al frente.",opts:["a) Se establecen las normas necesarias para que el conductor de Metro pueda regular la circulación de acuerdo con los tramos internos de tiempo entre trenes.","b) Es un conjunto de normas necesarias para regular la circulación de manera eficaz y segura tanto por la vía principal del Metro como por sus instalaciones, como para el personal al frente.","c) Es un manual de obligado cumplimiento para todos los trabajadores de Metro de Madrid.","d) Es una normativa interna de obligado cumplimiento para el personal de conducción y mantenimiento de los trenes de Metro de Madrid."],tip:"Art. 1.1.1: La NIC regula la circulación de manera eficaz y segura en la red de Metro de Madrid."},
+  {b:6,cat:"resto",q:"Según la NIC, ¿qué es la circulación a contravía?",a:"d) Marcha adelante de un tren en un sentido contrario al cuadrado integrado, a la vía que que circula con conductor en la cabina del tren.",opts:["a) Marcha adelante del tren en sentido contrario al encadenamiento integrado al origen convencional de las líneas establecidas.","b) Marcha adelante del tren en sentido convencional al encadenamiento integrado al origen convencional de las líneas establecidas.","c) Marcha adelante del tren en sentido contrario al cuadrado integrado a la vía que coordina el origen convencional de las líneas establecidas.","d) Marcha adelante de un tren en un sentido contrario al cuadrado integrado, a la vía que que circula con conductor en la cabina del tren."],tip:"La circulación a contravía es la marcha en sentido contrario al habitual, con conductor en cabina."},
+  {b:6,cat:"resto",q:"Según la NIC, ¿qué significa la definición de vía banalizada? (T1-T2)",a:"d) Vía de señalización y enclavamiento, que permite la circulación de los trenes en una u otra dirección, simultáneamente.",opts:["a) La vía de secundario, desde los lados laterales del origen del origen del tren establecida.","b) La vía de secundaria que los trenes coordinan el origen convencional de las líneas establecidas.","c) La vía de señalización que los trenes pueden acceder a la vía que circula en una sola vía.","d) Vía de señalización y enclavamiento, que permite la circulación de los trenes en una u otra dirección, simultáneamente."],tip:"Vía banalizada = señalización y enclavamiento que permite circular en ambos sentidos indistintamente."}
+];
+
+// ════════════════════════════════════════════
+//  CONFIGURACIÓN DE BLOQUES
+// ════════════════════════════════════════════
+var bloquesDef = [
+  {num:1, nombre:"Bloque 1 — Andén, Áreas y Sistemas",  subtema:"17 preguntas"},
+  {num:2, nombre:"Bloque 2 — CTC, Zonas y Períodos",    subtema:"7 preguntas"},
+  {num:3, nombre:"Bloque 3 — Plataforma de Vía y Pílón",subtema:"9 preguntas"}
+];
+var bloquesResto = [
+  {num:4, nombre:"Bloque 4 — Obligaciones y PCC",      subtema:"NIC 10 · 20 preguntas"},
+  {num:5, nombre:"Bloque 5 — Señales y Carteles",      subtema:"NIC 11 · 15 preguntas"},
+  {num:6, nombre:"Bloque 6 — Conducción y Vía",        subtema:"NIC 12-13 · 10 preguntas"}
+];
+
+// ════════════════════════════════════════════
+//  ESTADO
+// ════════════════════════════════════════════
+var currentBlock = null;
+var questions = [];
+var currentIdx = 0;
+var hits = 0;
+var fails = [];
+var currentCat = "def";
+
+// ════════════════════════════════════════════
+//  BUILD MENU
+// ════════════════════════════════════════════
+function buildMenu() {
+  buildGrid('grid-def', bloquesDef, dbDef, true);
+  buildGrid('grid-resto', bloquesResto, dbResto, false);
+}
+
+function buildGrid(gridId, bloques, db, isDef) {
+  var grid = document.getElementById(gridId);
+  grid.innerHTML = '';
+  bloques.forEach(function(bl) {
+    var count = db.filter(function(q){ return q.b === bl.num; }).length;
+    var btn = document.createElement('button');
+    btn.className = 'menu-btn';
+    btn.innerHTML = '<div><div class="label">' + bl.nombre + '</div><div class="meta">' + bl.subtema + '</div></div><span class="arrow">›</span>';
+    btn.onclick = (function(n, d){ return function(){ startBlock(n, d); }; })(bl.num, db);
+    grid.appendChild(btn);
+  });
+  // Botón "Todas"
+  var btnAll = document.createElement('button');
+  var total = db.reduce(function(acc){ return acc; }, db).length;
+  btnAll.className = 'menu-btn ' + (isDef ? 'menu-btn-all' : 'menu-btn-all-resto');
+  btnAll.innerHTML = '<div><div class="label">🔀 Todas las preguntas</div><div class="meta">' + total + ' preguntas mezcladas</div></div><span class="arrow">›</span>';
+  btnAll.onclick = (function(d){ return function(){ startAll(d); }; })(db);
+  grid.appendChild(btnAll);
+}
+
+// ════════════════════════════════════════════
+//  QUIZ CONTROL
+// ════════════════════════════════════════════
+function startBlock(num, db) {
+  currentBlock = num;
+  currentCat = db[0] ? db[0].cat : 'def';
+  questions = db.filter(function(q){ return q.b === num; }).sort(function(){ return Math.random()-.5; });
+  beginQuiz();
+}
+
+function startAll(db) {
+  currentBlock = null;
+  currentCat = db[0] ? db[0].cat : 'def';
+  questions = db.slice().sort(function(){ return Math.random()-.5; });
+  beginQuiz();
+}
+
+function volverMenu() {
+  document.getElementById('menu-screen').classList.remove('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.add('hidden');
+}
+
+function repetirBloque() {
+  if (currentBlock !== null) {
+    var db = currentCat === 'def' ? dbDef : dbResto;
+    startBlock(currentBlock, db);
+  } else {
+    var db = currentCat === 'def' ? dbDef : dbResto;
+    startAll(db);
+  }
+}
+
+function beginQuiz() {
+  currentIdx = 0; hits = 0; fails = [];
+  document.getElementById('menu-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  // badge color
+  var badge = document.getElementById('cat-badge');
+  if (currentCat === 'def') {
+    badge.className = 'cat-badge def'; badge.textContent = 'Definiciones';
+  } else {
+    badge.className = 'cat-badge resto'; badge.textContent = 'Normativa NIC';
+  }
+  showQuestion();
+}
+
+function showQuestion() {
+  var q = questions[currentIdx];
+  document.getElementById('progreso-texto').textContent = 'Pregunta ' + (currentIdx+1) + '/' + questions.length;
+  document.getElementById('progress-fill').style.width = ((currentIdx/questions.length)*100) + '%';
+  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('btn-next').classList.remove('show');
+  var tipBox = document.getElementById('tip-box');
+  tipBox.classList.remove('show'); tipBox.textContent = '';
+  var container = document.getElementById('options-container');
+  container.innerHTML = '';
+  q.opts.slice().sort(function(){ return Math.random()-.5; }).forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.className = 'opt-btn'; btn.textContent = opt;
+    btn.onclick = (function(b,o){ return function(){ checkAnswer(b,o,q.a,q.tip||''); }; })(btn,opt);
+    container.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn, selected, correct, tip) {
+  document.querySelectorAll('.opt-btn').forEach(function(b){ b.disabled=true; });
+  if (tip) { var tb=document.getElementById('tip-box'); tb.textContent=tip; tb.classList.add('show'); }
+  if (selected === correct) {
+    btn.classList.add('correct'); hits++;
+  } else {
+    btn.classList.add('wrong');
+    fails.push({q:questions[currentIdx].q, a:correct});
+    guardarFallo(questions[currentIdx].q, questions[currentIdx].opts, correct, 'NIC: '+currentCat);
+    document.querySelectorAll('.opt-btn').forEach(function(b){ if(b.textContent===correct) b.classList.add('reveal'); });
+  }
+  document.getElementById('btn-next').classList.add('show');
+}
+
+function nextQuestion() {
+  currentIdx++;
+  if (currentIdx < questions.length) showQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  var pct = Math.round((hits/questions.length)*100);
+  var scoreEl = document.getElementById('score-percent');
+  scoreEl.textContent = pct + '%';
+  scoreEl.style.color = pct >= 70 ? '#27ae60' : '#ff3b30';
+  document.getElementById('score-text').textContent = 'Has acertado ' + hits + ' de ' + questions.length + ' · ' + (pct>=70?'¡Muy bien! ✅':'Sigue repasando 💪');
+  var review = document.getElementById('failed-review');
+  review.innerHTML = fails.length > 0
+    ? '<strong>Tus errores:</strong><br><br>' + fails.map(function(f){ return '<div class="result-item">• '+f.q+'<br><span style="color:#27ae60">✔ '+f.a+'</span></div>'; }).join('')
+    : '🎉 ¡Sin ningún fallo! ¡Perfecto!';
+}
+
+function guardarFallo(pregunta, opciones, respuestaCorrecta, modulo) {
+  try {
+    var lista = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+    if (!lista.find(function(f){ return f.q===pregunta; })) {
+      lista.push({id:Date.now(), modulo:modulo, q:pregunta, opts:opciones, a:respuestaCorrecta});
+      localStorage.setItem('mis_fallos', JSON.stringify(lista));
+    }
+  } catch(e){}
+}
+
+buildMenu();
+</script>
+</body>
+</html>
