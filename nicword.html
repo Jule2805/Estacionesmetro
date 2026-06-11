@@ -3,14 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test NIC — Word</title>
+<title>Test NIC</title>
 <style>
 :root{--bg:#121212;--card:#1e1e1e;--accent:#27ae60;--correct:#009543;--wrong:#ff3b30;--text:#ffffff;--muted:#888;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;min-height:100vh;}
 .container{width:100%;max-width:500px;padding:20px;}
-
-/* MENÚ */
 .menu-title{text-align:center;font-size:1.3rem;font-weight:700;margin-bottom:4px;margin-top:8px;}
 .menu-subtitle{text-align:center;color:var(--muted);font-size:13px;margin-bottom:18px;}
 .btn-salir{background:none;border:1px solid #444;color:#ccc;padding:5px 12px;border-radius:5px;cursor:pointer;font-size:13px;margin-bottom:18px;display:inline-block;}
@@ -23,8 +21,6 @@ body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);di
 .menu-btn .arrow{color:var(--accent);font-size:20px;flex-shrink:0;margin-left:10px;}
 .menu-btn-all{background:var(--accent);border-color:var(--accent);margin-top:6px;}
 .menu-btn-all:hover{opacity:.9;}
-
-/* QUIZ */
 .quiz-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 #progreso-texto{font-size:14px;color:var(--muted);}
 .progress-bar{width:100%;height:6px;background:#333;border-radius:10px;margin-bottom:22px;overflow:hidden;}
@@ -38,12 +34,8 @@ h2{font-size:1rem;line-height:1.55;margin-bottom:18px;margin-top:0;}
 .opt-btn.correct{background:var(--correct)!important;border-color:var(--correct);}
 .opt-btn.wrong{background:var(--wrong)!important;border-color:var(--wrong);}
 .opt-btn.reveal{background:#005a28!important;border-color:var(--correct);opacity:.85;}
-.tip-box{display:none;margin-top:14px;padding:13px;background:#252525;border-left:3px solid var(--accent);border-radius:8px;font-size:13px;line-height:1.6;color:#ccc;}
-.tip-box.show{display:block;}
 .btn-next{width:100%;background:var(--accent);color:white;border:none;padding:14px;border-radius:10px;font-weight:bold;margin-top:14px;cursor:pointer;display:none;font-size:15px;}
 .btn-next.show{display:block;}
-
-/* RESULTADOS */
 .results-list{text-align:left;background:#000;padding:15px;border-radius:10px;font-size:13px;max-height:300px;overflow-y:auto;margin-top:14px;}
 .result-item{margin-bottom:10px;border-bottom:1px solid #222;padding-bottom:5px;}
 .hidden{display:none;}
@@ -52,15 +44,13 @@ h2{font-size:1rem;line-height:1.55;margin-bottom:18px;margin-top:0;}
 <body>
 <div class="container">
 
-<!-- MENÚ -->
 <div id="menu-screen">
   <div class="menu-title">📋 Test NIC</div>
   <div class="menu-subtitle">Elige un bloque de estudio</div>
-  <button class="btn-salir" onclick="window.location.href='detodo.html'">← Volver al menú NIC</button>
+  <button class="btn-salir" onclick="window.location.href='academia.html'">← Volver al menú NIC</button>
   <div class="menu-grid" id="grid-bloques"></div>
 </div>
 
-<!-- QUIZ -->
 <div id="quiz-screen" class="hidden">
   <div class="quiz-header">
     <div id="progreso-texto">Pregunta 1/30</div>
@@ -71,12 +61,10 @@ h2{font-size:1rem;line-height:1.55;margin-bottom:18px;margin-top:0;}
     <div id="nic-badge" class="nic-badge">NIC</div>
     <h2 id="question-text">Cargando...</h2>
     <div id="options-container" class="options-grid"></div>
-    <div id="tip-box" class="tip-box"></div>
     <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE →</button>
   </div>
 </div>
 
-<!-- RESULTADOS -->
 <div id="results-screen" class="hidden">
   <div class="question-card" style="text-align:center;">
     <h1 id="score-percent" style="font-size:52px;margin:10px 0">0%</h1>
@@ -91,342 +79,342 @@ h2{font-size:1rem;line-height:1.55;margin-bottom:18px;margin-top:0;}
 <script>
 var db = [
   {b:1,q:'¿Qué compone un cantón?',a:'Uno o varios circuitos de vía',opts:['Uno o varios circuitos de vía','Solo un túnel','Una estación','Una vía secundaria']},
-  {b:1,q:'¿Dónde están situadas las luminarias del alumbrado del túnel?',a:'Solo en el suelo del túnel',opts:['Solo en el suelo del túnel','En los paramentos o bóveda del túnel','En las traviesas','Únicamente en las estaciones']},
-  {b:1,q:'¿Qué se prohíbe en el Área de Seguridad sin autorización del PCC?',a:'El uso de freno mecánico',opts:['El uso de freno mecánico','La circulación de trenes','El encendido del alumbrado','El estacionamiento de trenes']},
-  {b:1,q:'¿Cuándo se autoriza la realización de trabajos en un Área de Trabajo?',a:'En horas sin tránsito de trenes',opts:['En horas sin tránsito de trenes','Durante el periodo de servicio','En el periodo fuera de servicio','Solo en fines de semana']},
+  {b:1,q:'¿Dónde están situadas las luminarias del alumbrado del túnel?',a:'En los paramentos o bóveda del túnel',opts:['Solo en el suelo del túnel','En los paramentos o bóveda del túnel','En las traviesas','Únicamente en las estaciones']},
+  {b:1,q:'¿Qué se prohíbe en el Área de Seguridad sin autorización del PCC?',a:'La circulación de trenes',opts:['El uso de freno mecánico','La circulación de trenes','El encendido del alumbrado','El estacionamiento de trenes']},
+  {b:1,q:'¿Cuándo se autoriza la realización de trabajos en un Área de Trabajo?',a:'En el periodo fuera de servicio',opts:['En horas sin tránsito de trenes','Durante el periodo de servicio','En el periodo fuera de servicio','Solo en fines de semana']},
   {b:1,q:'¿Cuál es el fin principal de la Comisión de programación?',a:'Coordinar y programar trabajos para evitar interferencias',opts:['Coordinar y programar trabajos para evitar interferencias','Reparar trenes','Autorizar boletines','Gestionar la energía']},
-  {b:1,q:'¿Desde dónde se mide la Zona A del andén?',a:'Desde el centro del andén',opts:['Desde el centro del andén','Desde el comienzo de la banda amarilla del andén','Desde la señal de salida','Desde el paramento de la estación']},
-  {b:1,q:'¿Qué delimita los límites del andén?',a:'Las señales de entrada',opts:['Las señales de entrada','Las luminarias','Las agujas','Los piñones de entrada y salida']},
+  {b:1,q:'¿Desde dónde se mide la Zona A del andén?',a:'Desde el comienzo de la banda amarilla del andén',opts:['Desde el centro del andén','Desde el comienzo de la banda amarilla del andén','Desde la señal de salida','Desde el paramento de la estación']},
+  {b:1,q:'¿Qué delimita los límites del andén?',a:'Los piñones de entrada y salida',opts:['Las señales de entrada','Las luminarias','Las agujas','Los piñones de entrada y salida']},
   {b:1,q:'¿Qué permite independizar un cambio de sección?',a:'Sectores de tracción distintos',opts:['Sectores de tracción distintos','Andenes centrales','Zonas de trabajo','Sectores de señalización']},
   {b:1,q:'¿Dónde permanece encendido permanentemente el alumbrado del túnel?',a:'En los sacos de maniobras',opts:['En los sacos de maniobras','En las interestaciones','En las vías principales','En toda la red']},
-  {b:1,q:'¿Qué sistema supervisa permanentemente circuitos de vía, señales, agujas y calzos?',a:'CTC',opts:['CTC','Enclavamiento de señales','PCC','Auto-Shunt']},
-  {b:1,q:'¿Quién debe autorizar el acceso a un Área de Trabajo?',a:'El jefe de mantenimiento',opts:['El jefe de mantenimiento','El responsable operativo','El PCC','La comisión de programación']},
-  {b:1,q:'¿Qué es la Zona B del andén?',a:'Solo la parte cubierta',opts:['Solo la parte cubierta','La zona de acceso restringido','La zona próxima a las escaleras','Todo el andén excluyendo la Zona A']},
-  {b:1,q:'¿Qué se realiza en un depósito o cochera?',a:'Limpieza de trenes',opts:['Limpieza de trenes','Reparación de trenes','Todas son correctas','Estancia y revisión de trenes']},
-  {b:1,q:'¿Quién elabora el Documento de programación?',a:'La Comisión de programación',opts:['La Comisión de programación','El PCC','El conductor jefe','El responsable operativo']},
-  {b:1,q:'¿Cuándo se cumplimenta el Boletín de acceso a la plataforma de vía?',a:'En periodo fuera de servicio',opts:['En periodo fuera de servicio','Solo en cocheras','Durante el periodo de servicio','En el PCC']},
-  {b:1,q:'El CTC permite el telemando de:',a:'Alumbrado',opts:['Alumbrado','Andenes','Rampas','Enclavamientos de señales']},
-  {b:1,q:'¿En qué situación se utiliza el acantonamiento?',a:'Cuando un tren supera la velocidad autorizada',opts:['Cuando un tren supera la velocidad autorizada','Cuando hay fallos en la catenaria','Cuando un tren, en su recorrido no garantiza el correcto shuntado de los circuitos de vía','Cuando se interrumpe el alumbrado del túnel']},
-  {b:1,q:'El Auto-Shunt es una maniobra realizada en modo de conducción:',a:'Manual',opts:['Manual','ATO','ATP','De emergencia']},
-  {b:1,q:'¿Qué caracteriza normalmente al Auto-Shunt respecto al conductor?',a:'Debe haber conductor en ambas cabinas',opts:['Debe haber conductor en ambas cabinas','Siempre sin conductor','Solo con dos conductores','Puede realizarse sin conductor en una o en las dos cabinas extremas']},
-  {b:1,q:'¿Dónde se sitúa el conductor en circulación a contravía?',a:'En cabina intermedia',opts:['En cabina intermedia','En la parte trasera','En la cabeza del tren','Fuera del tren']},
-  {b:1,q:'La circulación a contravía implica marcha:',a:'Atrás',opts:['Atrás','Lateral','Adelante en sentido contrario al usual','Sin conductor']},
-  {b:1,q:'¿Qué otra circunstancia justifica el uso del acantonamiento?',a:'Trenes con exceso de viajeros',opts:['Trenes con exceso de viajeros','Trenes con freno de estacionamiento averiado','Trenes que realizan movimientos hacia delante y hacia atrás','Trenes que circulan en vía de pruebas']},
-  {b:1,q:'¿Qué detecta la ocupación de trenes en un circuito de vía?',a:'El PCC',opts:['El PCC','El enclavamiento de señales','El CTC','El freno mecánico']},
+  {b:1,q:'¿Qué sistema supervisa permanentemente circuitos de vía, señales, agujas y calzos?',a:'PCC',opts:['CTC','Enclavamiento de señales','PCC','Auto-Shunt']},
+  {b:1,q:'¿Quién debe autorizar el acceso a un Área de Trabajo?',a:'El PCC',opts:['El jefe de mantenimiento','El responsable operativo','El PCC','La comisión de programación']},
+  {b:1,q:'¿Qué es la Zona B del andén?',a:'Todo el andén excluyendo la Zona A',opts:['Solo la parte cubierta','La zona de acceso restringido','La zona próxima a las escaleras','Todo el andén excluyendo la Zona A']},
+  {b:1,q:'¿Qué se realiza en un depósito o cochera?',a:'Todas son correctas',opts:['Limpieza de trenes','Reparación de trenes','Todas son correctas','Estancia y revisión de trenes']},
+  {b:1,q:'¿Quién elabora el Documento de programación?',a:'El PCC',opts:['La Comisión de programación','El PCC','El conductor jefe','El responsable operativo']},
+  {b:1,q:'¿Cuándo se cumplimenta el Boletín de acceso a la plataforma de vía?',a:'Durante el periodo de servicio',opts:['En periodo fuera de servicio','Solo en cocheras','Durante el periodo de servicio','En el PCC']},
+  {b:1,q:'El CTC permite el telemando de:',a:'Enclavamientos de señales',opts:['Alumbrado','Andenes','Rampas','Enclavamientos de señales']},
+  {b:1,q:'¿En qué situación se utiliza el acantonamiento?',a:'Cuando un tren, en su recorrido no garantiza el correcto shuntado de los circuitos de vía',opts:['Cuando un tren supera la velocidad autorizada','Cuando hay fallos en la catenaria','Cuando un tren, en su recorrido no garantiza el correcto shuntado de los circuitos de vía','Cuando se interrumpe el alumbrado del túnel']},
+  {b:1,q:'El Auto-Shunt es una maniobra realizada en modo de conducción:',a:'ATO',opts:['Manual','ATO','ATP','De emergencia']},
+  {b:1,q:'¿Qué caracteriza normalmente al Auto-Shunt respecto al conductor?',a:'Puede realizarse sin conductor en una o en las dos cabinas extremas',opts:['Debe haber conductor en ambas cabinas','Siempre sin conductor','Solo con dos conductores','Puede realizarse sin conductor en una o en las dos cabinas extremas']},
+  {b:1,q:'¿Dónde se sitúa el conductor en circulación a contravía?',a:'En la cabeza del tren',opts:['En cabina intermedia','En la parte trasera','En la cabeza del tren','Fuera del tren']},
+  {b:1,q:'La circulación a contravía implica marcha:',a:'Adelante en sentido contrario al usual',opts:['Atrás','Lateral','Adelante en sentido contrario al usual','Sin conductor']},
+  {b:1,q:'¿Qué otra circunstancia justifica el uso del acantonamiento?',a:'Trenes que realizan movimientos hacia delante y hacia atrás',opts:['Trenes con exceso de viajeros','Trenes con freno de estacionamiento averiado','Trenes que realizan movimientos hacia delante y hacia atrás','Trenes que circulan en vía de pruebas']},
+  {b:1,q:'¿Qué detecta la ocupación de trenes en un circuito de vía?',a:'El enclavamiento de señales',opts:['El PCC','El enclavamiento de señales','El CTC','El freno mecánico']},
   {b:1,q:'En trabajos itinerantes, el área de trabajo se corresponde con:',a:'Desde el piñón de salida de una estación hasta el de salida de la siguiente',opts:['Desde el piñón de salida de una estación hasta el de salida de la siguiente','Toda la línea','Una sola estación','Solo los túneles']},
-  {b:1,q:'¿Cuál puede ser el límite de un depósito según la normativa?',a:'El andén principal',opts:['El andén principal','La Zona A','El PCC','La boca del túnel de acceso a línea o la señal de salida']},
-  {b:1,q:'¿Qué visualiza el CTC?',a:'Consumo eléctrico',opts:['Consumo eléctrico','Personal en estaciones','Ocupación de los trenes en la línea','Estado de los andenes']},
+  {b:1,q:'¿Cuál puede ser el límite de un depósito según la normativa?',a:'La boca del túnel de acceso a línea o la señal de salida',opts:['El andén principal','La Zona A','El PCC','La boca del túnel de acceso a línea o la señal de salida']},
+  {b:1,q:'¿Qué visualiza el CTC?',a:'Ocupación de los trenes en la línea',opts:['Consumo eléctrico','Personal en estaciones','Ocupación de los trenes en la línea','Estado de los andenes']},
   {b:1,q:'En un andén central, ¿cuántas franjas de Zona A existen?',a:'Dos',opts:['Dos','Ninguna','Una','Cuatro']},
-  {b:1,q:'¿Qué delimita como mínimo el Área de Trabajo?',a:'Agujas',opts:['Agujas','Balizas rojas o luces rojas','Vallas','Señales verdes']},
-  {b:1,q:'¿Qué anchura aproximada tiene la Zona A del andén?',a:'50 cm',opts:['50 cm','1 metro','80 cm','2 metros']},
-  {b:1,q:'¿Entre qué elementos está delimitado un cantón?',a:'Dos agujas',opts:['Dos agujas','Dos señales consecutivas','Dos estaciones','Dos cambios de sección','“']},
+  {b:1,q:'¿Qué delimita como mínimo el Área de Trabajo?',a:'Balizas rojas o luces rojas',opts:['Agujas','Balizas rojas o luces rojas','Vallas','Señales verdes']},
+  {b:1,q:'¿Qué anchura aproximada tiene la Zona A del andén?',a:'80 cm',opts:['50 cm','1 metro','80 cm','2 metros']},
+  {b:1,q:'¿Entre qué elementos está delimitado un cantón?',a:'Dos señales consecutivas',opts:['Dos agujas','Dos señales consecutivas','Dos estaciones','Dos cambios de sección']},
   {b:3,q:'El control de trabajos en la plataforma de vía es competencia de:',a:'El PCC',opts:['El PCC','Las jefaturas','El jefe de mantenimiento','Los Mandos']},
-  {b:3,q:'También son zonas colindantes los recintos que comunican con:',a:'El túnel',opts:['El túnel','PCC','Andenes','Vías principales únicamente']},
-  {b:3,q:'¿Qué sistema de publicación utiliza la NIC?',a:'Edición digital cerrada',opts:['Edición digital cerrada','Publicación anual','Sistema de hojas intercambiables','Publicación por volúmenes']},
-  {b:3,q:'¿En qué casos no será de aplicación la NIC en la Red operada por Metro?',a:'Cuando existan incidencias técnicas',opts:['Cuando existan incidencias técnicas','Durante horarios nocturnos','Cuando existan explotaciones con Normativa propia','En la red secundaria']},
-  {b:3,q:'¿En qué situaciones debe velar el PCC por el cumplimiento de la NIC?',a:'Solo en situaciones normales',opts:['Solo en situaciones normales','En normalidad y en situaciones sensibles para la seguridad','Solo en emergencias','Solo en circulación degradada']},
-  {b:3,q:'¿Quién asegura la distribución y entrega de la NIC?',a:'Recursos Humanos',opts:['Recursos Humanos','Las jefaturas a través de la Dirección','La Dirección a través de las jefaturas','El PCC']},
-  {b:3,q:'¿Quién es el máximo responsable de la explotación del servicio?',a:'El conductor jefe',opts:['El conductor jefe','La Dirección','El PCC','La jefatura']},
-  {b:3,q:'Las Circulares de Dirección, una vez publicadas:',a:'Se aplican solo temporalmente',opts:['Se aplican solo temporalmente','Pasan a formar parte integrada de la NIC','Sustituyen a la NIC','Se aplican solo a en casos puntuales']},
+  {b:3,q:'También son zonas colindantes los recintos que comunican con:',a:'PCC',opts:['El túnel','PCC','Andenes','Vías principales únicamente']},
+  {b:3,q:'¿Qué sistema de publicación utiliza la NIC?',a:'Sistema de hojas intercambiables',opts:['Edición digital cerrada','Publicación anual','Sistema de hojas intercambiables','Publicación por volúmenes']},
+  {b:3,q:'¿En qué casos no será de aplicación la NIC en la Red operada por Metro?',a:'Cuando existan explotaciones con Normativa propia',opts:['Cuando existan incidencias técnicas','Durante horarios nocturnos','Cuando existan explotaciones con Normativa propia','En la red secundaria']},
+  {b:3,q:'¿En qué situaciones debe velar el PCC por el cumplimiento de la NIC?',a:'En normalidad y en situaciones sensibles para la seguridad',opts:['Solo en situaciones normales','En normalidad y en situaciones sensibles para la seguridad','Solo en emergencias','Solo en circulación degradada']},
+  {b:3,q:'¿Quién asegura la distribución y entrega de la NIC?',a:'El PCC',opts:['Recursos Humanos','Las jefaturas a través de la Dirección','La Dirección a través de las jefaturas','El PCC']},
+  {b:3,q:'¿Quién es el máximo responsable de la explotación del servicio?',a:'El PCC',opts:['El conductor jefe','La Dirección','El PCC','La jefatura']},
+  {b:3,q:'Las Circulares de Dirección, una vez publicadas:',a:'Pasan a formar parte integrada de la NIC',opts:['Se aplican solo temporalmente','Pasan a formar parte integrada de la NIC','Sustituyen a la NIC','Se aplican solo a en casos puntuales']},
   {b:3,q:'La zona colindante está  entre:',a:'Límites de plataforma de vía y cerramientos exteriores',opts:['Límites de plataforma de vía y cerramientos exteriores','Dos estaciones','Señales y agujas','Andén y vía']},
   {b:3,q:'El PCC ejerce mando jerárquico y funcional sobre:',a:'Todo el personal con responsabilidad en la circulación',opts:['Todo el personal con responsabilidad en la circulación','Solo el personal de estaciones','Solo los mandos','Solo los conductores']},
   {b:3,q:'¿Para quién es de obligado cumplimiento la NIC?',a:'Para todos los trabajadores que intervengan en la circulación',opts:['Para todos los trabajadores que intervengan en la circulación','Para personal externo','Solo para mandos','Solo para conductores']},
-  {b:3,q:'En líneas circulares, la vía II es la:',a:'Interior',opts:['Interior','Exterior','Secundaria','Principal']},
-  {b:3,q:'¿Qué obligación tiene todo trabajador que intervenga en una maniobra?',a:'Consultar a su superior',opts:['Consultar a su superior','Cumplir las normas de la NIC','Registrar la operación','Informar a los viajeros']},
-  {b:3,q:'¿Cuál es el objeto principal de la Normativa Interna de Circulación de Metro de Madrid (NIC)?',a:'Establecer normas de explotación comercial',opts:['Establecer normas de explotación comercial','Todas son correctas','Cuando existan explotaciones con Normativa propia','En la red secundaria']},
+  {b:3,q:'En líneas circulares, la vía II es la:',a:'Exterior',opts:['Interior','Exterior','Secundaria','Principal']},
+  {b:3,q:'¿Qué obligación tiene todo trabajador que intervenga en una maniobra?',a:'Cumplir las normas de la NIC',opts:['Consultar a su superior','Cumplir las normas de la NIC','Registrar la operación','Informar a los viajeros']},
+  {b:3,q:'¿Cuál es el objeto principal de la Normativa Interna de Circulación de Metro de Madrid (NIC)?',a:'Cuando existan explotaciones con Normativa propia',opts:['Establecer normas de explotación comercial','Todas son correctas','Cuando existan explotaciones con Normativa propia','En la red secundaria']},
   {b:3,q:'¿Para qué se utiliza el sistema de hojas intercambiables?',a:'Facilitar sustituciones por rectificaciones o ampliaciones',opts:['Facilitar sustituciones por rectificaciones o ampliaciones','Facilitar rectificaciones por ampliaciones o sustituciones','Facilitar sustituciones por rectificaciones o deficiencias','Facilitar deficiencias por sustituciones o ampliaciones']},
-  {b:3,q:'Las vías secundarias son:',a:'Las de saco de maniobras',opts:['Las de saco de maniobras','Las de estaciones finales','Las que no son vías principales','Las de túnel']},
-  {b:3,q:'¿Quién debe poner en conocimiento la NIC al personal afectado?',a:'El PCC',opts:['El PCC','La Dirección de Metro de Madrid S.A.','Las jefaturas de línea','Recursos Humanos']},
-  {b:3,q:'¿Cómo pueden modificarse o ampliarse las normas de la NIC?',a:'Mediante instrucciones verbales',opts:['Mediante instrucciones verbales','Por acuerdos sindicales','Por Circulares de Dirección','Por decisión del PCC']},
-  {b:3,q:'¿Qué instalaciones quedan fuera del ámbito de aplicación de la NIC?',a:'Las estaciones terminales',opts:['Las estaciones terminales','Las dependencias cerradas a la explotación','Las cocheras','Los depósitos']},
-  {b:3,q:'La vía II es recorrida por trenes:',a:'Acercándose al origen convencional',opts:['Acercándose al origen convencional','En ATO obligatorio','En retroceso','Alejándose del origen convencional']},
-  {b:3,q:'En líneas circulares, la vía I es la:',a:'Exterior',opts:['Exterior','Secundaria','Principal','Interior']},
-  {b:3,q:'La zona de trabajo es donde:',a:'No hay personal trabajando en la plataforma de vía',opts:['No hay personal trabajando en la plataforma de vía','Hay personal trabajando en la plataforma de vía','Se hacen pruebas dinámicas','No circulan trenes']},
-  {b:3,q:'La vía de pruebas es una vía:',a:'Banalizada',opts:['Banalizada','Vía I','Secundaria para pruebas dinámicas','Vía II']},
-  {b:3,q:'El PCC transmite órdenes principalmente a:',a:'Solo a mandos',opts:['Solo a mandos','Solo a jefaturas','Conductores y personal con responsabilidad en la circulación','Todas son correctas']},
-  {b:3,q:'¿Quién asume la autoridad del PCC si este no puede ejercerla?',a:'Exclusivamente la Dirección',opts:['Exclusivamente la Dirección','Las jefaturas','El personal de estaciones','Responsables operativos o, en su defecto, los conductores']},
-  {b:3,q:'En zona de obras se limita:',a:'El número de trenes',opts:['El número de trenes','La velocidad de los trenes','El uso de ATO','La tensión']},
-  {b:3,q:'La vía I es la recorrida por trenes:',a:'Hacia el origen',opts:['Hacia el origen','En retroceso','Alejándose del origen convencional','En contravía']},
+  {b:3,q:'Las vías secundarias son:',a:'Las que no son vías principales',opts:['Las de saco de maniobras','Las de estaciones finales','Las que no son vías principales','Las de túnel']},
+  {b:3,q:'¿Quién debe poner en conocimiento la NIC al personal afectado?',a:'La Dirección de Metro de Madrid S.A.',opts:['El PCC','La Dirección de Metro de Madrid S.A.','Las jefaturas de línea','Recursos Humanos']},
+  {b:3,q:'¿Cómo pueden modificarse o ampliarse las normas de la NIC?',a:'Por Circulares de Dirección',opts:['Mediante instrucciones verbales','Por acuerdos sindicales','Por Circulares de Dirección','Por decisión del PCC']},
+  {b:3,q:'¿Qué instalaciones quedan fuera del ámbito de aplicación de la NIC?',a:'Las dependencias cerradas a la explotación',opts:['Las estaciones terminales','Las dependencias cerradas a la explotación','Las cocheras','Los depósitos']},
+  {b:3,q:'La vía II es recorrida por trenes:',a:'Alejándose del origen convencional',opts:['Acercándose al origen convencional','En ATO obligatorio','En retroceso','Alejándose del origen convencional']},
+  {b:3,q:'En líneas circulares, la vía I es la:',a:'Interior',opts:['Exterior','Secundaria','Principal','Interior']},
+  {b:3,q:'La zona de trabajo es donde:',a:'Hay personal trabajando en la plataforma de vía',opts:['No hay personal trabajando en la plataforma de vía','Hay personal trabajando en la plataforma de vía','Se hacen pruebas dinámicas','No circulan trenes']},
+  {b:3,q:'La vía de pruebas es una vía:',a:'Secundaria para pruebas dinámicas',opts:['Banalizada','Vía I','Secundaria para pruebas dinámicas','Vía II']},
+  {b:3,q:'El PCC transmite órdenes principalmente a:',a:'Conductores y personal con responsabilidad en la circulación',opts:['Solo a mandos','Solo a jefaturas','Conductores y personal con responsabilidad en la circulación','Todas son correctas']},
+  {b:3,q:'¿Quién asume la autoridad del PCC si este no puede ejercerla?',a:'Responsables operativos o, en su defecto, los conductores',opts:['Exclusivamente la Dirección','Las jefaturas','El personal de estaciones','Responsables operativos o, en su defecto, los conductores']},
+  {b:3,q:'En zona de obras se limita:',a:'La velocidad de los trenes',opts:['El número de trenes','La velocidad de los trenes','El uso de ATO','La tensión']},
+  {b:3,q:'La vía I es la recorrida por trenes:',a:'Alejándose del origen convencional',opts:['Hacia el origen','En retroceso','Alejándose del origen convencional','En contravía']},
   {b:3,q:'¿Cuál es una función principal del PCC en la circulación?',a:'Supervisar, controlar y regular la circulación',opts:['Supervisar, controlar y regular la circulación','Elaborar horarios','Atender a viajeros','Todas son correctas']},
-  {b:3,q:'El mando del PCC sobre los equipos de mantenimiento se limita a:',a:'La organización del trabajo',opts:['La organización del trabajo','La seguridad laboral','Todo lo relativo a la circulación','El mantenimiento preventivo']},
-  {b:3,q:'¿Quién publica el momento en que las dependencias quedan o no en explotación?',a:'El PCC',opts:['El PCC','Las jefaturas','El personal de estaciones','La Dirección']},
-  {b:4,q:'¿Qué funciones no son delegables?',a:'Las administrativas',opts:['Las administrativas','Las de atención al cliente','Las de mantenimiento','Las de circulación que afecten a la seguridad']},
-  {b:4,q:'En caso de fuerza mayor, antes de abandonar el puesto se debe:',a:'Avisar a los viajeros',opts:['Avisar a los viajeros','Adoptar medidas que garanticen la seguridad','Registrar la incidencia','Avisar a un compañero']},
-  {b:4,q:'¿Qué se hace con las conversaciones con el PCC?',a:'Se resumen por escrito',opts:['Se resumen por escrito','Se eliminan tras el servicio','Se graban todas','Solo se archivan incidencias']},
-  {b:4,q:'El abandono del puesto sin autorización solo es posible:',a:'En descansos',opts:['En descansos','En cambios de turno','Todas son correctas','Por fuerza mayor o para evitar un peligro']},
-  {b:4,q:'¿Qué medio se utiliza si la radiotelefonía no está operativa?',a:'Solo telefonía automática',opts:['Solo telefonía automática','Solo telefonía móvil','Telefonía selectiva de los piñones de las estaciones','Comunicaciones escritas']},
-  {b:4,q:'¿Qué tipo de comunicaciones se graban con el PCC?',a:'Solo radiadas',opts:['Solo radiadas','Todas, independientemente del medio','Solo telefónicas','Solo las críticas']},
-  {b:4,q:'Si una circunstancia personal impide prestar servicio con seguridad, el trabajador debe:',a:'Solicitar relevo',opts:['Solicitar relevo','Abandonar el puesto','Avisar a los viajeros','Informar de inmediato a sus superiores']},
-  {b:4,q:'El medio prioritario de comunicación entre PCC y conductores es:',a:'Telefonía móvil',opts:['Telefonía móvil','Telefonía automática','Radiotelefonía de trenes','Mensajería interna']},
-  {b:4,q:'Durante el servicio está prohibido:',a:'Comer',opts:['Comer','Dormir','Cambiar de puesto','Hablar con los viajeros']},
+  {b:3,q:'El mando del PCC sobre los equipos de mantenimiento se limita a:',a:'Todo lo relativo a la circulación',opts:['La organización del trabajo','La seguridad laboral','Todo lo relativo a la circulación','El mantenimiento preventivo']},
+  {b:3,q:'¿Quién publica el momento en que las dependencias quedan o no en explotación?',a:'La Dirección',opts:['El PCC','Las jefaturas','El personal de estaciones','La Dirección']},
+  {b:4,q:'¿Qué funciones no son delegables?',a:'Las de circulación que afecten a la seguridad',opts:['Las administrativas','Las de atención al cliente','Las de mantenimiento','Las de circulación que afecten a la seguridad']},
+  {b:4,q:'En caso de fuerza mayor, antes de abandonar el puesto se debe:',a:'Adoptar medidas que garanticen la seguridad',opts:['Avisar a los viajeros','Adoptar medidas que garanticen la seguridad','Registrar la incidencia','Avisar a un compañero']},
+  {b:4,q:'¿Qué se hace con las conversaciones con el PCC?',a:'Se graban todas',opts:['Se resumen por escrito','Se eliminan tras el servicio','Se graban todas','Solo se archivan incidencias']},
+  {b:4,q:'El abandono del puesto sin autorización solo es posible:',a:'Por fuerza mayor o para evitar un peligro',opts:['En descansos','En cambios de turno','Todas son correctas','Por fuerza mayor o para evitar un peligro']},
+  {b:4,q:'¿Qué medio se utiliza si la radiotelefonía no está operativa?',a:'Telefonía selectiva de los piñones de las estaciones',opts:['Solo telefonía automática','Solo telefonía móvil','Telefonía selectiva de los piñones de las estaciones','Comunicaciones escritas']},
+  {b:4,q:'¿Qué tipo de comunicaciones se graban con el PCC?',a:'Todas, independientemente del medio',opts:['Solo radiadas','Todas, independientemente del medio','Solo telefónicas','Solo las críticas']},
+  {b:4,q:'Si una circunstancia personal impide prestar servicio con seguridad, el trabajador debe:',a:'Informar de inmediato a sus superiores',opts:['Solicitar relevo','Abandonar el puesto','Avisar a los viajeros','Informar de inmediato a sus superiores']},
+  {b:4,q:'El medio prioritario de comunicación entre PCC y conductores es:',a:'Radiotelefonía de trenes',opts:['Telefonía móvil','Telefonía automática','Radiotelefonía de trenes','Mensajería interna']},
+  {b:4,q:'Durante el servicio está prohibido:',a:'Dormir',opts:['Comer','Dormir','Cambiar de puesto','Hablar con los viajeros']},
   {b:4,q:'La prohibición de dormir durante el servicio se aplica a:',a:'Todos los trabajadores con funciones en la circulación',opts:['Todos los trabajadores con funciones en la circulación','Conductores','Mandos','Personal de estaciones']},
-  {b:4,q:'Los mandos deben vigilar especialmente:',a:'El trato al viajero',opts:['El trato al viajero','La correcta interpretación de las normas','La puntualidad','El uso del uniforme']},
-  {b:4,q:'¿Cuándo pueden delegarse funciones no delegables?',a:'Nunca',opts:['Nunca','En emergencias','Cuando exista autorización expresa por orden superior','Cuando lo considere el jefe de estación']},
-  {b:4,q:'¿Cuándo deben comprobar los trabajadores documentos y equipos?',a:'Solo al inicio',opts:['Solo al inicio','Al final del servicio','Al tomar servicio y durante el mismo','En caso de incidencia']},
-  {b:4,q:'¿Qué debe hacerse cuando se imparte una orden verbal o radiada?',a:'Registrarla por escrito',opts:['Registrarla por escrito','Hacerla repetir por el receptor','Confirmarla al final del turno','Comunicarla al superior']},
+  {b:4,q:'Los mandos deben vigilar especialmente:',a:'La correcta interpretación de las normas',opts:['El trato al viajero','La correcta interpretación de las normas','La puntualidad','El uso del uniforme']},
+  {b:4,q:'¿Cuándo pueden delegarse funciones no delegables?',a:'Cuando exista autorización expresa por orden superior',opts:['Nunca','En emergencias','Cuando exista autorización expresa por orden superior','Cuando lo considere el jefe de estación']},
+  {b:4,q:'¿Cuándo deben comprobar los trabajadores documentos y equipos?',a:'Al tomar servicio y durante el mismo',opts:['Solo al inicio','Al final del servicio','Al tomar servicio y durante el mismo','En caso de incidencia']},
+  {b:4,q:'¿Qué debe hacerse cuando se imparte una orden verbal o radiada?',a:'Hacerla repetir por el receptor',opts:['Registrarla por escrito','Hacerla repetir por el receptor','Confirmarla al final del turno','Comunicarla al superior']},
   {b:4,q:'¿Quién puede autorizar el abandono del puesto de trabajo?',a:'El superior jerárquico',opts:['El superior jerárquico','El PCC','El propio trabajador','El jefe de estación']},
-  {b:4,q:'¿Qué debe hacer quien conozca el abandono del servicio de otro trabajador?',a:'Sustituirlo',opts:['Sustituirlo','Informar al viajero','Registrar el hecho','Tomar medidas de protección y avisar al PCC y superior']},
-  {b:4,q:'La atención debida durante el servicio implica que los trabajadores:',a:'Puedan ausentarse si no hay incidencias',opts:['Puedan ausentarse si no hay incidencias','Eviten ausencias o distracciones que perjudiquen el servicio','Se concentren solo en cabina','Prioricen la rapidez del servicio']},
+  {b:4,q:'¿Qué debe hacer quien conozca el abandono del servicio de otro trabajador?',a:'Tomar medidas de protección y avisar al PCC y superior',opts:['Sustituirlo','Informar al viajero','Registrar el hecho','Tomar medidas de protección y avisar al PCC y superior']},
+  {b:4,q:'La atención debida durante el servicio implica que los trabajadores:',a:'Eviten ausencias o distracciones que perjudiquen el servicio',opts:['Puedan ausentarse si no hay incidencias','Eviten ausencias o distracciones que perjudiquen el servicio','Se concentren solo en cabina','Prioricen la rapidez del servicio']},
   {b:4,q:'¿Qué documento regula la forma de repetir las órdenes?',a:'El Manual de estilo para las comunicaciones',opts:['El Manual de estilo para las comunicaciones','El convenio colectivo','El reglamento interno','La NIC']},
-  {b:4,q:'¿A Quién debe comunicar un trabajador al detectar defectos en la aplicación de la NIC?',a:'Solo a su superior',opts:['Solo a su superior','Al personal de mantenimiento','Al PCC y a su superior inmediato','Todas son correctas']},
-  {b:4,q:'¿Qué debe hacerse ante una falta o deficiencia detectada?',a:'Comunicarla al jefe de estación',opts:['Comunicarla al jefe de estación','Anotarla','Comunicarla al jefe de mantenimiento','Comunicarla al superior inmediato o al PCC']},
-  {b:4,q:'Para órdenes escritas se deben usar preferentemente:',a:'Mensajes electrónicos',opts:['Mensajes electrónicos','Comunicaciones verbales','Anotaciones personales','Impresos establecidos al efecto']},
+  {b:4,q:'¿A Quién debe comunicar un trabajador al detectar defectos en la aplicación de la NIC?',a:'Al PCC y a su superior inmediato',opts:['Solo a su superior','Al personal de mantenimiento','Al PCC y a su superior inmediato','Todas son correctas']},
+  {b:4,q:'¿Qué debe hacerse ante una falta o deficiencia detectada?',a:'Comunicarla al superior inmediato o al PCC',opts:['Comunicarla al jefe de estación','Anotarla','Comunicarla al jefe de mantenimiento','Comunicarla al superior inmediato o al PCC']},
+  {b:4,q:'Para órdenes escritas se deben usar preferentemente:',a:'Impresos establecidos al efecto',opts:['Mensajes electrónicos','Comunicaciones verbales','Anotaciones personales','Impresos establecidos al efecto']},
   {b:4,q:'¿Quién resolverá lo que proceda ante una deficiencia comunicada?',a:'El superior inmediato o el PCC',opts:['El superior inmediato o el PCC','El jefe de línea','El jefe mantenimiento','El jefe de estación']},
-  {b:4,q:'¿Quién puede permanecer en cabinas de conducción?',a:'Todo el personal',opts:['Todo el personal','Personal adscrito y expresamente autorizado','Mandos sin autorización','Personal en formación']},
-  {b:4,q:'¿A quién deben comunicar acciones contra trenes o instalaciones?',a:'A su jefe de turno',opts:['A su jefe de turno','A seguridad','Al PCC de forma inmediata','A mantenimiento']},
-  {b:4,q:'Los mandos deben exigir al personal:',a:'Flexibilidad en la aplicación de normas',opts:['Flexibilidad en la aplicación de normas','Priorizar el servicio comercial','Cumplimiento estricto de la NIC','Autonomía operativa']},
+  {b:4,q:'¿Quién puede permanecer en cabinas de conducción?',a:'Personal adscrito y expresamente autorizado',opts:['Todo el personal','Personal adscrito y expresamente autorizado','Mandos sin autorización','Personal en formación']},
+  {b:4,q:'¿A quién deben comunicar acciones contra trenes o instalaciones?',a:'Al PCC de forma inmediata',opts:['A su jefe de turno','A seguridad','Al PCC de forma inmediata','A mantenimiento']},
+  {b:4,q:'Los mandos deben exigir al personal:',a:'Cumplimiento estricto de la NIC',opts:['Flexibilidad en la aplicación de normas','Priorizar el servicio comercial','Cumplimiento estricto de la NIC','Autonomía operativa']},
   {b:4,q:'¿Cuál es el objetivo principal de la señalización según el Art. 3.1.1?',a:'Regular la circulación de trenes con seguridad',opts:['Regular la circulación de trenes con seguridad','Regular la circulación de trenes con puntualidad','Optimizar la velocidad comercial','Todas son correctas']},
-  {b:4,q:'Los documentos y equipos deben encontrarse:',a:'Operativos',opts:['Operativos','Actualizados','En perfecto estado y en los lugares destinados','Inventariados','[04/06/2026 10:49] Quiz Bot: [ Encuesta : [28/30] ¿A quién debe informar el trabajador al tomar servicio? ]','Solo al PCC','Al superior jerárquico o al PCC si no fuera posible','Solo a su superior','Al PCC o al superior jerárquico si no fuera posible']},
-  {b:4,q:'¿Dónde deben prestar atención los trabajadores con funciones en la circulación?',a:'Solo en cabinas de conducción',opts:['Solo en cabinas de conducción','Solo en estaciones','Únicamente en la vía','En cabinas y otras dependencias relacionadas con la circulación']},
-  {b:4,q:'¿Cómo deben realizarse las notificaciones relativas a la circulación?',a:'Siempre por escrito',opts:['Siempre por escrito','A través de intermediarios','Solo verbalmente','Sin intermediarios','“']},
-  {b:6,q:'¿Qué indica el aspecto amarillo de una señal ferroviaria?',a:'Vía libre',opts:['Vía libre','Parada inmediata','Zona de obras','Anuncio de parada en la próxima señal']},
-  {b:6,q:'¿Dónde suele situarse una señal con aspecto amarillo?',a:'En depósitos',opts:['En depósitos','En estaciones finales','Para autorizar el paso a un túnel de enlace con otra línea','En vías secundarias']},
-  {b:6,q:'¿En qué situaciones se presenta el aspecto morado?',a:'En zonas con ATP',opts:['En zonas con ATP','Entrada a zonas sin señalización o con posibles obstáculos','En túneles de enlace','En estaciones finales']},
-  {b:6,q:'¿Qué indica una funda opaca gris cubriendo una señal?',a:'Señal averiada',opts:['Señal averiada','Señal en rojo','Señal fuera de servicio sin influencia en la circulación','Señal provisional']},
-  {b:6,q:'¿Qué indica el farol azul portátil?',a:'Fin de obras',opts:['Fin de obras','Inicio de precaución','Parada en estación','Inicio de la zona de obras']},
+  {b:4,q:'Los documentos y equipos deben encontrarse:',a:'Al superior jerárquico o al PCC si no fuera posible',opts:['Operativos','Actualizados','En perfecto estado y en los lugares destinados','Inventariados','Solo al PCC','Al superior jerárquico o al PCC si no fuera posible','Solo a su superior','Al PCC o al superior jerárquico si no fuera posible']},
+  {b:4,q:'¿Dónde deben prestar atención los trabajadores con funciones en la circulación?',a:'En cabinas y otras dependencias relacionadas con la circulación',opts:['Solo en cabinas de conducción','Solo en estaciones','Únicamente en la vía','En cabinas y otras dependencias relacionadas con la circulación']},
+  {b:4,q:'¿Cómo deben realizarse las notificaciones relativas a la circulación?',a:'Sin intermediarios',opts:['Siempre por escrito','A través de intermediarios','Solo verbalmente','Sin intermediarios']},
+  {b:6,q:'¿Qué indica el aspecto amarillo de una señal ferroviaria?',a:'Anuncio de parada en la próxima señal',opts:['Vía libre','Parada inmediata','Zona de obras','Anuncio de parada en la próxima señal']},
+  {b:6,q:'¿Dónde suele situarse una señal con aspecto amarillo?',a:'Para autorizar el paso a un túnel de enlace con otra línea',opts:['En depósitos','En estaciones finales','Para autorizar el paso a un túnel de enlace con otra línea','En vías secundarias']},
+  {b:6,q:'¿En qué situaciones se presenta el aspecto morado?',a:'Entrada a zonas sin señalización o con posibles obstáculos',opts:['En zonas con ATP','Entrada a zonas sin señalización o con posibles obstáculos','En túneles de enlace','En estaciones finales']},
+  {b:6,q:'¿Qué indica una funda opaca gris cubriendo una señal?',a:'Señal fuera de servicio sin influencia en la circulación',opts:['Señal averiada','Señal en rojo','Señal fuera de servicio sin influencia en la circulación','Señal provisional']},
+  {b:6,q:'¿Qué indica el farol azul portátil?',a:'Inicio de la zona de obras',opts:['Fin de obras','Inicio de precaución','Parada en estación','Inicio de la zona de obras']},
   {b:6,q:'El aspecto amarillo autoriza el rebase de la señal:',a:'Con prevención',opts:['Con prevención','Sin condiciones','A velocidad normal','Solo en ATO']},
   {b:6,q:'¿A qué altura mínima se sitúa la baliza roja?',a:'1,5 metros',opts:['1,5 metros','1 metro','1,2 metros','2 metros']},
-  {b:6,q:'¿Qué indica el cartel cuando el tiempo de parada es superior a 30 segundos?',a:'Cuenta atrás',opts:['Cuenta atrás','Indicación de parada','Tren retrasado','Sistema desconectado']},
-  {b:6,q:'¿Cómo se considera una señal apagada o con indicación dudosa?',a:'Como vía libre',opts:['Como vía libre','Como fuera de servicio','Como su aspecto más restrictivo','Como señal repetidora']},
-  {b:6,q:'La señal M-Roja de estación indica parada absoluta para trenes que:',a:'Circulan en ATO',opts:['Circulan en ATO','Circulan en M+ATP','No circulan en ATO ni en M+ATP','Están en maniobra']},
-  {b:6,q:'¿Qué característica distingue a la señal M-Roja de interestación?',a:'Letra M verde y foco rojo intermitente simultáneo',opts:['Letra M verde y foco rojo intermitente simultáneo','Letra M roja y foco verde simultáneamente de forma intermitente','Letra M roja y foco verde simultáneamente de forma fija','Solo foco rojo fijo']},
-  {b:6,q:'¿Qué indica el farol amarillo portátil?',a:'Inicio de obras',opts:['Inicio de obras','Fin de precaución','Inicio de precaución','Parada absoluta']},
-  {b:6,q:'¿Qué prevalece sobre las indicaciones del ATP?',a:'Las órdenes del conductor',opts:['Las órdenes del conductor','Los carteles','Las señales acústicas','Las indicaciones de las señales ferroviarias']},
-  {b:6,q:'¿Qué indica una baliza roja situada en la plataforma de vía?',a:'Precaución',opts:['Precaución','Zona de obras','Fin de limitación','Prohibición absoluta de rebasarla']},
-  {b:6,q:'¿Qué indica el indicador luminoso “C”?',a:'Aviso previo',opts:['Aviso previo','Punto donde se produce reducción de códigos con señal ferroviaria','Fin de reducción','Punto donde se produce reducción de códigos sin señal ferroviaria']},
+  {b:6,q:'¿Qué indica el cartel cuando el tiempo de parada es superior a 30 segundos?',a:'Indicación de parada',opts:['Cuenta atrás','Indicación de parada','Tren retrasado','Sistema desconectado']},
+  {b:6,q:'¿Cómo se considera una señal apagada o con indicación dudosa?',a:'Como su aspecto más restrictivo',opts:['Como vía libre','Como fuera de servicio','Como su aspecto más restrictivo','Como señal repetidora']},
+  {b:6,q:'La señal M-Roja de estación indica parada absoluta para trenes que:',a:'No circulan en ATO ni en M+ATP',opts:['Circulan en ATO','Circulan en M+ATP','No circulan en ATO ni en M+ATP','Están en maniobra']},
+  {b:6,q:'¿Qué característica distingue a la señal M-Roja de interestación?',a:'Letra M roja y foco verde simultáneamente de forma intermitente',opts:['Letra M verde y foco rojo intermitente simultáneo','Letra M roja y foco verde simultáneamente de forma intermitente','Letra M roja y foco verde simultáneamente de forma fija','Solo foco rojo fijo']},
+  {b:6,q:'¿Qué indica el farol amarillo portátil?',a:'Inicio de precaución',opts:['Inicio de obras','Fin de precaución','Inicio de precaución','Parada absoluta']},
+  {b:6,q:'¿Qué prevalece sobre las indicaciones del ATP?',a:'Las indicaciones de las señales ferroviarias',opts:['Las órdenes del conductor','Los carteles','Las señales acústicas','Las indicaciones de las señales ferroviarias']},
+  {b:6,q:'¿Qué indica una baliza roja situada en la plataforma de vía?',a:'Prohibición absoluta de rebasarla',opts:['Precaución','Zona de obras','Fin de limitación','Prohibición absoluta de rebasarla']},
+  {b:6,q:'¿Qué indica el indicador luminoso “C”?',a:'Punto donde se produce reducción de códigos sin señal ferroviaria',opts:['Aviso previo','Punto donde se produce reducción de códigos con señal ferroviaria','Fin de reducción','Punto donde se produce reducción de códigos sin señal ferroviaria']},
   {b:6,q:'¿Qué señales nunca pueden rebasarse sin autorización del PCC en interestación?',a:'No Rebasables (NR)',opts:['No Rebasables (NR)','Automáticas','Repetidoras','Mandadas']},
-  {b:6,q:'¿Cuánto tiempo debe esperar un conductor detenido ante una señal en rojo en interestación sin comunicación con el PCC?',a:'Un minuto',opts:['Un minuto','Tres minutos','Dos minutos','Cinco minutos']},
+  {b:6,q:'¿Cuánto tiempo debe esperar un conductor detenido ante una señal en rojo en interestación sin comunicación con el PCC?',a:'Tres minutos',opts:['Un minuto','Tres minutos','Dos minutos','Cinco minutos']},
   {b:6,q:'¿Qué indica el farol verde portátil?',a:'Final de precaución',opts:['Final de precaución','Fin de vía','Inicio de obras','Vía libre']},
-  {b:6,q:'¿Qué aspecto también indica vía libre además del verde?',a:'Amarillo',opts:['Amarillo','Blanco','Morado','Azul']},
-  {b:6,q:'¿Qué autoriza la señal M-Roja de estación a trenes en ATO o M+ATP?',a:'Parada obligatoria',opts:['Parada obligatoria','Marcha a la vista','El rebase de la señal','Cambio de vía']},
-  {b:6,q:'¿Dónde se sitúan los carteles de regulación?',a:'En túneles',opts:['En túneles','En trenes','En el piñón de algunas estaciones','En depósitos']},
-  {b:6,q:'Tras el tiempo que debe esperar un conductor detenido ante una señal en rojo en interestación sin comunicación con el PCC, este continuará la marcha:',a:'A velocidad normal',opts:['A velocidad normal','En ATO','En marcha atrás','A paso de hombre']},
+  {b:6,q:'¿Qué aspecto también indica vía libre además del verde?',a:'Blanco',opts:['Amarillo','Blanco','Morado','Azul']},
+  {b:6,q:'¿Qué autoriza la señal M-Roja de estación a trenes en ATO o M+ATP?',a:'El rebase de la señal',opts:['Parada obligatoria','Marcha a la vista','El rebase de la señal','Cambio de vía']},
+  {b:6,q:'¿Dónde se sitúan los carteles de regulación?',a:'En el piñón de algunas estaciones',opts:['En túneles','En trenes','En el piñón de algunas estaciones','En depósitos']},
+  {b:6,q:'Tras el tiempo que debe esperar un conductor detenido ante una señal en rojo en interestación sin comunicación con el PCC, este continuará la marcha:',a:'A paso de hombre',opts:['A velocidad normal','En ATO','En marcha atrás','A paso de hombre']},
   {b:6,q:'¿Qué indica el indicador “C1”?',a:'Aviso de próxima reducción de códigos',opts:['Aviso de próxima reducción de códigos','Cambio de tensión','Fin de códigos','Reducción inmediata']},
   {b:6,q:'¿Qué autoriza el aspecto morado o azul?',a:'Rebase con precaución en marcha a la vista',opts:['Rebase con precaución en marcha a la vista','Vía libre total','Parada absoluta','Rebase solo en estaciones']},
-  {b:6,q:'¿Qué señales pueden rebasarse sin autorización del PCC cuando están apagadas?',a:'Señales no rebasables',opts:['Señales no rebasables','Señales mandadas','Señales repetidoras','Señales automáticas']},
-  {b:6,q:'Las señales cubiertas con funda opaca deben ser:',a:'Rebasadas solo con autorización',opts:['Rebasadas solo con autorización','Franqueadas sin trámite especial','Consideradas en rojo','Respetadas']},
-  {b:6,q:'¿Qué tipos de indicadores luminosos existen según el Cap. 3.4?',a:'Fijos y manuales',opts:['Fijos y manuales','Temporales y definitivos','Portátiles y fijos','Ópticos y acústicos']},
-  {b:6,q:'¿Dónde se sitúan los faroles amarillo, azul y verde?',a:'Entre carriles',opts:['Entre carriles','En el eje de vía','Entre carril exterior y paramento lateral o límite de plataforma','En postes']},
-  {b:6,q:'¿A qué distancia aproximada, antes de una señal ferroviaria se coloca el indicador “CS”?',a:'50 m',opts:['50 m','100 m','150 m','200 m']},
-  {b:6,q:'¿Cuándo empieza a parpadear la cuenta atrás del tiempo de parada en estación?',a:'A los 20 segundos',opts:['A los 20 segundos','A los 15 segundos','A los 10 segundos','A los 5 segundos','“']},
+  {b:6,q:'¿Qué señales pueden rebasarse sin autorización del PCC cuando están apagadas?',a:'Señales repetidoras',opts:['Señales no rebasables','Señales mandadas','Señales repetidoras','Señales automáticas']},
+  {b:6,q:'Las señales cubiertas con funda opaca deben ser:',a:'Franqueadas sin trámite especial',opts:['Rebasadas solo con autorización','Franqueadas sin trámite especial','Consideradas en rojo','Respetadas']},
+  {b:6,q:'¿Qué tipos de indicadores luminosos existen según el Cap. 3.4?',a:'Portátiles y fijos',opts:['Fijos y manuales','Temporales y definitivos','Portátiles y fijos','Ópticos y acústicos']},
+  {b:6,q:'¿Dónde se sitúan los faroles amarillo, azul y verde?',a:'Entre carril exterior y paramento lateral o límite de plataforma',opts:['Entre carriles','En el eje de vía','Entre carril exterior y paramento lateral o límite de plataforma','En postes']},
+  {b:6,q:'¿A qué distancia aproximada, antes de una señal ferroviaria se coloca el indicador “CS”?',a:'100 m',opts:['50 m','100 m','150 m','200 m']},
+  {b:6,q:'¿Cuándo empieza a parpadear la cuenta atrás del tiempo de parada en estación?',a:'A los 10 segundos',opts:['A los 20 segundos','A los 15 segundos','A los 10 segundos','A los 5 segundos']},
   {b:7,q:'¿Dónde debe colocarse el cartel de prohibición de paso en Auto-Shunt?',a:'En todos los accesos a sacos con Auto-Shunt',opts:['En todos los accesos a sacos con Auto-Shunt','En todos los accesos a estaciones con Auto-Shunt','En todos los accesos a depósitos con Auto-Shunt','En todos los accesos a túneles con Auto-Shunt']},
-  {b:7,q:'¿Cómo se señaliza un tren por cabeza?',a:'Un faro blanco',opts:['Un faro blanco','Dos faros amarillos','Un faro verde','Dos faros blancos horizontales']},
-  {b:7,q:'¿Qué forma tiene la señal de fin de limitación de velocidad?',a:'Circular',opts:['Circular','Romboidal','Cuadrada','Triangular']},
+  {b:7,q:'¿Cómo se señaliza un tren por cabeza?',a:'Dos faros blancos horizontales',opts:['Un faro blanco','Dos faros amarillos','Un faro verde','Dos faros blancos horizontales']},
+  {b:7,q:'¿Qué forma tiene la señal de fin de limitación de velocidad?',a:'Cuadrada',opts:['Circular','Romboidal','Cuadrada','Triangular']},
   {b:7,q:'¿Cómo se señaliza un tren por cola?',a:'Dos pilotos rojos horizontales',opts:['Dos pilotos rojos horizontales','Un piloto azul','Dos pilotos blancos','Un piloto rojo']},
   {b:7,q:'¿Cómo son los indicadores kilométricos en túnel?',a:'Chapa rectangular blanca con números',opts:['Chapa rectangular blanca con números','Chapa circular blanca con números','Chapa cuadrada blanca con números','Chapa circular blanca con números y letras']},
-  {b:7,q:'Los indicadores de vía de destino informan:',a:'Si la vía está libre',opts:['Si la vía está libre','Solo de la vía de destino','Del estado de agujas','De la señal siguiente']},
-  {b:7,q:'¿Dónde se coloca el cartel de tren en proceso de mantenimiento?',a:'En el exterior del tren',opts:['En el exterior del tren','En el regulador de mando de ambas cabinas','En el PCC','En el andén']},
+  {b:7,q:'Los indicadores de vía de destino informan:',a:'Solo de la vía de destino',opts:['Si la vía está libre','Solo de la vía de destino','Del estado de agujas','De la señal siguiente']},
+  {b:7,q:'¿Dónde se coloca el cartel de tren en proceso de mantenimiento?',a:'En el regulador de mando de ambas cabinas',opts:['En el exterior del tren','En el regulador de mando de ambas cabinas','En el PCC','En el andén']},
   {b:7,q:'¿Qué debe hacer el conductor si la puerta está abierta y el piloto no parpadea?',a:'No iniciar la marcha hasta autorización',opts:['No iniciar la marcha hasta autorización','Avanzar','Retroceder','Avisar al PCC y avanzar']},
-  {b:7,q:'¿Cómo se indica un retraso superior a 99 segundos?',a:'Número fijo rojo',opts:['Número fijo rojo','Número parpadeante blanco','Letra “R” parpadeando en rojo','Señal acústica']},
-  {b:7,q:'¿Cada cuánto se sitúan generalmente los indicadores kilométricos?',a:'Cada 5 m',opts:['Cada 5 m','Cada 50 m','Cada 10 m','Cada 100 m']},
-  {b:7,q:'¿Qué letras identifican una placa de aguja?',a:'SAg',opts:['SAg','AGU','AG','NR']},
-  {b:7,q:'¿Quién debe autorizar el paso entre zonas de tensión en depósitos?',a:'El conductor',opts:['El conductor','El jefe de tren','El ATP','El responsable operativo o el PCC']},
-  {b:7,q:'¿Qué tipo de habilitaciones para conducir pueden existir?',a:'Temporales o indefinidas',opts:['Temporales o indefinidas','Generales o limitadas','Ordinarias o extraordinarias','Permanentes o provisionales']},
-  {b:7,q:'¿Qué texto incluye el cartel avisador de precaución próxima en fondo amarillo?',a:'SELECCIONAR A.T.P.',opts:['SELECCIONAR A.T.P.','PRECAUCIÓN OBRAS','¡ATENCIÓN! CARTEL PRECAUTORIO EN LA SIGUIENTE ESTACIÓN','PERSONAL EN VÍA']},
-  {b:7,q:'¿Dónde se sitúan las placas de número de aparato de vía?',a:'En trenes',opts:['En trenes','En depósitos o en el propio motor del aparato','En estaciones o en el propio motor del aparato de la vía','En túnel o en el propio motor del aparato de la vía']},
-  {b:7,q:'¿Qué debe hacer el conductor cuando aparece “tren fuera del margen de regulación”?',a:'Esperar indicaciones',opts:['Esperar indicaciones','Reducir velocidad','Salir tan pronto como autorice la señal ferroviaria','Permanecer detenido']},
-  {b:7,q:'¿Cuándo está autorizado el paso por puertas enrollables?',a:'Puerta cerrada',opts:['Puerta cerrada','Piloto intermitente con puerta abierta','Piloto fijo con puerta abierta','Piloto apagado']},
-  {b:7,q:'¿Qué es necesario para rebasar un cartel precautorio por personal en vía?',a:'Solo reducir velocidad',opts:['Solo reducir velocidad','Confirmación y autorización del PCC o testigo piloto','Señal verde','ATP activo']},
+  {b:7,q:'¿Cómo se indica un retraso superior a 99 segundos?',a:'Letra “R” parpadeando en rojo',opts:['Número fijo rojo','Número parpadeante blanco','Letra “R” parpadeando en rojo','Señal acústica']},
+  {b:7,q:'¿Cada cuánto se sitúan generalmente los indicadores kilométricos?',a:'Cada 10 m',opts:['Cada 5 m','Cada 50 m','Cada 10 m','Cada 100 m']},
+  {b:7,q:'¿Qué letras identifican una placa de aguja?',a:'AG',opts:['SAg','AGU','AG','NR']},
+  {b:7,q:'¿Quién debe autorizar el paso entre zonas de tensión en depósitos?',a:'El responsable operativo o el PCC',opts:['El conductor','El jefe de tren','El ATP','El responsable operativo o el PCC']},
+  {b:7,q:'¿Qué tipo de habilitaciones para conducir pueden existir?',a:'Generales o limitadas',opts:['Temporales o indefinidas','Generales o limitadas','Ordinarias o extraordinarias','Permanentes o provisionales']},
+  {b:7,q:'¿Qué texto incluye el cartel avisador de precaución próxima en fondo amarillo?',a:'¡ATENCIÓN! CARTEL PRECAUTORIO EN LA SIGUIENTE ESTACIÓN',opts:['SELECCIONAR A.T.P.','PRECAUCIÓN OBRAS','¡ATENCIÓN! CARTEL PRECAUTORIO EN LA SIGUIENTE ESTACIÓN','PERSONAL EN VÍA']},
+  {b:7,q:'¿Dónde se sitúan las placas de número de aparato de vía?',a:'En túnel o en el propio motor del aparato de la vía',opts:['En trenes','En depósitos o en el propio motor del aparato','En estaciones o en el propio motor del aparato de la vía','En túnel o en el propio motor del aparato de la vía']},
+  {b:7,q:'¿Qué debe hacer el conductor cuando aparece “tren fuera del margen de regulación”?',a:'Salir tan pronto como autorice la señal ferroviaria',opts:['Esperar indicaciones','Reducir velocidad','Salir tan pronto como autorice la señal ferroviaria','Permanecer detenido']},
+  {b:7,q:'¿Cuándo está autorizado el paso por puertas enrollables?',a:'Piloto intermitente con puerta abierta',opts:['Puerta cerrada','Piloto intermitente con puerta abierta','Piloto fijo con puerta abierta','Piloto apagado']},
+  {b:7,q:'¿Qué es necesario para rebasar un cartel precautorio por personal en vía?',a:'Confirmación y autorización del PCC o testigo piloto',opts:['Solo reducir velocidad','Confirmación y autorización del PCC o testigo piloto','Señal verde','ATP activo']},
   {b:7,q:'Las habilitaciones limitadas pueden restringirse a:',a:'Un tipo de material móvil y/o un tipo de vías',opts:['Un tipo de material móvil y/o un tipo de vías','Una línea concreta exclusivamente','Un horario determinado','Un trayecto específico autorizado por el PCC']},
-  {b:7,q:'¿Qué indican las tensiones en una señal de cambio de tensión?',a:'Inferior: zona siguiente / superior: zona actual',opts:['Inferior: zona siguiente / superior: zona actual','Ambas corresponden a la zona actual','Inferior: zona actual / superior: zona siguiente','Ambas corresponden a la zona siguiente']},
+  {b:7,q:'¿Qué indican las tensiones en una señal de cambio de tensión?',a:'Inferior: zona actual / superior: zona siguiente',opts:['Inferior: zona siguiente / superior: zona actual','Ambas corresponden a la zona actual','Inferior: zona actual / superior: zona siguiente','Ambas corresponden a la zona siguiente']},
   {b:7,q:'¿Cómo deben rebasarse las señales de final de catenaria?',a:'Con pantógrafos abatidos y autorización',opts:['Con pantógrafos abatidos y autorización','En ATO','Con pantógrafos abatidos y sin autorización','Con pantógrafos elevados']},
-  {b:7,q:'¿Qué forma tiene la señal de aviso de limitación de velocidad?',a:'Romboidal',opts:['Romboidal','Circular','Triangular','Cuadrada']},
-  {b:7,q:'¿En qué condición pueden conducir trenes los trabajadores aún no habilitados?',a:'En maniobras exclusivamente',opts:['En maniobras exclusivamente','Solo en vías secundarias','Para realizar prácticas bajo supervisión','Con autorización verbal del responsable operativo']},
-  {b:7,q:'¿Dónde se coloca el cartel avisador de precaución próxima?',a:'En el piñón de entrada de la estación anterior',opts:['En el piñón de entrada de la estación anterior','En el piñón de salida de la estación siguiente','En el piñón de salida de la estación anterior','En el piñón de entrada de la estación siguiente']},
-  {b:7,q:'¿Quién debe comunicar el uso de carteles especiales no normalizados?',a:'El PCC',opts:['El PCC','El conductor','El jefe de estación','La Dirección o departamento delegado']},
-  {b:7,q:'¿Qué indica el piquete de entrevía?',a:'Punto hasta el que no es compatible la circulación por ambas vías',opts:['Punto hasta el que no es compatible la circulación por ambas vías','Punto hasta el que es compatible la circulación por tres vías','Punto hasta el que es compatible la circulación por ambas vías','Punto hasta el que no es compatible la circulación por tres vías']},
-  {b:7,q:'¿Qué forma tiene la señal de limitación de velocidad?',a:'Circular',opts:['Circular','Cuadrada','Rectangular','Romboidal']},
-  {b:7,q:'¿Qué requisito general se exige para conducir cualquier tren?',a:'Estar autorizado verbalmente por el PCC',opts:['Estar autorizado verbalmente por el PCC','Haber realizado prácticas de conducción','Estar en posesión de la correspondiente habilitación','Ser trabajador con antigüedad superior a un año']},
-  {b:7,q:'¿Qué indica la señal de final de catenaria?',a:'Cambio de tensión',opts:['Cambio de tensión','Punto a partir del cual no se puede circular con tracción eléctrica','Reducción de velocidad','Punto a partir del cual se puede circular con tracción eléctrica']},
-  {b:7,q:'¿Qué debe hacer el conductor al paso por un aislador de sección?',a:'Aumentar potencia',opts:['Aumentar potencia','Situar el regulador en posición “0”','Cambiar modo','Situar el regulador en posición “1”','“']},
-  {b:9,q:'Finalizada la jornada, las Hojas de Ruta se entregarán:',a:'Al PCC',opts:['Al PCC','Al relevo','En el lugar que determine la Dirección o departamento delegado','En cualquier estación principal']},
-  {b:9,q:'Si detenido sin tracción en interestación, el alumbrado se enciende y apaga 3 o 4 veces y queda encendido, deberá:',a:'Subir pantógrafos',opts:['Subir pantógrafos','Avisar a viajeros','Reiniciar sistemas','Abatir los pantógrafos']},
-  {b:9,q:'En abandono en interestación, además se deberá:',a:'Aplicar señalización indicada en art. 5.1.4 e informar al PCC',opts:['Aplicar señalización indicada en art. 5.1.4 e informar al PCC','Aplicar señalización indicada en art. 5.4.1 e informar a viajeros','Aplicar señalización indicada en art. 5.4.1 e informar al PCC','Aplicar la señalización indicada en art. 5.1.4 e informar a viajeros']},
-  {b:9,q:'Si la señal de salida está en parada absoluta al pasar sin detenerse, el tren:',a:'Continuará hasta autorización verbal',opts:['Continuará hasta autorización verbal','Retrocederá automáticamente','Se detendrá en el piñón de entrada o punto más próximo con visibilidad','Circulará a marcha a la vista']},
-  {b:9,q:'En condiciones normales queda prohibida la circulación a contravía por vías principales:',a:'Siempre sin excepción',opts:['Siempre sin excepción','Salvo casos específicos recogidos en el artículo','Solo en horario nocturno','Únicamente en vías banalizadas']},
-  {b:9,q:'Si debe abandonar el tren por indisposición, lo dejará:',a:'Con puertas cerradas',opts:['Con puertas cerradas','Con tracción desconectada solamente','Bajo supervisión del personal de estación','Inmovilizado según art. 4.2.11 y con puertas del recinto de viajeros abiertas']},
-  {b:9,q:'La circulación de cualquier tren por la Red de Metro deberá ser:',a:'Comunicada verbalmente',opts:['Comunicada verbalmente','Registrada al finalizar servicio','Autorizada de forma expresa y previa','Validada por el conductor']},
-  {b:9,q:'Durante el recorrido entre estaciones, las puertas deberán permanecer:',a:'Desbloqueadas',opts:['Desbloqueadas','Cerradas','Cerradas y bloqueadas','En modo manual']},
-  {b:9,q:'En el relevo, el conductor saliente comunicará:',a:'Solo averías graves',opts:['Solo averías graves','Averías, desperfectos y cualquier circunstancia de interés','Únicamente incidencias de puertas','Exclusivamente situaciones degradadas']},
-  {b:9,q:'La autorización de circulación para trenes de viajeros corresponde actualmente a:',a:'El Consorcio Regional de Transportes de Madrid',opts:['El Consorcio Regional de Transportes de Madrid','El PCC','Metro','El responsable de estación']},
+  {b:7,q:'¿Qué forma tiene la señal de aviso de limitación de velocidad?',a:'Cuadrada',opts:['Romboidal','Circular','Triangular','Cuadrada']},
+  {b:7,q:'¿En qué condición pueden conducir trenes los trabajadores aún no habilitados?',a:'Para realizar prácticas bajo supervisión',opts:['En maniobras exclusivamente','Solo en vías secundarias','Para realizar prácticas bajo supervisión','Con autorización verbal del responsable operativo']},
+  {b:7,q:'¿Dónde se coloca el cartel avisador de precaución próxima?',a:'En el piñón de salida de la estación anterior',opts:['En el piñón de entrada de la estación anterior','En el piñón de salida de la estación siguiente','En el piñón de salida de la estación anterior','En el piñón de entrada de la estación siguiente']},
+  {b:7,q:'¿Quién debe comunicar el uso de carteles especiales no normalizados?',a:'La Dirección o departamento delegado',opts:['El PCC','El conductor','El jefe de estación','La Dirección o departamento delegado']},
+  {b:7,q:'¿Qué indica el piquete de entrevía?',a:'Punto hasta el que es compatible la circulación por ambas vías',opts:['Punto hasta el que no es compatible la circulación por ambas vías','Punto hasta el que es compatible la circulación por tres vías','Punto hasta el que es compatible la circulación por ambas vías','Punto hasta el que no es compatible la circulación por tres vías']},
+  {b:7,q:'¿Qué forma tiene la señal de limitación de velocidad?',a:'Romboidal',opts:['Circular','Cuadrada','Rectangular','Romboidal']},
+  {b:7,q:'¿Qué requisito general se exige para conducir cualquier tren?',a:'Estar en posesión de la correspondiente habilitación',opts:['Estar autorizado verbalmente por el PCC','Haber realizado prácticas de conducción','Estar en posesión de la correspondiente habilitación','Ser trabajador con antigüedad superior a un año']},
+  {b:7,q:'¿Qué indica la señal de final de catenaria?',a:'Punto a partir del cual no se puede circular con tracción eléctrica',opts:['Cambio de tensión','Punto a partir del cual no se puede circular con tracción eléctrica','Reducción de velocidad','Punto a partir del cual se puede circular con tracción eléctrica']},
+  {b:7,q:'¿Qué debe hacer el conductor al paso por un aislador de sección?',a:'Situar el regulador en posición “0”',opts:['Aumentar potencia','Situar el regulador en posición “0”','Cambiar modo','Situar el regulador en posición “1”']},
+  {b:9,q:'Finalizada la jornada, las Hojas de Ruta se entregarán:',a:'En el lugar que determine la Dirección o departamento delegado',opts:['Al PCC','Al relevo','En el lugar que determine la Dirección o departamento delegado','En cualquier estación principal']},
+  {b:9,q:'Si detenido sin tracción en interestación, el alumbrado se enciende y apaga 3 o 4 veces y queda encendido, deberá:',a:'Abatir los pantógrafos',opts:['Subir pantógrafos','Avisar a viajeros','Reiniciar sistemas','Abatir los pantógrafos']},
+  {b:9,q:'En abandono en interestación, además se deberá:',a:'Aplicar la señalización indicada en art. 5.1.4 e informar a viajeros',opts:['Aplicar señalización indicada en art. 5.1.4 e informar al PCC','Aplicar señalización indicada en art. 5.4.1 e informar a viajeros','Aplicar señalización indicada en art. 5.4.1 e informar al PCC','Aplicar la señalización indicada en art. 5.1.4 e informar a viajeros']},
+  {b:9,q:'Si la señal de salida está en parada absoluta al pasar sin detenerse, el tren:',a:'Se detendrá en el piñón de entrada o punto más próximo con visibilidad',opts:['Continuará hasta autorización verbal','Retrocederá automáticamente','Se detendrá en el piñón de entrada o punto más próximo con visibilidad','Circulará a marcha a la vista']},
+  {b:9,q:'En condiciones normales queda prohibida la circulación a contravía por vías principales:',a:'Salvo casos específicos recogidos en el artículo',opts:['Siempre sin excepción','Salvo casos específicos recogidos en el artículo','Solo en horario nocturno','Únicamente en vías banalizadas']},
+  {b:9,q:'Si debe abandonar el tren por indisposición, lo dejará:',a:'Inmovilizado según art. 4.2.11 y con puertas del recinto de viajeros abiertas',opts:['Con puertas cerradas','Con tracción desconectada solamente','Bajo supervisión del personal de estación','Inmovilizado según art. 4.2.11 y con puertas del recinto de viajeros abiertas']},
+  {b:9,q:'La circulación de cualquier tren por la Red de Metro deberá ser:',a:'Autorizada de forma expresa y previa',opts:['Comunicada verbalmente','Registrada al finalizar servicio','Autorizada de forma expresa y previa','Validada por el conductor']},
+  {b:9,q:'Durante el recorrido entre estaciones, las puertas deberán permanecer:',a:'Cerradas y bloqueadas',opts:['Desbloqueadas','Cerradas','Cerradas y bloqueadas','En modo manual']},
+  {b:9,q:'En el relevo, el conductor saliente comunicará:',a:'Averías, desperfectos y cualquier circunstancia de interés',opts:['Solo averías graves','Averías, desperfectos y cualquier circunstancia de interés','Únicamente incidencias de puertas','Exclusivamente situaciones degradadas']},
+  {b:9,q:'La autorización de circulación para trenes de viajeros corresponde actualmente a:',a:'Metro',opts:['El Consorcio Regional de Transportes de Madrid','El PCC','Metro','El responsable de estación']},
   {b:9,q:'El relevo de conductores debe realizarse de forma que:',a:'No produzca demora en la circulación',opts:['No produzca demora en la circulación','Coincida con el horario comercial','Se efectúe siempre en estación terminal','Lo determine el conductor saliente']},
-  {b:9,q:'El alumbrado del túnel estará permanentemente encendido:',a:'En toda la red',opts:['En toda la red','En estaciones principales','En los sacos de maniobras','En vías banalizadas']},
-  {b:9,q:'En la Hoja de Ruta se especificarán:',a:'Todas son falsas',opts:['Todas son falsas','Horarios, anomalías y observaciones relevantes','Horarios, recorrido, número de viajeros transportados, anomalías y observaciones relevantes','Horarios, recorrido, anomalías y observaciones relevantes']},
+  {b:9,q:'El alumbrado del túnel estará permanentemente encendido:',a:'En los sacos de maniobras',opts:['En toda la red','En estaciones principales','En los sacos de maniobras','En vías banalizadas']},
+  {b:9,q:'En la Hoja de Ruta se especificarán:',a:'Horarios, recorrido, número de viajeros transportados, anomalías y observaciones relevantes',opts:['Todas son falsas','Horarios, anomalías y observaciones relevantes','Horarios, recorrido, número de viajeros transportados, anomalías y observaciones relevantes','Horarios, recorrido, anomalías y observaciones relevantes']},
   {b:9,q:'Habitualmente el alumbrado del túnel estará apagado:',a:'En toda la red excepto en los sacos de maniobras',opts:['En toda la red excepto en los sacos de maniobras','En toda la red excepto en los depósitos','En toda la red excepto en las estaciones','Todas son falsas']},
-  {b:9,q:'La advertencia previa al cierre de puertas se realiza mediante:',a:'Dos toques cortos de silbato',opts:['Dos toques cortos de silbato','Señal luminosa exclusivamente','Un toque corto de silbato','Aviso por megafonía obligatorio']},
-  {b:9,q:'El conductor entrante deberá presentarse en el punto de relevo:',a:'A la hora exacta',opts:['A la hora exacta','Tras aviso del PCC','Con la antelación necesaria','Después de recibir informe escrito']},
+  {b:9,q:'La advertencia previa al cierre de puertas se realiza mediante:',a:'Un toque corto de silbato',opts:['Dos toques cortos de silbato','Señal luminosa exclusivamente','Un toque corto de silbato','Aviso por megafonía obligatorio']},
+  {b:9,q:'El conductor entrante deberá presentarse en el punto de relevo:',a:'Con la antelación necesaria',opts:['A la hora exacta','Tras aviso del PCC','Con la antelación necesaria','Después de recibir informe escrito']},
   {b:9,q:'Al abandonar la cabina, la puerta de acceso deberá quedar:',a:'Cerrada',opts:['Cerrada','Abierta','Entornada','Bloqueada con llave externa']},
-  {b:9,q:'La autorización de circulación para vehículos auxiliares corresponde a:',a:'El Consorcio Regional de Transportes de Madrid',opts:['El Consorcio Regional de Transportes de Madrid','El conductor responsable','El PCC exclusivamente','Departamento competente de Metro']},
-  {b:9,q:'Al pasar por estación sin detenerse, la velocidad no superará:',a:'20 km/h',opts:['20 km/h','25 km/h','30 km/h','40 km/h']},
-  {b:9,q:'Uno de los casos permitidos de circulación a contravía es:',a:'Por decisión del conductor',opts:['Por decisión del conductor','En cualquier estación','Con señales en vías banalizadas','Cuando haya retraso']},
-  {b:9,q:'Si un conductor se siente indispuesto durante la marcha, deberá detener el tren:',a:'Inmediatamente en vía principal',opts:['Inmediatamente en vía principal','En cualquier punto seguro','En la primera estación','Solo si lo autoriza el PCC']},
+  {b:9,q:'La autorización de circulación para vehículos auxiliares corresponde a:',a:'Departamento competente de Metro',opts:['El Consorcio Regional de Transportes de Madrid','El conductor responsable','El PCC exclusivamente','Departamento competente de Metro']},
+  {b:9,q:'Al pasar por estación sin detenerse, la velocidad no superará:',a:'30 km/h',opts:['20 km/h','25 km/h','30 km/h','40 km/h']},
+  {b:9,q:'Uno de los casos permitidos de circulación a contravía es:',a:'Con señales en vías banalizadas',opts:['Por decisión del conductor','En cualquier estación','Con señales en vías banalizadas','Cuando haya retraso']},
+  {b:9,q:'Si un conductor se siente indispuesto durante la marcha, deberá detener el tren:',a:'En la primera estación',opts:['Inmediatamente en vía principal','En cualquier punto seguro','En la primera estación','Solo si lo autoriza el PCC']},
   {b:9,q:'En vehículos auxiliares fuera de servicio sin conductor habilitado en cabina se aplicará:',a:'Freno de estacionamiento en todos los vehículos',opts:['Freno de estacionamiento en todos los vehículos','Inversión de marcha','Desconexión de batería','Solo freno neumático']},
-  {b:9,q:'Si detenido con pantógrafos abatidos, el alumbrado se apaga 15 segundos y queda encendido, deberá:',a:'Mantener pantógrafos abatidos',opts:['Mantener pantógrafos abatidos','Subir los pantógrafos','Esperar orden del PCC','Reiniciar ATP']},
-  {b:9,q:'Si se produce incidencia con puertas en marcha, el conductor deberá:',a:'Continuar hasta estación',opts:['Continuar hasta estación','Detener inmediatamente el tren','Avisar en próxima parada','Reducir velocidad sin detener']},
-  {b:9,q:'Si el conductor encuentra el túnel encendido en vía principal sin otra señalización, deberá:',a:'Reducir velocidad sin avisar',opts:['Reducir velocidad sin avisar','Llamar al PCC para informarse','Detenerse inmediatamente','Continuar normalmente']},
-  {b:9,q:'En vehículos auxiliares clásicos, deberá permanecer en cabina:',a:'Un responsable operativo',opts:['Un responsable operativo','Un ayudante técnico','Un conductor al cuidado de los frenos','Personal de estación']},
-  {b:9,q:'En la autorización para circulación de trenes, deben reflejarse circunstancias que requieran:',a:'Incremento de personal',opts:['Incremento de personal','Medidas especiales de circulación','Control policial','Revisión médica']},
+  {b:9,q:'Si detenido con pantógrafos abatidos, el alumbrado se apaga 15 segundos y queda encendido, deberá:',a:'Subir los pantógrafos',opts:['Mantener pantógrafos abatidos','Subir los pantógrafos','Esperar orden del PCC','Reiniciar ATP']},
+  {b:9,q:'Si se produce incidencia con puertas en marcha, el conductor deberá:',a:'Detener inmediatamente el tren',opts:['Continuar hasta estación','Detener inmediatamente el tren','Avisar en próxima parada','Reducir velocidad sin detener']},
+  {b:9,q:'Si el conductor encuentra el túnel encendido en vía principal sin otra señalización, deberá:',a:'Llamar al PCC para informarse',opts:['Reducir velocidad sin avisar','Llamar al PCC para informarse','Detenerse inmediatamente','Continuar normalmente']},
+  {b:9,q:'En vehículos auxiliares clásicos, deberá permanecer en cabina:',a:'Un conductor al cuidado de los frenos',opts:['Un responsable operativo','Un ayudante técnico','Un conductor al cuidado de los frenos','Personal de estación']},
+  {b:9,q:'En la autorización para circulación de trenes, deben reflejarse circunstancias que requieran:',a:'Medidas especiales de circulación',opts:['Incremento de personal','Medidas especiales de circulación','Control policial','Revisión médica']},
   {b:9,q:'La Hoja de Ruta deberá cumplimentarse salvo que:',a:'Exista sistema automático que la sustituya',opts:['Exista sistema automático que la sustituya','Lo autorice el PCC','Sea tren auxiliar','Sea trayecto inferior a 10 km']},
-  {b:9,q:'Si la circulación está afectada por situaciones degradadas del capítulo 4.7, el saliente deberá:',a:'Comunicarlo solo al PCC',opts:['Comunicarlo solo al PCC','Reflejarlo únicamente en Hoja de Ruta','Informar adecuadamente al entrante','Suspender el relevo']},
-  {b:9,q:'Tras detener el tren por indisposición, el conductor deberá:',a:'Solicitar relevo al personal de estación',opts:['Solicitar relevo al personal de estación','Notificar al PCC para recibir ayuda y sustituto','Abandonar el tren sin comunicar','Esperar revisión médica en cabina','“']},
-  {b:10,q:'Cuando una persona distinta asume la conducción, se deberá:',a:'Notificar al Consorcio',opts:['Notificar al Consorcio','Informar al PCC','Anotarlo en Hoja de Ruta únicamente','Solicitar nueva autorización de circulación']},
-  {b:10,q:'Se exceptúa la autorización del PCC para accionar el mando local cuando:',a:'Haya retrasos',opts:['Haya retrasos','Sea imprescindible para evitar accidentes','Lo solicite el conductor','Exista circulación degradada']},
-  {b:10,q:'Si las señales no se perciben claramente, el conductor deberá:',a:'Mantener velocidad constante',opts:['Mantener velocidad constante','Aumentar atención sin modificar marcha','Reducir marcha y si es necesario detenerse','Solicitar relevo inmediato']},
-  {b:10,q:'Todo tren que circule por vías principales deberá estar identificado además de su matrícula con un:',a:'Número de estación base',opts:['Número de estación base','Número de tren','Código del conductor','Código del PCC']},
-  {b:10,q:'Las líneas se dividen en tramos denominados:',a:'Sectores',opts:['Sectores','Zonas de control','Distritos','Cantones']},
-  {b:10,q:'¿Cuál es una característica de la circulación por vías principales?',a:'Uso exclusivo de conducción manual',opts:['Uso exclusivo de conducción manual','Uso exclusivo de conducción manual','Uso exclusivo del sistema CBTC','Disposición de sistemas de bloqueo automático y ATP']},
-  {b:10,q:'El número de tren puede mostrarse mediante:',a:'Solo placa física',opts:['Solo placa física','Solo cartel luminoso','Únicamente comunicación verbal','Placa física, cartel luminoso u otro método establecido']},
+  {b:9,q:'Si la circulación está afectada por situaciones degradadas del capítulo 4.7, el saliente deberá:',a:'Informar adecuadamente al entrante',opts:['Comunicarlo solo al PCC','Reflejarlo únicamente en Hoja de Ruta','Informar adecuadamente al entrante','Suspender el relevo']},
+  {b:9,q:'Tras detener el tren por indisposición, el conductor deberá:',a:'Notificar al PCC para recibir ayuda y sustituto',opts:['Solicitar relevo al personal de estación','Notificar al PCC para recibir ayuda y sustituto','Abandonar el tren sin comunicar','Esperar revisión médica en cabina']},
+  {b:10,q:'Cuando una persona distinta asume la conducción, se deberá:',a:'Informar al PCC',opts:['Notificar al Consorcio','Informar al PCC','Anotarlo en Hoja de Ruta únicamente','Solicitar nueva autorización de circulación']},
+  {b:10,q:'Se exceptúa la autorización del PCC para accionar el mando local cuando:',a:'Sea imprescindible para evitar accidentes',opts:['Haya retrasos','Sea imprescindible para evitar accidentes','Lo solicite el conductor','Exista circulación degradada']},
+  {b:10,q:'Si las señales no se perciben claramente, el conductor deberá:',a:'Reducir marcha y si es necesario detenerse',opts:['Mantener velocidad constante','Aumentar atención sin modificar marcha','Reducir marcha y si es necesario detenerse','Solicitar relevo inmediato']},
+  {b:10,q:'Todo tren que circule por vías principales deberá estar identificado además de su matrícula con un:',a:'Número de tren',opts:['Número de estación base','Número de tren','Código del conductor','Código del PCC']},
+  {b:10,q:'Las líneas se dividen en tramos denominados:',a:'Cantones',opts:['Sectores','Zonas de control','Distritos','Cantones']},
+  {b:10,q:'¿Cuál es una característica de la circulación por vías principales?',a:'Disposición de sistemas de bloqueo automático y ATP',opts:['Uso exclusivo de conducción manual','Uso exclusivo de conducción manual','Uso exclusivo del sistema CBTC','Disposición de sistemas de bloqueo automático y ATP']},
+  {b:10,q:'El número de tren puede mostrarse mediante:',a:'Placa física, cartel luminoso u otro método establecido',opts:['Solo placa física','Solo cartel luminoso','Únicamente comunicación verbal','Placa física, cartel luminoso u otro método establecido']},
   {b:10,q:'El tren se detendrá de inmediato si se aprecia:',a:'Cualquier indicio de peligro para la circulación',opts:['Cualquier indicio de peligro para la circulación','Retraso acumulado','Alta ocupación de viajeros','Avería leve sin riesgo']},
   {b:10,q:'El PCC podrá ceder el control de los enclavamientos de señales:',a:'En determinadas situaciones al responsable operativo de la estación',opts:['En determinadas situaciones al responsable operativo de la estación','Permanentemente al personal de estación','Al conductor del tren','Al Consorcio Regional de Transportes']},
-  {b:10,q:'El PCC llevará permanentemente control en tiempo real de:',a:'Solo trenes de viajeros',opts:['Solo trenes de viajeros','Trenes y personal de estación','Todos los trenes existentes en cada línea y su orden','Únicamente trenes en vía principal']},
-  {b:10,q:'Tras apreciar indicios de peligro, el conductor deberá:',a:'Avisar a la estación siguiente',opts:['Avisar a la estación siguiente','Informar inmediatamente al PCC','Todas son correctas','Anotar en Hoja de Ruta']},
-  {b:10,q:'Cuando un tren es retirado y encerrado en depósito no controlado por el PCC:',a:'Mantendrá su número',opts:['Mantendrá su número','Se le retirará el número de tren','Cambiará automáticamente de número','Quedará en espera de decisión del Consorcio']},
-  {b:10,q:'El número de tren deberá estar siempre visible en:',a:'La cabina principal únicamente',opts:['La cabina principal únicamente','Un lateral del tren','Los dos frontales de los extremos del tren','El interior de cada coche']},
-  {b:10,q:'Cada coche o vehículo tendrá un número de matrícula:',a:'Compartido por serie',opts:['Compartido por serie','Asignado por línea','Exclusivo','Temporal']},
+  {b:10,q:'El PCC llevará permanentemente control en tiempo real de:',a:'Todos los trenes existentes en cada línea y su orden',opts:['Solo trenes de viajeros','Trenes y personal de estación','Todos los trenes existentes en cada línea y su orden','Únicamente trenes en vía principal']},
+  {b:10,q:'Tras apreciar indicios de peligro, el conductor deberá:',a:'Todas son correctas',opts:['Avisar a la estación siguiente','Informar inmediatamente al PCC','Todas son correctas','Anotar en Hoja de Ruta']},
+  {b:10,q:'Cuando un tren es retirado y encerrado en depósito no controlado por el PCC:',a:'Se le retirará el número de tren',opts:['Mantendrá su número','Se le retirará el número de tren','Cambiará automáticamente de número','Quedará en espera de decisión del Consorcio']},
+  {b:10,q:'El número de tren deberá estar siempre visible en:',a:'Los dos frontales de los extremos del tren',opts:['La cabina principal únicamente','Un lateral del tren','Los dos frontales de los extremos del tren','El interior de cada coche']},
+  {b:10,q:'Cada coche o vehículo tendrá un número de matrícula:',a:'Exclusivo',opts:['Compartido por serie','Asignado por línea','Exclusivo','Temporal']},
   {b:10,q:'El conductor deberá delegar la conducción si lo solicitan expresamente y están habilitados:',a:'Todas son correctas',opts:['Todas son correctas','Mandos de línea','Otros de rango superior','Instructores en funciones de formación autorizados por el PCC']},
   {b:10,q:'¿Cuál es el objetivo principal de los sistemas de bloqueo automático y ATP?',a:'Garantizar la seguridad manteniendo distancia entre trenes',opts:['Garantizar la seguridad manteniendo distancia entre trenes','Incrementar la velocidad comercial','Facilitar la circulación en vía única','Permitir la circulación sin señalización']},
-  {b:10,q:'En caso de urgente necesidad y a instancia de responsable operativo, el personal habilitado para conducir:',a:'Podrá negarse si no está de servicio',opts:['Podrá negarse si no está de servicio','Solo podrá conducir trenes auxiliares','Deberá conducir aunque desatienda provisionalmente otras funciones','Necesitará autorización del PCC']},
+  {b:10,q:'En caso de urgente necesidad y a instancia de responsable operativo, el personal habilitado para conducir:',a:'Deberá conducir aunque desatienda provisionalmente otras funciones',opts:['Podrá negarse si no está de servicio','Solo podrá conducir trenes auxiliares','Deberá conducir aunque desatienda provisionalmente otras funciones','Necesitará autorización del PCC']},
   {b:10,q:'El número por defecto asignado al crearse un tren puede ser modificado:',a:'Única y exclusivamente por el PCC',opts:['Única y exclusivamente por el PCC','Por el conductor','Por el responsable de estación','Por el departamento técnico']},
-  {b:10,q:'Cuando un tren entra en circuito de vía de transferencia desde cochera o depósito, el sistema:',a:'Le mantiene sin identificación',opts:['Le mantiene sin identificación','Crea un tren con número por defecto','Le asigna número definitivo automáticamente','Espera confirmación del conductor']},
-  {b:10,q:'Todo trabajador autorizado que tome los mandos y conduzca un tren:',a:'Actúa bajo responsabilidad del conductor titular',opts:['Actúa bajo responsabilidad del conductor titular','Solo puede maniobrar en estación','Asume funciones y responsabilidades del conductor','Necesita autorización escrita adicional']},
-  {b:10,q:'Por delegación del PCC, el personal de estación tendrá autoridad sobre trenes en estación cuando:',a:'Siempre',opts:['Siempre','Solo en horario nocturno','Participen en resolución de circulación degradada y operen con mando local','Lo solicite el conductor']},
-  {b:10,q:'En situación normal, el personal de estaciones atenderá principalmente:',a:'Control técnico de enclavamientos',opts:['Control técnico de enclavamientos','Dirección total de circulación','Supervisión de conductores','Funciones comerciales']},
-  {b:10,q:'El número de tren solo podrá ser modificado por:',a:'El conductor',opts:['El conductor','El responsable operativo','El departamento de mantenimiento','El PCC']},
-  {b:10,q:'Si un tren sufre un golpe de cualquier índole, el conductor:',a:'Continuará hasta estación',opts:['Continuará hasta estación','Evaluará daños y decidirá','Dará aviso inmediato y no moverá el tren hasta revisión y autorización','Solo reducirá velocidad']},
-  {b:10,q:'El personal de estación no podrá accionar el cuadro de mando local sin:',a:'Presencia del conductor',opts:['Presencia del conductor','Comunicación al Consorcio','Aviso a mantenimiento','Autorización del PCC']},
-  {b:10,q:'El conductor es responsable de:',a:'Seguridad de la marcha y correcta conducción',opts:['Seguridad de la marcha y correcta conducción','Consrvación del material','Averias y accidentes por negligencia','Todas son correctas']},
-  {b:10,q:'Los sistemas de bloqueo automático y ATP limitan la velocidad de los trenes en función de:',a:'Trazado de la vía',opts:['Trazado de la vía','Todas son correctas','Situación del tren anterior','Circunstancias puntuales']},
-  {b:10,q:'Quién deberá disponer de una copia de los documentos o fichas de autorización para circular:',a:'El PCC',opts:['El PCC','El Consorcio Regional de Transportes de Madrid','El departamento competente de Metro','Todas son correctas','[05/06/2026 11:14] Quiz Bot: [ Encuesta conocido y memorizado por: ]','El personal de estación','El responsable operativo','El conductor del tren','El PCC']},
-  {b:10,q:'En condiciones normales, el control de enclavamientos de señales lo tendrá:',a:'El responsable de estación',opts:['El responsable de estación','El conductor','El PCC mediante el CTC','El PCC únicamente','“']},
-  {b:15,q:'¿Qué debe hacer el conductor del tren detenido para auxiliar?',a:'Abandonar el tren',opts:['Abandonar el tren','Identificarse y confirmar el mensaje al PCC','Continuar marcha','Identificarse únicamente']},
-  {b:15,q:'¿Cómo debe circular un tren que no garantiza shuntado por vías principales o túneles de enlace entre líneas?',a:'A paso de hombre',opts:['A paso de hombre','Automático','Permanentemente acantonado por el PCC','Sin restricciones']},
+  {b:10,q:'Cuando un tren entra en circuito de vía de transferencia desde cochera o depósito, el sistema:',a:'Crea un tren con número por defecto',opts:['Le mantiene sin identificación','Crea un tren con número por defecto','Le asigna número definitivo automáticamente','Espera confirmación del conductor']},
+  {b:10,q:'Todo trabajador autorizado que tome los mandos y conduzca un tren:',a:'Asume funciones y responsabilidades del conductor',opts:['Actúa bajo responsabilidad del conductor titular','Solo puede maniobrar en estación','Asume funciones y responsabilidades del conductor','Necesita autorización escrita adicional']},
+  {b:10,q:'Por delegación del PCC, el personal de estación tendrá autoridad sobre trenes en estación cuando:',a:'Participen en resolución de circulación degradada y operen con mando local',opts:['Siempre','Solo en horario nocturno','Participen en resolución de circulación degradada y operen con mando local','Lo solicite el conductor']},
+  {b:10,q:'En situación normal, el personal de estaciones atenderá principalmente:',a:'Funciones comerciales',opts:['Control técnico de enclavamientos','Dirección total de circulación','Supervisión de conductores','Funciones comerciales']},
+  {b:10,q:'El número de tren solo podrá ser modificado por:',a:'El PCC',opts:['El conductor','El responsable operativo','El departamento de mantenimiento','El PCC']},
+  {b:10,q:'Si un tren sufre un golpe de cualquier índole, el conductor:',a:'Dará aviso inmediato y no moverá el tren hasta revisión y autorización',opts:['Continuará hasta estación','Evaluará daños y decidirá','Dará aviso inmediato y no moverá el tren hasta revisión y autorización','Solo reducirá velocidad']},
+  {b:10,q:'El personal de estación no podrá accionar el cuadro de mando local sin:',a:'Autorización del PCC',opts:['Presencia del conductor','Comunicación al Consorcio','Aviso a mantenimiento','Autorización del PCC']},
+  {b:10,q:'El conductor es responsable de:',a:'Todas son correctas',opts:['Seguridad de la marcha y correcta conducción','Consrvación del material','Averias y accidentes por negligencia','Todas son correctas']},
+  {b:10,q:'Los sistemas de bloqueo automático y ATP limitan la velocidad de los trenes en función de:',a:'Todas son correctas',opts:['Trazado de la vía','Todas son correctas','Situación del tren anterior','Circunstancias puntuales']},
+  {b:10,q:'Quién deberá disponer de una copia de los documentos o fichas de autorización para circular:',a:'El PCC',opts:['El PCC','El Consorcio Regional de Transportes de Madrid','El departamento competente de Metro','Todas son correctas','El personal de estación','El responsable operativo','El conductor del tren','El PCC']},
+  {b:10,q:'En condiciones normales, el control de enclavamientos de señales lo tendrá:',a:'El PCC mediante el CTC',opts:['El responsable de estación','El conductor','El PCC mediante el CTC','El PCC únicamente']},
+  {b:15,q:'¿Qué debe hacer el conductor del tren detenido para auxiliar?',a:'Identificarse y confirmar el mensaje al PCC',opts:['Abandonar el tren','Identificarse y confirmar el mensaje al PCC','Continuar marcha','Identificarse únicamente']},
+  {b:15,q:'¿Cómo debe circular un tren que no garantiza shuntado por vías principales o túneles de enlace entre líneas?',a:'Permanentemente acantonado por el PCC',opts:['A paso de hombre','Automático','Permanentemente acantonado por el PCC','Sin restricciones']},
   {b:15,q:'¿Cómo se realiza la circulación del tren de auxilio salvo indicación contraria?',a:'En marcha a la vista',opts:['En marcha a la vista','En automático','En manual','En marcha a la vista']},
-  {b:15,q:'Tras una concesión de vía, ¿qué está prohibido?',a:'Circular',opts:['Circular','Parar','Señalizar','Realizar maniobras en el tramo bloqueado']},
-  {b:15,q:'¿Cómo se circula a contravía con trabajadores presentes?',a:'A paso de hombre',opts:['A paso de hombre','Automático','En marcha a la vista','Normal']},
-  {b:15,q:'¿Cuál es uno de los casos para circular por cantón ocupado?',a:'Alta velocidad',opts:['Alta velocidad','Transporte comercial','Maniobras de inversión de marcha','Limpieza de tren']},
-  {b:15,q:'¿Qué es un servicio de lanzadera sin señales?',a:'Dos trenes en paralelo',opts:['Dos trenes en paralelo','Servicio normal','Un tren que circula en ambos sentidos por una vía','Un tren que circula en único sentido por una vía']},
-  {b:15,q:'En concesión por estación para auxilio por el responsable operativo, ¿es necesaria la localización del tren anterior?',a:'Siempre',opts:['Siempre','A veces','No es necesaria','Solo en túneles']},
-  {b:15,q:'¿Qué señal se emite a la entrada de estaciones en contravía?',a:'Luminosa',opts:['Luminosa','Manual','Acústica mediante claxon o silbato','Radio']},
-  {b:15,q:'¿Cuál es uno de los casos para circular por cantón ocupado?',a:'Transporte urgente',opts:['Transporte urgente','Operación conjunta con un tren de trabajo','Limpieza de vía','Cambio de conductor']},
+  {b:15,q:'Tras una concesión de vía, ¿qué está prohibido?',a:'Realizar maniobras en el tramo bloqueado',opts:['Circular','Parar','Señalizar','Realizar maniobras en el tramo bloqueado']},
+  {b:15,q:'¿Cómo se circula a contravía con trabajadores presentes?',a:'En marcha a la vista',opts:['A paso de hombre','Automático','En marcha a la vista','Normal']},
+  {b:15,q:'¿Cuál es uno de los casos para circular por cantón ocupado?',a:'Maniobras de inversión de marcha',opts:['Alta velocidad','Transporte comercial','Maniobras de inversión de marcha','Limpieza de tren']},
+  {b:15,q:'¿Qué es un servicio de lanzadera sin señales?',a:'Un tren que circula en ambos sentidos por una vía',opts:['Dos trenes en paralelo','Servicio normal','Un tren que circula en ambos sentidos por una vía','Un tren que circula en único sentido por una vía']},
+  {b:15,q:'En concesión por estación para auxilio por el responsable operativo, ¿es necesaria la localización del tren anterior?',a:'No es necesaria',opts:['Siempre','A veces','No es necesaria','Solo en túneles']},
+  {b:15,q:'¿Qué señal se emite a la entrada de estaciones en contravía?',a:'Acústica mediante claxon o silbato',opts:['Luminosa','Manual','Acústica mediante claxon o silbato','Radio']},
+  {b:15,q:'¿Cuál es uno de los casos para circular por cantón ocupado?',a:'Operación conjunta con un tren de trabajo',opts:['Transporte urgente','Operación conjunta con un tren de trabajo','Limpieza de vía','Cambio de conductor']},
   {b:15,q:'¿Qué se debe garantizar antes de establecer el servicio lanzadera?',a:'Seguridad acantonando el tren',opts:['Seguridad acantonando el tren','Comunicación','Seguridad circulando marcha a la vista','Seguridad circulando a paso de hombre']},
-  {b:15,q:'Antes de conceder vía a contravía, ¿qué debe confirmar el PCC?',a:'Tipo de tren',opts:['Tipo de tren','Localización del tren precedente','Localización del tren siguiente y del precedente','Localización del tren siguiente']},
-  {b:15,q:'¿Qué debe hacer el responsable operativo antes de conceder vía?',a:'Detener todos los trenes',opts:['Detener todos los trenes','Informar por escrito al PCC','Informarse del orden de circulación a través del PCC','Informar por radio al PCC']},
-  {b:15,q:'En concesión mixta, ¿qué puede hacer el PCC?',a:'Delegar totalmente',opts:['Delegar totalmente','Autorizar sin datos','Solicitar localización mediante mensaje escrito a las estaciones','Solicitar localización mediante llamada general a las estaciones']},
-  {b:15,q:'¿Qué procedimiento se aplica en la primera circulación de lanzadera?',a:'Circular en automático',opts:['Circular en automático','Concesión de vía','Circular en manual','Circular en marcha a la vista']},
-  {b:15,q:'¿Cómo se solicita la localización del tren precedente al que se va a autorizar por el responsable operativo de estación?',a:'Por escrito',opts:['Por escrito','Individualmente','Mediante llamada general indicando estación y vía','Por señal acústica']},
+  {b:15,q:'Antes de conceder vía a contravía, ¿qué debe confirmar el PCC?',a:'Localización del tren siguiente y del precedente',opts:['Tipo de tren','Localización del tren precedente','Localización del tren siguiente y del precedente','Localización del tren siguiente']},
+  {b:15,q:'¿Qué debe hacer el responsable operativo antes de conceder vía?',a:'Informarse del orden de circulación a través del PCC',opts:['Detener todos los trenes','Informar por escrito al PCC','Informarse del orden de circulación a través del PCC','Informar por radio al PCC']},
+  {b:15,q:'En concesión mixta, ¿qué puede hacer el PCC?',a:'Solicitar localización mediante llamada general a las estaciones',opts:['Delegar totalmente','Autorizar sin datos','Solicitar localización mediante mensaje escrito a las estaciones','Solicitar localización mediante llamada general a las estaciones']},
+  {b:15,q:'¿Qué procedimiento se aplica en la primera circulación de lanzadera?',a:'Concesión de vía',opts:['Circular en automático','Concesión de vía','Circular en manual','Circular en marcha a la vista']},
+  {b:15,q:'¿Cómo se solicita la localización del tren precedente al que se va a autorizar por el responsable operativo de estación?',a:'Mediante llamada general indicando estación y vía',opts:['Por escrito','Individualmente','Mediante llamada general indicando estación y vía','Por señal acústica']},
   {b:15,q:'Si no puede contactar con el PCC, ¿qué hace?',a:'Continúa a paso de hombre tras 3 minutos',opts:['Continúa a paso de hombre tras 3 minutos','Continúa marcha a la vista tras 2 minutos','Continúa a paso de hombre tras 2 minutos','Continúa marcha a la vista tras 3 minutos']},
-  {b:15,q:'Si un tren rebasa una señal en parada involuntariamente, ¿qué hace?',a:'Continúa',opts:['Continúa','Lo ignora y lo comunica al PCC','Retocede y lo comunica al PCC','Se detiene y lo comunica al PCC']},
-  {b:15,q:'Salvo indicación contraria, ¿cómo se circula en cantón ocupado?',a:'En marcha a la vista',opts:['En marcha a la vista','En automático','A paso de hombre','Normal']},
-  {b:15,q:'¿Qué documentos se confeccionan en el proceso de localización del tren precedente y el tren autorizado?',a:'Concesión de vía y Boletín de doble precaución',opts:['Concesión de vía y Boletín de doble precaución','Boletín de doble precaución','Concesión de vía','Partes de incidencia']},
-  {b:15,q:'Si no hay comunicación con el tren detenido, ¿cómo circulará el tren de auxilio?',a:'En marcha a la vista',opts:['En marcha a la vista','A paso de hombre','En automático','A velocidad media']},
-  {b:15,q:'¿Cómo circulan los vehículos auxiliares en vías principales?',a:'En marcha a la vista',opts:['En marcha a la vista','En automático','A paso de hombre','Manual']},
-  {b:15,q:'¿Qué tipo de concesiones de vía pueden establecerse en avería de comunicaciones?',a:'Parciales',opts:['Parciales','Mixtas','Manuales','Automáticas']},
-  {b:15,q:'¿Cuándo puede el PCC autorizar circular por un cantón ocupado?',a:'Siempre',opts:['Siempre','Nunca','Excepcionalmente en casos específicos','Solo en túneles']},
-  {b:15,q:'¿Qué debe hacer el conductor ante una señal dudosa o apagada en vía secundaria?',a:'Continuar y comunicar al PCC',opts:['Continuar y comunicar al PCC','Detenerse y comunicar al PCC','Detenerse sin comunicar al PCC','Continuar sin comunicar al PCC']},
-  {b:15,q:'¿Cuándo no es necesario bloqueo telefónico en vía secundaria?',a:'Siempre',opts:['Siempre','Nunca','Cuando toda la maniobra es en el mismo enclavamiento','Cuando toda la maniobra no es en el mismo enclavamiento']},
-  {b:15,q:'Antes de auxiliar un tren detenido, ¿qué debe hacer el PCC?',a:'Enviar ayuda directa',opts:['Enviar ayuda directa','Informar al tren detenido únicamente','Informar al tren detenido y ordenar su inmovilización','Apagar señales']},
-  {b:15,q:'¿Qué modo de conducción no debe utilizar el tren que debe circular detrás del tren acantonado?',a:'Manual',opts:['Manual','ATO','M+20','M+ATP']},
+  {b:15,q:'Si un tren rebasa una señal en parada involuntariamente, ¿qué hace?',a:'Se detiene y lo comunica al PCC',opts:['Continúa','Lo ignora y lo comunica al PCC','Retocede y lo comunica al PCC','Se detiene y lo comunica al PCC']},
+  {b:15,q:'Salvo indicación contraria, ¿cómo se circula en cantón ocupado?',a:'A paso de hombre',opts:['En marcha a la vista','En automático','A paso de hombre','Normal']},
+  {b:15,q:'¿Qué documentos se confeccionan en el proceso de localización del tren precedente y el tren autorizado?',a:'Concesión de vía',opts:['Concesión de vía y Boletín de doble precaución','Boletín de doble precaución','Concesión de vía','Partes de incidencia']},
+  {b:15,q:'Si no hay comunicación con el tren detenido, ¿cómo circulará el tren de auxilio?',a:'A paso de hombre',opts:['En marcha a la vista','A paso de hombre','En automático','A velocidad media']},
+  {b:15,q:'¿Cómo circulan los vehículos auxiliares en vías principales?',a:'A paso de hombre',opts:['En marcha a la vista','En automático','A paso de hombre','Manual']},
+  {b:15,q:'¿Qué tipo de concesiones de vía pueden establecerse en avería de comunicaciones?',a:'Mixtas',opts:['Parciales','Mixtas','Manuales','Automáticas']},
+  {b:15,q:'¿Cuándo puede el PCC autorizar circular por un cantón ocupado?',a:'Excepcionalmente en casos específicos',opts:['Siempre','Nunca','Excepcionalmente en casos específicos','Solo en túneles']},
+  {b:15,q:'¿Qué debe hacer el conductor ante una señal dudosa o apagada en vía secundaria?',a:'Detenerse y comunicar al PCC',opts:['Continuar y comunicar al PCC','Detenerse y comunicar al PCC','Detenerse sin comunicar al PCC','Continuar sin comunicar al PCC']},
+  {b:15,q:'¿Cuándo no es necesario bloqueo telefónico en vía secundaria?',a:'Cuando toda la maniobra es en el mismo enclavamiento',opts:['Siempre','Nunca','Cuando toda la maniobra es en el mismo enclavamiento','Cuando toda la maniobra no es en el mismo enclavamiento']},
+  {b:15,q:'Antes de auxiliar un tren detenido, ¿qué debe hacer el PCC?',a:'Informar al tren detenido y ordenar su inmovilización',opts:['Enviar ayuda directa','Informar al tren detenido únicamente','Informar al tren detenido y ordenar su inmovilización','Apagar señales']},
+  {b:15,q:'¿Qué modo de conducción no debe utilizar el tren que debe circular detrás del tren acantonado?',a:'ATO',opts:['Manual','ATO','M+20','M+ATP']},
   {b:15,q:'¿Qué debe indicar el PCC al tren que circula detrás del tren acantonado?',a:'Que solo podrá circular bajo autorización y hasta un punto concreto',opts:['Que solo podrá circular bajo autorización y hasta un punto concreto','Velocidad','Señales','Hora']},
-  {b:15,q:'En trabajos conjuntos con tren acantonado, ¿qué orden recibe este último?',a:'Circular',opts:['Circular','Retroceder','Cambiar vía','Permanecer inmovilizado','“']},
-  {b:16,q:'Según el Art. 4.10.1, para acceder a la plataforma desde un tren para resolución de incidencias, ¿qué debe llevar el trabajador?',a:'Linterna del tren y prenda de alta visibilidad',opts:['Linterna del tren y prenda de alta visibilidad','Prenda de alta visibilidad y medio de comunicación si lo hubiera','Linterna del tren y medio de comunicación si lo hubiera','Linterna del tren, prenda de alta visibilidad y medio de comunicación si lo hubiera']},
-  {b:16,q:'¿Qué debe hacer el PCC antes de autorizar la circulación por áreas de seguridad o trabajo?',a:'Informar a los equipos de trabajadores de la salida del tren, indicando sentido y vía',opts:['Informar a los equipos de trabajadores de la salida del tren, indicando sentido y vía','Informar a los equipos de trabajadores de la entrada del tren, indicando solo la vía','Informar a los equipos de trabajadores de la entrada del tren, indicando sentido y vía','Informar a los equipos de trabajadores de la entrada del tren, indicando solo el sentido']},
+  {b:15,q:'En trabajos conjuntos con tren acantonado, ¿qué orden recibe este último?',a:'Permanecer inmovilizado',opts:['Circular','Retroceder','Cambiar vía','Permanecer inmovilizado']},
+  {b:16,q:'Según el Art. 4.10.1, para acceder a la plataforma desde un tren para resolución de incidencias, ¿qué debe llevar el trabajador?',a:'Linterna del tren, prenda de alta visibilidad y medio de comunicación si lo hubiera',opts:['Linterna del tren y prenda de alta visibilidad','Prenda de alta visibilidad y medio de comunicación si lo hubiera','Linterna del tren y medio de comunicación si lo hubiera','Linterna del tren, prenda de alta visibilidad y medio de comunicación si lo hubiera']},
+  {b:16,q:'¿Qué debe hacer el PCC antes de autorizar la circulación por áreas de seguridad o trabajo?',a:'Informar a los equipos de trabajadores de la entrada del tren, indicando sentido y vía',opts:['Informar a los equipos de trabajadores de la salida del tren, indicando sentido y vía','Informar a los equipos de trabajadores de la entrada del tren, indicando solo la vía','Informar a los equipos de trabajadores de la entrada del tren, indicando sentido y vía','Informar a los equipos de trabajadores de la entrada del tren, indicando solo el sentido']},
   {b:16,q:'¿Qué debe hacer el PCC cuando un incidente impide la circulación en un punto kilométrico?',a:'Establecer un servicio provisional y dividir la línea en tramos independientes',opts:['Establecer un servicio provisional y dividir la línea en tramos independientes','Establecer un servicio adional y dividir la línea en tramos independientes','Dividir la línea en tramos independientes únicamente','Establecer un servicio provisional únicamente']},
-  {b:16,q:'En el Art. 4.9.5, al circular por un tramo en obras sin presencia de personal, ¿qué modo debe seleccionar el conductor si está en ATO?',a:'M+20',opts:['M+20','Normal','M+ATP','Paso de hombre']},
+  {b:16,q:'En el Art. 4.9.5, al circular por un tramo en obras sin presencia de personal, ¿qué modo debe seleccionar el conductor si está en ATO?',a:'M+ATP',opts:['M+20','Normal','M+ATP','Paso de hombre']},
   {b:16,q:'Si un tren debe realizar desplazamientos en los dos sentidos dentro de un tramo autorizado fuera de servicio, ¿qué se requiere?',a:'Cada cambio de sentido debe ser autorizado por el PCC',opts:['Cada cambio de sentido debe ser autorizado por el PCC','Informar a los trabajadores','Disminuir velocidad a 30 km/h','Circular libremente sin autorización']},
-  {b:16,q:'¿Qué debe hacer el conductor ante cartel precautorio?',a:'Seleccionar ATO',opts:['Seleccionar ATO','Continuar','Reducir velocidad','Detenerse sin rebasarlo']},
-  {b:16,q:'¿Cómo se circula en áreas de trabajo?',a:'Marcha a la vista y en M+20 si es posible',opts:['Marcha a la vista y en M+20 si es posible','A paso de hombre y en M+ATP si es posible','A paso de hombre y en M+20 si es posible','Marcha a la vista y en M+ATP si es posible']},
-  {b:16,q:'¿Qué indica la secuencia de carteles precautorios?',a:'Cambio de tensión',opts:['Cambio de tensión','Presencia de personal en vía','Velocidad','Señales','9/30] En periodo fuera de servicio, ¿cómo se comunica el inicio del periodo de trabajo a los equipos de trabajadores? ]','Mediante la autorización del PCC para acceder a la plataforma de vía','No se comunica, deben verificar por sí mismos','Solo con carteles','Solo de forma verbal']},
+  {b:16,q:'¿Qué debe hacer el conductor ante cartel precautorio?',a:'Detenerse sin rebasarlo',opts:['Seleccionar ATO','Continuar','Reducir velocidad','Detenerse sin rebasarlo']},
+  {b:16,q:'¿Cómo se circula en áreas de trabajo?',a:'A paso de hombre y en M+20 si es posible',opts:['Marcha a la vista y en M+20 si es posible','A paso de hombre y en M+ATP si es posible','A paso de hombre y en M+20 si es posible','Marcha a la vista y en M+ATP si es posible']},
+  {b:16,q:'¿Qué indica la secuencia de carteles precautorios?',a:'Mediante la autorización del PCC para acceder a la plataforma de vía',opts:['Cambio de tensión','Presencia de personal en vía','Velocidad','Señales','Mediante la autorización del PCC para acceder a la plataforma de vía','No se comunica, deben verificar por sí mismos','Solo con carteles','Solo de forma verbal']},
   {b:16,q:'Según el Art. 4.10.3, al acceder a sacos con Auto-Shunt, además de la prenda de alta visibilidad, ¿qué debe solicitar el trabajador?',a:'Desconexión del Auto-Shunt y Boletín de acceso a plataforma',opts:['Desconexión del Auto-Shunt y Boletín de acceso a plataforma','Conexión del Auto-Shunt y Boletín de acceso a plataforma','Desconexión del Auto-Shunt únicamente','Boletín de acceso a plataforma únicamente']},
-  {b:16,q:'Si no hay comunicación con el PCC, ¿qué debe hacer el trabajador antes de acceder a la plataforma de vía desde un tren?',a:'Extremar precauciones y no acceder hasta confirmar detención de trenes en la misma vía',opts:['Extremar precauciones y no acceder hasta confirmar detención de trenes en la misma vía','Extremar precauciones y acceder para confirmar detención de trenes en vía contraria','Extremar precauciones y no acceder hasta confirmar detención de trenes en vía contraria','Extremar precauciones y acceder para confirmar detención de trenes en la misma vía']},
-  {b:16,q:'¿Cuándo no es necesaria la colocación de carteles precautorios en sacos con Auto-Shunt?',a:'Durante operaciones de encierre',opts:['Durante operaciones de encierre','Reposición de trenes','Resolución de incidencias puntuales','Todas son correctas']},
-  {b:16,q:'¿Cuál es la velocidad máxima al pasar por farol azul en tramos con obras sin personal?',a:'50 km/h salvo que se indique limitación inferior',opts:['50 km/h salvo que se indique limitación inferior','40 km/h salvo que se indique limitación inferior','30 km/h salvo que se indique limitación inferior','20 km/h salvo que se indique limitación inferior']},
+  {b:16,q:'Si no hay comunicación con el PCC, ¿qué debe hacer el trabajador antes de acceder a la plataforma de vía desde un tren?',a:'Extremar precauciones y no acceder hasta confirmar detención de trenes en vía contraria',opts:['Extremar precauciones y no acceder hasta confirmar detención de trenes en la misma vía','Extremar precauciones y acceder para confirmar detención de trenes en vía contraria','Extremar precauciones y no acceder hasta confirmar detención de trenes en vía contraria','Extremar precauciones y acceder para confirmar detención de trenes en la misma vía']},
+  {b:16,q:'¿Cuándo no es necesaria la colocación de carteles precautorios en sacos con Auto-Shunt?',a:'Todas son correctas',opts:['Durante operaciones de encierre','Reposición de trenes','Resolución de incidencias puntuales','Todas son correctas']},
+  {b:16,q:'¿Cuál es la velocidad máxima al pasar por farol azul en tramos con obras sin personal?',a:'30 km/h salvo que se indique limitación inferior',opts:['50 km/h salvo que se indique limitación inferior','40 km/h salvo que se indique limitación inferior','30 km/h salvo que se indique limitación inferior','20 km/h salvo que se indique limitación inferior']},
   {b:16,q:'Si no hay comunicación con PCC al acceder para resolución de incidencias, ¿qué debe hacerse?',a:'No acceder hasta confirmar detención de trenes en el tramo',opts:['No acceder hasta confirmar detención de trenes en el tramo','Acceder con precaución','Colocar señales provisionales','Ignorar trenes cercanos']},
-  {b:16,q:'Para auxiliar trenes detenidos o resolver incidencias, ¿qué equipo debe portar el trabajador que accede a la plataforma?',a:'Linterna, más medio de comunicación si lo hubiera',opts:['Linterna, más medio de comunicación si lo hubiera','Linterna y prenda de alta visibilidad','Linterna y prenda de alta visibilidad, más medio de comunicación si lo hubiera','Prenda de alta visibilidad, más medio de comunicación si lo hubiera']},
+  {b:16,q:'Para auxiliar trenes detenidos o resolver incidencias, ¿qué equipo debe portar el trabajador que accede a la plataforma?',a:'Linterna y prenda de alta visibilidad, más medio de comunicación si lo hubiera',opts:['Linterna, más medio de comunicación si lo hubiera','Linterna y prenda de alta visibilidad','Linterna y prenda de alta visibilidad, más medio de comunicación si lo hubiera','Prenda de alta visibilidad, más medio de comunicación si lo hubiera']},
   {b:16,q:'Ante cartel de precaución próxima, ¿qué debe hacer el conductor en ATO?',a:'Seleccionar modo M+ATP',opts:['Seleccionar modo M+ATP','Seleccionar modo automático','Seleccionar modo manual','Seleccionar modo M+20']},
-  {b:16,q:'Una interrupción de servicio que no afecte a la totalidad de la línea implica:',a:'La clausura definitiva del tramo afectado',opts:['La clausura definitiva del tramo afectado','La reducción de velocidad en toda la línea','Una redefinición temporal de la topología de la línea','La sustitución de trenes por autobuses']},
-  {b:16,q:'Para acceder a los sacos de maniobras sin Auto-Shunt, ¿es necesaria la colocación de carteles precautorios?',a:'Sí, siempre',opts:['Sí, siempre','Solo si hay personal presente','Solo en depósitos','No, no es necesaria']},
-  {b:16,q:'En periodo fuera de servicio, ¿cómo es la circulación general ante la presencia de personal en la vía?',a:'En marcha a la vista sin excepciones',opts:['En marcha a la vista sin excepciones','A paso de hombre sin excepciones','En marcha a la vista con excepciones','A paso de hombre con excepciones']},
-  {b:16,q:'Según el Art. 4.10.2, para acceder a sacos de maniobras sin Auto-Shunt, ¿qué prenda es obligatoria?',a:'Casco y guantes',opts:['Casco y guantes','Uniforme normal','Prenda de señalización personal de alta visibilidad','Chaleco reflectante solo de noche']},
-  {b:16,q:'Antes de autorizar el movimiento de trenes en cabeceras de línea, ¿qué se confirma respecto al personal en plataforma?',a:'Que esté ubicado en el itinerario que va a efectuar el tren autorizado',opts:['Que esté ubicado en el itinerario que va a efectuar el tren autorizado','Que esté ubicado fuera del itinerario que va a efectuar el tren autorizado','Que haya carteles','Que lleve chaleco reflectante']},
-  {b:16,q:'En periodo de servicio, ¿qué está prohibido en la vía?',a:'Presencia de personal sin excepciones',opts:['Presencia de personal sin excepciones','Usar claxon','Presencia de personal salvo excepciones','Señalizar']},
-  {b:16,q:'¿Qué debe hacer al ver una luz roja en vía por zona protegida con cartel precautorio?',a:'Detenerse a unos 80 metros',opts:['Detenerse a unos 80 metros','Detenerse a unos 20 metros','Detenerse a unos 30 metros','Detenerse a unos 50 metros']},
-  {b:16,q:'¿Quién autoriza el inicio de trabajos en la franja de borde de andén (Zona A)?',a:'El jefe de estación y se informa a los conductores de las estaciones donde se trabaja',opts:['El jefe de estación y se informa a los conductores de las estaciones donde se trabaja','El PCC y se informa a los conductores de las estaciones donde se trabaja','El jefe de mantenimiento y se informa a los conductores de las estaciones donde se trabaja','El responsable operativo y se informa a los conductores de las estaciones donde se trabaja']},
-  {b:16,q:'¿Cómo circulará tras autorización ante cartel precautorio?',a:'En marcha a la vista',opts:['En marcha a la vista','Automático','A marcha de hombre','M+ATP']},
-  {b:16,q:'Según el Art. 4.9.6, en periodo de servicio, ¿qué debe hacer el PCC cuando se autoriza el acceso a la plataforma de vía?',a:'Establecer el inicio del proceso para el acceso a la vía',opts:['Establecer el inicio del proceso para el acceso a la vía','Autorizar los carteles precautorios','Establecimiento de recogida de firmas','Todas son correctas']},
-  {b:16,q:'¿Qué requiere la entrada/salida de vehículos bi-viales?',a:'Autorización del PCC o cualquier responsable operativo',opts:['Autorización del PCC o cualquier responsable operativo','Autorización del PCC únicamente','Autorización del PCC o responsable operativo del centro donde se encuentren','Autorización del responsable operativo únicamente']},
+  {b:16,q:'Una interrupción de servicio que no afecte a la totalidad de la línea implica:',a:'Una redefinición temporal de la topología de la línea',opts:['La clausura definitiva del tramo afectado','La reducción de velocidad en toda la línea','Una redefinición temporal de la topología de la línea','La sustitución de trenes por autobuses']},
+  {b:16,q:'Para acceder a los sacos de maniobras sin Auto-Shunt, ¿es necesaria la colocación de carteles precautorios?',a:'No, no es necesaria',opts:['Sí, siempre','Solo si hay personal presente','Solo en depósitos','No, no es necesaria']},
+  {b:16,q:'En periodo fuera de servicio, ¿cómo es la circulación general ante la presencia de personal en la vía?',a:'En marcha a la vista con excepciones',opts:['En marcha a la vista sin excepciones','A paso de hombre sin excepciones','En marcha a la vista con excepciones','A paso de hombre con excepciones']},
+  {b:16,q:'Según el Art. 4.10.2, para acceder a sacos de maniobras sin Auto-Shunt, ¿qué prenda es obligatoria?',a:'Prenda de señalización personal de alta visibilidad',opts:['Casco y guantes','Uniforme normal','Prenda de señalización personal de alta visibilidad','Chaleco reflectante solo de noche']},
+  {b:16,q:'Antes de autorizar el movimiento de trenes en cabeceras de línea, ¿qué se confirma respecto al personal en plataforma?',a:'Que esté ubicado fuera del itinerario que va a efectuar el tren autorizado',opts:['Que esté ubicado en el itinerario que va a efectuar el tren autorizado','Que esté ubicado fuera del itinerario que va a efectuar el tren autorizado','Que haya carteles','Que lleve chaleco reflectante']},
+  {b:16,q:'En periodo de servicio, ¿qué está prohibido en la vía?',a:'Presencia de personal salvo excepciones',opts:['Presencia de personal sin excepciones','Usar claxon','Presencia de personal salvo excepciones','Señalizar']},
+  {b:16,q:'¿Qué debe hacer al ver una luz roja en vía por zona protegida con cartel precautorio?',a:'Detenerse a unos 50 metros',opts:['Detenerse a unos 80 metros','Detenerse a unos 20 metros','Detenerse a unos 30 metros','Detenerse a unos 50 metros']},
+  {b:16,q:'¿Quién autoriza el inicio de trabajos en la franja de borde de andén (Zona A)?',a:'El PCC y se informa a los conductores de las estaciones donde se trabaja',opts:['El jefe de estación y se informa a los conductores de las estaciones donde se trabaja','El PCC y se informa a los conductores de las estaciones donde se trabaja','El jefe de mantenimiento y se informa a los conductores de las estaciones donde se trabaja','El responsable operativo y se informa a los conductores de las estaciones donde se trabaja']},
+  {b:16,q:'¿Cómo circulará tras autorización ante cartel precautorio?',a:'M+ATP',opts:['En marcha a la vista','Automático','A marcha de hombre','M+ATP']},
+  {b:16,q:'Según el Art. 4.9.6, en periodo de servicio, ¿qué debe hacer el PCC cuando se autoriza el acceso a la plataforma de vía?',a:'Todas son correctas',opts:['Establecer el inicio del proceso para el acceso a la vía','Autorizar los carteles precautorios','Establecimiento de recogida de firmas','Todas son correctas']},
+  {b:16,q:'¿Qué requiere la entrada/salida de vehículos bi-viales?',a:'Autorización del PCC o responsable operativo del centro donde se encuentren',opts:['Autorización del PCC o cualquier responsable operativo','Autorización del PCC únicamente','Autorización del PCC o responsable operativo del centro donde se encuentren','Autorización del responsable operativo únicamente']},
   {b:16,q:'¿Cómo se realiza la circulación a contravía en vías banalizadas con obras?',a:'A velocidad máxima de 30 km/h en toda la interestación, salvo limitación inferior indicada',opts:['A velocidad máxima de 30 km/h en toda la interestación, salvo limitación inferior indicada','Solo con autorización verbal del PCC','A velocidad máxima de 50 km/h en toda la interestación, salvo limitación inferior indicada','A velocidad máxima de 40 km/h en toda la interestación, salvo limitación inferior indicada']},
-  {b:16,q:'Durante el periodo de servicio, ¿qué debe garantizar el PCC respecto a la circulación de trenes en zonas con personal trabajando?',a:'Que circulen todos los trenes a paso de hombre',opts:['Que circulen todos los trenes a paso de hombre','Que no exista circulación simultánea por ambas vías y comunicarlo al responsable operativo','Que circulen todos los trenes en marcha a la vista','Que exista circulación simultánea por ambas vías y comunicarlo al responsable operativo']},
-  {b:16,q:'¿Qué función tiene el PCC respecto al alumbrado del túnel?',a:'Únicamente encender según circunstancias, o dar órdenes al responsable operativo',opts:['Únicamente encender según circunstancias, o dar órdenes al responsable operativo','No tiene ninguna función','Encender o apagar según circunstancias, o dar órdenes al responsable operativo','Únicamente apagar según circunstancias, o dar órdenes al responsable operativo','“']},
-  {b:17,q:'Las estaciones que limitan la circulación durante una interrupción pasan a ser:',a:'Estaciones de paso restringido',opts:['Estaciones de paso restringido','Zonas de mantenimiento','Cabeceras de línea','Puntos de evacuación obligatoria']},
-  {b:17,q:'Durante el retroceso ante el rebase del piñon de salida:',a:'Se va a paso de hombre sin señales acústicas',opts:['Se va a paso de hombre sin señales acústicas','Se va en marcha a la vista con señales acústicas','Se va a paso de hombre con señales acústicas','Se va en marcha a la vista sin señales acústicas']},
-  {b:17,q:'Si el rebase supera el 50% y la señal estaba en parada o hay duda:',a:'Se espera 3 minutos y se avanza en marcha a la vista',opts:['Se espera 3 minutos y se avanza en marcha a la vista','Se espera 3 minutos y se avanza a paso de hombre','Se espera 5 minutos y se avanza a paso de hombre','Se espera 5 minutos y se avanza en marcha a la vista']},
+  {b:16,q:'Durante el periodo de servicio, ¿qué debe garantizar el PCC respecto a la circulación de trenes en zonas con personal trabajando?',a:'Que no exista circulación simultánea por ambas vías y comunicarlo al responsable operativo',opts:['Que circulen todos los trenes a paso de hombre','Que no exista circulación simultánea por ambas vías y comunicarlo al responsable operativo','Que circulen todos los trenes en marcha a la vista','Que exista circulación simultánea por ambas vías y comunicarlo al responsable operativo']},
+  {b:16,q:'¿Qué función tiene el PCC respecto al alumbrado del túnel?',a:'Encender o apagar según circunstancias, o dar órdenes al responsable operativo',opts:['Únicamente encender según circunstancias, o dar órdenes al responsable operativo','No tiene ninguna función','Encender o apagar según circunstancias, o dar órdenes al responsable operativo','Únicamente apagar según circunstancias, o dar órdenes al responsable operativo']},
+  {b:17,q:'Las estaciones que limitan la circulación durante una interrupción pasan a ser:',a:'Cabeceras de línea',opts:['Estaciones de paso restringido','Zonas de mantenimiento','Cabeceras de línea','Puntos de evacuación obligatoria']},
+  {b:17,q:'Durante el retroceso ante el rebase del piñon de salida:',a:'Se va a paso de hombre con señales acústicas',opts:['Se va a paso de hombre sin señales acústicas','Se va en marcha a la vista con señales acústicas','Se va a paso de hombre con señales acústicas','Se va en marcha a la vista sin señales acústicas']},
+  {b:17,q:'Si el rebase supera el 50% y la señal estaba en parada o hay duda:',a:'Se espera 3 minutos y se avanza a paso de hombre',opts:['Se espera 3 minutos y se avanza en marcha a la vista','Se espera 3 minutos y se avanza a paso de hombre','Se espera 5 minutos y se avanza a paso de hombre','Se espera 5 minutos y se avanza en marcha a la vista']},
   {b:17,q:'Si el corte de corriente supera 10 minutos:',a:'Se conecta el freno de estacionamiento',opts:['Se conecta el freno de estacionamiento','Se conecta el freno de emergencia','Se conecta el freno eléctrico','Se conecta el freno manual']},
-  {b:17,q:'Sin comunicación tras restablecimiento de la corriente:',a:'Se espera 2 minutos y se continúa a paso de hombre',opts:['Se espera 2 minutos y se continúa a paso de hombre','Se espera 3 minutos y se continúa a marcha a la vista','Se espera 2 minutos y se continúa a marcha a la vista','Se espera 3 minutos y se continúa a paso de hombre']},
-  {b:17,q:'Si el rebase supera el 50% y la señal permitía el rebase:',a:'Se detiene el tren',opts:['Se detiene el tren','Se continúa la marcha hasta la siguiente estación','Se retrocede','Se evacúa el tren']},
+  {b:17,q:'Sin comunicación tras restablecimiento de la corriente:',a:'Se espera 2 minutos y se continúa a marcha a la vista',opts:['Se espera 2 minutos y se continúa a paso de hombre','Se espera 3 minutos y se continúa a marcha a la vista','Se espera 2 minutos y se continúa a marcha a la vista','Se espera 3 minutos y se continúa a paso de hombre']},
+  {b:17,q:'Si el rebase supera el 50% y la señal permitía el rebase:',a:'Se continúa la marcha hasta la siguiente estación',opts:['Se detiene el tren','Se continúa la marcha hasta la siguiente estación','Se retrocede','Se evacúa el tren']},
   {b:17,q:'Si no hay comunicación con el PCC y el rebase del piñon de salida es menor del 50%:',a:'El conductor recoloca el tren circulando a contravía',opts:['El conductor recoloca el tren circulando a contravía','Se continúa a la siguiente estación','Se detiene el servicio','Se informara al responsable operativo']},
-  {b:17,q:'Si un tren no puede reanudar la marcha por sus medios:',a:'Se abandona el tren informando al PCC',opts:['Se abandona el tren informando al PCC','Se solicita remolque únicamente','Se solicita tren de auxilio únicamente','Se solicita tren de auxilio o remolque']},
-  {b:17,q:'En avería de ATP en interestación, tras señal M-Roja, en caso de no tener comunicación con el PCC, la marcha será:',a:'Marcha a la vista',opts:['Marcha a la vista','A paso de hombre','A 30 km/h','A 10 km/h']},
-  {b:17,q:'La conducción en modo Llave Especial tiene una velocidad máxima de:',a:'10 km/h',opts:['10 km/h','20 km/h','40 km/h','30 km/h']},
-  {b:17,q:'Si un viajero acciona el tirador y el tren se frena en emergencia:',a:'Se evacúa el tren',opts:['Se evacúa el tren','Se reanuda marcha inmediatamente','Se averiguaran las causas','Se informa al jefe de estación']},
-  {b:17,q:'Durante el movimiento sin PCC tras rebase del piñon de salida inferior al 50%:',a:'No se usan señales',opts:['No se usan señales','Se emiten señales acústicas insistentemente','Se usa solo luz','Se circula a paso de hombre']},
+  {b:17,q:'Si un tren no puede reanudar la marcha por sus medios:',a:'Se solicita tren de auxilio o remolque',opts:['Se abandona el tren informando al PCC','Se solicita remolque únicamente','Se solicita tren de auxilio únicamente','Se solicita tren de auxilio o remolque']},
+  {b:17,q:'En avería de ATP en interestación, tras señal M-Roja, en caso de no tener comunicación con el PCC, la marcha será:',a:'A 10 km/h',opts:['Marcha a la vista','A paso de hombre','A 30 km/h','A 10 km/h']},
+  {b:17,q:'La conducción en modo Llave Especial tiene una velocidad máxima de:',a:'30 km/h',opts:['10 km/h','20 km/h','40 km/h','30 km/h']},
+  {b:17,q:'Si un viajero acciona el tirador y el tren se frena en emergencia:',a:'Se averiguaran las causas',opts:['Se evacúa el tren','Se reanuda marcha inmediatamente','Se averiguaran las causas','Se informa al jefe de estación']},
+  {b:17,q:'Durante el movimiento sin PCC tras rebase del piñon de salida inferior al 50%:',a:'Se emiten señales acústicas insistentemente',opts:['No se usan señales','Se emiten señales acústicas insistentemente','Se usa solo luz','Se circula a paso de hombre']},
   {b:17,q:'En avería de ATP en interestación, tras señal M-Roja, en caso de no tener comunicación con el PCC:',a:'Se espera 3 minutos y se usa modo M+20',opts:['Se espera 3 minutos y se usa modo M+20','Se espera 5 minutos y se usa modo M+20','Se espera 3 minutos y se usa modo M+ATO','Se espera 5 minutos y se usa modo M+ATO']},
   {b:17,q:'Si un conductor detecta un tren detenido en vía contraria:',a:'Detiene su tren sin rebasarlo',opts:['Detiene su tren sin rebasarlo','Circulará a paso de hombre','Circulará marcha a la vista','Lo comunicará al PCC']},
-  {b:17,q:'Si se rebasa el piñón de salida, el retroceso está permitido si el rebase es:',a:'Mayor del 50% de la longitud del tren',opts:['Mayor del 50% de la longitud del tren','Menor del 40% de la longitud del tren','Menor del 50% de la longitud del tren','Mayor del 40% de la longitud del tren']},
-  {b:17,q:'En evacuación por vía, se deben aplicar medidas de:',a:'Seguridad según art. 5.1.4',opts:['Seguridad según art. 5.1.4','Protección según art. 5.1.5','Protección según art. 5.1.4','Seguridad según art. 5.1.5']},
-  {b:17,q:'Velocidad máxima en remolque mediante acoplamiento:',a:'10 km/h',opts:['10 km/h','30 km/h','20 km/h','40 km/h']},
+  {b:17,q:'Si se rebasa el piñón de salida, el retroceso está permitido si el rebase es:',a:'Menor del 50% de la longitud del tren',opts:['Mayor del 50% de la longitud del tren','Menor del 40% de la longitud del tren','Menor del 50% de la longitud del tren','Mayor del 40% de la longitud del tren']},
+  {b:17,q:'En evacuación por vía, se deben aplicar medidas de:',a:'Protección según art. 5.1.4',opts:['Seguridad según art. 5.1.4','Protección según art. 5.1.5','Protección según art. 5.1.4','Seguridad según art. 5.1.5']},
+  {b:17,q:'Velocidad máxima en remolque mediante acoplamiento:',a:'30 km/h',opts:['10 km/h','30 km/h','20 km/h','40 km/h']},
   {b:17,q:'Si el rebase del piñon de salida sin comunicación con el PCC supera el 50% o se desconoce:',a:'Se continúa hasta la siguiente estación si está autorizado',opts:['Se continúa hasta la siguiente estación si está autorizado','Se retrocede igualmente','Se detiene el tren','Se evacúa el tren']},
-  {b:17,q:'Antes de retroceder, el conductor debe:',a:'Realizar señales acústicas',opts:['Realizar señales acústicas','Avisar al PCC','Informar a los viajeros','Informar al jefe de estación']},
-  {b:17,q:'En la detención accidental de trenes, siempre que sea preciso, se procurará hacerlo en:',a:'En túneles',opts:['En túneles','En curvas','En estaciones','En pendientes']},
-  {b:17,q:'El PCC, al detectar detención anormal, intentará:',a:'Parar otros trenes',opts:['Parar otros trenes','Cortar la línea','Avisar a viajeros','Encender alumbrado del túnel']},
-  {b:17,q:'El cruce cuando reiniciamos la marcha tras detección de tren detenido en interestaciónen se realizará:',a:'Marcha a la vista',opts:['Marcha a la vista','30 km/h','A paso de hombre','A 20 km/h']},
-  {b:17,q:'Velocidad máxima en remolque mediante barrón:',a:'30 km/h',opts:['30 km/h','20 km/h','10 km/h','5 km/h']},
-  {b:17,q:'Si el uso del tirador no está justificado:',a:'Se detiene el tren',opts:['Se detiene el tren','Se toman datos del viajero','No ocurre nada','Se evacúa el vagón']},
-  {b:17,q:'En corte de corriente, el regulador de marcha debe ponerse:',a:'En máxima potencia',opts:['En máxima potencia','En neutro','En posición cero','En emergencia']},
-  {b:17,q:'Si un viajero acciona el tirador y el tren no se detiene por el sistema inhibidor del freno de emergencia:',a:'Se detiene automáticamente',opts:['Se detiene automáticamente','El conductor se comunica con los viajeros','Se ignora','Se informara al responsable operativo']},
+  {b:17,q:'Antes de retroceder, el conductor debe:',a:'Informar a los viajeros',opts:['Realizar señales acústicas','Avisar al PCC','Informar a los viajeros','Informar al jefe de estación']},
+  {b:17,q:'En la detención accidental de trenes, siempre que sea preciso, se procurará hacerlo en:',a:'En estaciones',opts:['En túneles','En curvas','En estaciones','En pendientes']},
+  {b:17,q:'El PCC, al detectar detención anormal, intentará:',a:'Encender alumbrado del túnel',opts:['Parar otros trenes','Cortar la línea','Avisar a viajeros','Encender alumbrado del túnel']},
+  {b:17,q:'El cruce cuando reiniciamos la marcha tras detección de tren detenido en interestaciónen se realizará:',a:'A paso de hombre',opts:['Marcha a la vista','30 km/h','A paso de hombre','A 20 km/h']},
+  {b:17,q:'Velocidad máxima en remolque mediante barrón:',a:'10 km/h',opts:['30 km/h','20 km/h','10 km/h','5 km/h']},
+  {b:17,q:'Si el uso del tirador no está justificado:',a:'Se toman datos del viajero',opts:['Se detiene el tren','Se toman datos del viajero','No ocurre nada','Se evacúa el vagón']},
+  {b:17,q:'En corte de corriente, el regulador de marcha debe ponerse:',a:'En posición cero',opts:['En máxima potencia','En neutro','En posición cero','En emergencia']},
+  {b:17,q:'Si un viajero acciona el tirador y el tren no se detiene por el sistema inhibidor del freno de emergencia:',a:'El conductor se comunica con los viajeros',opts:['Se detiene automáticamente','El conductor se comunica con los viajeros','Se ignora','Se informara al responsable operativo']},
   {b:17,q:'Si no hay comunicación con el PCC en la evacuación y hay riesgo:',a:'El conductor dirige la evacuación',opts:['El conductor dirige la evacuación','El jefe de estación dirige la evacuación','El responsable operativo dirige la evacuación','Todas son correctas']},
   {b:17,q:'¿Qué normativa afecta a los trenes que trabajan en tramos interrumpidos?',a:'Normativa del periodo fuera de servicio (arts. 4.9.4 y 4.9.6)',opts:['Normativa del periodo fuera de servicio (arts. 4.9.4 y 4.9.6)','Normativa del periodo fuera de servicio (arts. 4.9.5 y 4.9.6)','Normativa del periodo fuera de servicio (arts. 4.9.5 y 4.9.7)','Normativa del periodo fuera de servicio (arts. 4.9.4 y 4.9.7)']},
-  {b:17,q:'¿Qué frenos deben aplicarse para inmovilizar el tren en detención anormal en interestación?',a:'Solo freno de emergencia',opts:['Solo freno de emergencia','Freno de servicio y de estacionamiento','Solo freno de estacionamiento','Solo freno de servicio']},
-  {b:17,q:'Si no hay comunicación tras desacople:',a:'Se aplican medidas del art. 5.2.5',opts:['Se aplican medidas del art. 5.2.5','Se aplican medidas del art. 5.2.4','Se aplican medidas del art. 5.1.5','Se aplican medidas del art. 5.1.4','“']},
-  {b:18,q:'En un descarrilamiento, el conductor debe:',a:'Detener el tren y evacuar inmediatamente',opts:['Detener el tren y evacuar inmediatamente','Detener el tren y encender pilotos en cabaza','Detener el tren y poner freno de emergencia','Detener el tren y poner freno de estacionamiento']},
-  {b:18,q:'Tras un alcance, los conductores deben comprobar:',a:'Si hay viajeros accidentados y el estado de la vía',opts:['Si hay viajeros accidentados y el estado de la vía','Si hay viajeros accidentados y los daños materiales','Si hay viajeros accidentados y la ocupación de gálibo','Estado de la vía, daños materiales y la ocupación de gálibo']},
-  {b:18,q:'Un trabajador que presencia un accidente debe ponrse a disposición de:',a:'Policía',opts:['Policía','Viajeros','Conductor o trabajador de mayor categoría','Autoridad judicial']},
-  {b:18,q:'La autorización para mover un tren tras alcance corresponde a:',a:'Personal de mantenimiento especializado',opts:['Personal de mantenimiento especializado','Jefe de estación','PCC','Responsable operativo']},
-  {b:18,q:'En arrollamiento de persona, si esta con vida:',a:'Se prestan auxilios posibles',opts:['Se prestan auxilios posibles','Se traslada para prestar auxilio','Se esperan servicios sanitarios','Todas son correctas']},
-  {b:18,q:'En un alcance, los conductores deben:',a:'Poner freno de estacionamiento y encender pilotos',opts:['Poner freno de estacionamiento y encender pilotos','Poner freno de emergencia y encender pilotos','Inmovilizar los trenes y encender pilotos','Inmovilizar los trenes únicamente']},
-  {b:18,q:'¿Qué se debe indicar al solicitar corte urgente de catenaria?',a:'Ubicación general',opts:['Ubicación general','Motivo de la petición','Número de tren','Su nombre únicamente']},
-  {b:18,q:'Un trabajador que presencia un accidente debe:',a:'Informar a los viajeros',opts:['Informar a los viajeros','Avisar solo si es grave','Esperar instrucciones','Prestar ayuda a afectados']},
-  {b:18,q:'Si un viajero enfermo está en un tren:',a:'Se detiene en túnel',opts:['Se detiene en túnel','Se evacúa inmediatamente','Se intenta llegar a la primera estación','Se avisa al responsable operativo']},
-  {b:18,q:'Si no hay comunicación en descarrilamiento:',a:'Se realizan señales acusticas para detener trenes en vía contraria',opts:['Se realizan señales acusticas para detener trenes en vía contraria','Se espera ayuda','Se realizan señales luminosas para detener trenes en vía contraria','Se abandona el tren']},
-  {b:18,q:'Ante desperfecto en catenaria:',a:'Se detiene el tren sin rebasarlo',opts:['Se detiene el tren sin rebasarlo','Adoptar medidas para prevenir peligros','Informar inmediatamente al PCC','Todas son correctas']},
-  {b:18,q:'El acta de retirada de cadáveres debe incluir:',a:'Circunstancias, hora y lugar',opts:['Circunstancias, hora y lugar','Circunstancias y número de tren','Circunstancias y filiación de testigos','Filiación de testigos y nombre del fallecido']},
-  {b:18,q:'¿Quién puede solicitar corte urgente de catenaria?',a:'Cualquier trabajador identificado',opts:['Cualquier trabajador identificado','Solo mantenimiento','Solo el PCC','Solo el conductor']},
-  {b:18,q:'Las actuaciones ante incendio siguen:',a:'Directrices del PCC',opts:['Directrices del PCC','Normas internas','Normativa policial','El Plan de Emergencia']},
-  {b:18,q:'En arrollamiento de persona, se debe avisar al PCC indicando:',a:'Ubicación',opts:['Ubicación','Número de tren','Todas son correctas','Gravedad del accidente']},
+  {b:17,q:'¿Qué frenos deben aplicarse para inmovilizar el tren en detención anormal en interestación?',a:'Freno de servicio y de estacionamiento',opts:['Solo freno de emergencia','Freno de servicio y de estacionamiento','Solo freno de estacionamiento','Solo freno de servicio']},
+  {b:17,q:'Si no hay comunicación tras desacople:',a:'Se aplican medidas del art. 5.1.4',opts:['Se aplican medidas del art. 5.2.5','Se aplican medidas del art. 5.2.4','Se aplican medidas del art. 5.1.5','Se aplican medidas del art. 5.1.4']},
+  {b:18,q:'En un descarrilamiento, el conductor debe:',a:'Detener el tren y encender pilotos en cabaza',opts:['Detener el tren y evacuar inmediatamente','Detener el tren y encender pilotos en cabaza','Detener el tren y poner freno de emergencia','Detener el tren y poner freno de estacionamiento']},
+  {b:18,q:'Tras un alcance, los conductores deben comprobar:',a:'Si hay viajeros accidentados y la ocupación de gálibo',opts:['Si hay viajeros accidentados y el estado de la vía','Si hay viajeros accidentados y los daños materiales','Si hay viajeros accidentados y la ocupación de gálibo','Estado de la vía, daños materiales y la ocupación de gálibo']},
+  {b:18,q:'Un trabajador que presencia un accidente debe ponrse a disposición de:',a:'Conductor o trabajador de mayor categoría',opts:['Policía','Viajeros','Conductor o trabajador de mayor categoría','Autoridad judicial']},
+  {b:18,q:'La autorización para mover un tren tras alcance corresponde a:',a:'PCC',opts:['Personal de mantenimiento especializado','Jefe de estación','PCC','Responsable operativo']},
+  {b:18,q:'En arrollamiento de persona, si esta con vida:',a:'Todas son correctas',opts:['Se prestan auxilios posibles','Se traslada para prestar auxilio','Se esperan servicios sanitarios','Todas son correctas']},
+  {b:18,q:'En un alcance, los conductores deben:',a:'Inmovilizar los trenes y encender pilotos',opts:['Poner freno de estacionamiento y encender pilotos','Poner freno de emergencia y encender pilotos','Inmovilizar los trenes y encender pilotos','Inmovilizar los trenes únicamente']},
+  {b:18,q:'¿Qué se debe indicar al solicitar corte urgente de catenaria?',a:'Motivo de la petición',opts:['Ubicación general','Motivo de la petición','Número de tren','Su nombre únicamente']},
+  {b:18,q:'Un trabajador que presencia un accidente debe:',a:'Prestar ayuda a afectados',opts:['Informar a los viajeros','Avisar solo si es grave','Esperar instrucciones','Prestar ayuda a afectados']},
+  {b:18,q:'Si un viajero enfermo está en un tren:',a:'Se intenta llegar a la primera estación',opts:['Se detiene en túnel','Se evacúa inmediatamente','Se intenta llegar a la primera estación','Se avisa al responsable operativo']},
+  {b:18,q:'Si no hay comunicación en descarrilamiento:',a:'Se realizan señales luminosas para detener trenes en vía contraria',opts:['Se realizan señales acusticas para detener trenes en vía contraria','Se espera ayuda','Se realizan señales luminosas para detener trenes en vía contraria','Se abandona el tren']},
+  {b:18,q:'Ante desperfecto en catenaria:',a:'Todas son correctas',opts:['Se detiene el tren sin rebasarlo','Adoptar medidas para prevenir peligros','Informar inmediatamente al PCC','Todas son correctas']},
+  {b:18,q:'El acta de retirada de cadáveres debe incluir:',a:'Circunstancias y filiación de testigos',opts:['Circunstancias, hora y lugar','Circunstancias y número de tren','Circunstancias y filiación de testigos','Filiación de testigos y nombre del fallecido']},
+  {b:18,q:'¿Quién puede solicitar corte urgente de catenaria?',a:'Solo el PCC',opts:['Cualquier trabajador identificado','Solo mantenimiento','Solo el PCC','Solo el conductor']},
+  {b:18,q:'Las actuaciones ante incendio siguen:',a:'El Plan de Emergencia',opts:['Directrices del PCC','Normas internas','Normativa policial','El Plan de Emergencia']},
+  {b:18,q:'En arrollamiento de persona, se debe avisar al PCC indicando:',a:'Gravedad del accidente',opts:['Ubicación','Número de tren','Todas son correctas','Gravedad del accidente']},
   {b:18,q:'Un trabajador debe informar de un accidente a:',a:'PCC o responsable operativo',opts:['PCC o responsable operativo','Policía','Mantenimiento','Jefe de estación']},
-  {b:18,q:'Sin comunicación tras restablecimiento la marcha a la vista se mantiene hasta:',a:'Final de línea',opts:['Final de línea','Nueva orden','La siguiente señal o estación','5 km']},
-  {b:18,q:'Ante riesgo para la circulación, el trabajador debe indicar en el aviso:',a:'Número de tren, auxilios necesarios e interrupción si procede',opts:['Número de tren, auxilios necesarios e interrupción si procede','Lugar, nombre del conductor, auxilios necesarios e interrupción si procede','Lugar,gravedad, auxilios necesarios e interrupción si procede','Lugar, auxilios necesarios e interrupción si procede']},
-  {b:18,q:'Si el cadáver intercepta la vía y no hay autoridad judicia pero hay personal de serviciol:',a:'No se actúa',opts:['No se actúa','Se formaliza acta de retirada de cadáver','Se evacúa','Se espera según plan de emergencia']},
-  {b:18,q:'Para asistencia sanitaria se avisará a:',a:'Jefe de estación',opts:['Jefe de estación','PCC','Responsable operativo','Policía','“']},
-  {b:19,q:'¿Qué deben hacer las empresas contratistas para aplicar la Normativa?',a:'Reducir costes',opts:['Reducir costes','Cambiar sus normas internas','Adoptar medidas para informar a sus trabajadores','Aplicar sanciones']},
-  {b:19,q:'¿Qué obligación fundamenta la aplicación de la normativa a terceros a terceros?',a:'Obligación fiscal',opts:['Obligación fiscal','Obligación contractual','Obligación de coordinación de actividades empresariales','Obligación sindical']},
-  {b:19,q:'¿Qué órgano se crea en el Art. 6.1.6?',a:'Junta operativa',opts:['Junta operativa','Comité directivo','Consejo laboral','Comisión Técnica de Seguimiento']},
-  {b:19,q:'¿En qué condición se aplica la Normativa a terceros?',a:'Siempre',opts:['Siempre','Solo voluntariamente','Cuando sea legalmente exigible o se establezca','Solo por contrato']},
-  {b:19,q:'¿Cuál es la finalidad principal la Comisión Técnica de Seguimiento?',a:'Gestión económica',opts:['Gestión económica','Actualización permanente de la Normativa','Control disciplinario','Evaluación de personal']},
-  {b:19,q:'¿Quién resuelve las diferencias de criterios en la interpretación de una norma?',a:'El superior jerárquico',opts:['El superior jerárquico','El jefe de departamento','El comité técnico','El PCC']},
-  {b:19,q:'¿A qué tipo de empresas se extiende la Normativa en coordinación?',a:'Solo públicas',opts:['Solo públicas','Solo privadas','Contratistas y subcontratistas','Solo nacionales']},
-  {b:19,q:'Según art 6,1,3,¿Quién puede dictar instrucciones complementarias?',a:'El PCC únicamente',opts:['El PCC únicamente','Los departamentos afectados','Los trabajadores','La comisión técnica']},
-  {b:19,q:'El acta de retirada de cadáveres se entrega a:',a:'Policía',opts:['Policía','Conductor','Personal que custodia el cadáver','El responsable operativo']},
-  {b:19,q:'En cabinas de conducción está prohibido el uso de:',a:'Medios audiovisuales',opts:['Medios audiovisuales','Juegos o medios escritos','Todas son correctas','Cualquier dispositivo ajeno al desempeño del puesto de trabajo']},
-  {b:19,q:'¿Qué criterios aplica el PCC en casos no contemplados?',a:'Legalidad y rapidez',opts:['Legalidad y rapidez','Seguridad y eficacia','Jerarquía y disciplina','Coste y beneficio']},
-  {b:19,q:'¿Quién debe resolver las dudas de interpretación inicialmente planteadas por el trabajador?',a:'El departamento jurídico',opts:['El departamento jurídico','El PCC o su superior jerárquico inmediato','El Comité de empresa','El director general']},
-  {b:19,q:'¿Qué ocurre si una norma contradice futuras modificaciones?',a:'Se mantiene',opts:['Se mantiene','Se revisa','Queda sin efecto','Se aplica parcialmente']},
-  {b:19,q:'¿Quién resuelve los casos urgentes no contemplados en la Normativa?',a:'El jefe de departamento',opts:['El jefe de departamento','La comisión técnica','El PCC','El superior jerárquico']},
+  {b:18,q:'Sin comunicación tras restablecimiento la marcha a la vista se mantiene hasta:',a:'La siguiente señal o estación',opts:['Final de línea','Nueva orden','La siguiente señal o estación','5 km']},
+  {b:18,q:'Ante riesgo para la circulación, el trabajador debe indicar en el aviso:',a:'Lugar, auxilios necesarios e interrupción si procede',opts:['Número de tren, auxilios necesarios e interrupción si procede','Lugar, nombre del conductor, auxilios necesarios e interrupción si procede','Lugar,gravedad, auxilios necesarios e interrupción si procede','Lugar, auxilios necesarios e interrupción si procede']},
+  {b:18,q:'Si el cadáver intercepta la vía y no hay autoridad judicia pero hay personal de serviciol:',a:'Se formaliza acta de retirada de cadáver',opts:['No se actúa','Se formaliza acta de retirada de cadáver','Se evacúa','Se espera según plan de emergencia']},
+  {b:18,q:'Para asistencia sanitaria se avisará a:',a:'PCC',opts:['Jefe de estación','PCC','Responsable operativo','Policía']},
+  {b:19,q:'¿Qué deben hacer las empresas contratistas para aplicar la Normativa?',a:'Adoptar medidas para informar a sus trabajadores',opts:['Reducir costes','Cambiar sus normas internas','Adoptar medidas para informar a sus trabajadores','Aplicar sanciones']},
+  {b:19,q:'¿Qué obligación fundamenta la aplicación de la normativa a terceros a terceros?',a:'Obligación de coordinación de actividades empresariales',opts:['Obligación fiscal','Obligación contractual','Obligación de coordinación de actividades empresariales','Obligación sindical']},
+  {b:19,q:'¿Qué órgano se crea en el Art. 6.1.6?',a:'Comisión Técnica de Seguimiento',opts:['Junta operativa','Comité directivo','Consejo laboral','Comisión Técnica de Seguimiento']},
+  {b:19,q:'¿En qué condición se aplica la Normativa a terceros?',a:'Cuando sea legalmente exigible o se establezca',opts:['Siempre','Solo voluntariamente','Cuando sea legalmente exigible o se establezca','Solo por contrato']},
+  {b:19,q:'¿Cuál es la finalidad principal la Comisión Técnica de Seguimiento?',a:'Actualización permanente de la Normativa',opts:['Gestión económica','Actualización permanente de la Normativa','Control disciplinario','Evaluación de personal']},
+  {b:19,q:'¿Quién resuelve las diferencias de criterios en la interpretación de una norma?',a:'El PCC',opts:['El superior jerárquico','El jefe de departamento','El comité técnico','El PCC']},
+  {b:19,q:'¿A qué tipo de empresas se extiende la Normativa en coordinación?',a:'Contratistas y subcontratistas',opts:['Solo públicas','Solo privadas','Contratistas y subcontratistas','Solo nacionales']},
+  {b:19,q:'Según art 6,1,3,¿Quién puede dictar instrucciones complementarias?',a:'Los departamentos afectados',opts:['El PCC únicamente','Los departamentos afectados','Los trabajadores','La comisión técnica']},
+  {b:19,q:'El acta de retirada de cadáveres se entrega a:',a:'Personal que custodia el cadáver',opts:['Policía','Conductor','Personal que custodia el cadáver','El responsable operativo']},
+  {b:19,q:'En cabinas de conducción está prohibido el uso de:',a:'Todas son correctas',opts:['Medios audiovisuales','Juegos o medios escritos','Todas son correctas','Cualquier dispositivo ajeno al desempeño del puesto de trabajo']},
+  {b:19,q:'¿Qué criterios aplica el PCC en casos no contemplados?',a:'Seguridad y eficacia',opts:['Legalidad y rapidez','Seguridad y eficacia','Jerarquía y disciplina','Coste y beneficio']},
+  {b:19,q:'¿Quién debe resolver las dudas de interpretación inicialmente planteadas por el trabajador?',a:'El PCC o su superior jerárquico inmediato',opts:['El departamento jurídico','El PCC o su superior jerárquico inmediato','El Comité de empresa','El director general']},
+  {b:19,q:'¿Qué ocurre si una norma contradice futuras modificaciones?',a:'Queda sin efecto',opts:['Se mantiene','Se revisa','Queda sin efecto','Se aplica parcialmente']},
+  {b:19,q:'¿Quién resuelve los casos urgentes no contemplados en la Normativa?',a:'El PCC',opts:['El jefe de departamento','La comisión técnica','El PCC','El superior jerárquico']},
   {b:19,q:'¿Qué ocurre con la normativa interna anterior que contradiga la actual?',a:'Queda sin efecto',opts:['Queda sin efecto','Se mantiene','Se revisa','Se aplica parcialmente']},
-  {b:19,q:'¿A quién se aplica también la Normativa además del personal de Metro de Madrid?',a:'Solo a directivos',opts:['Solo a directivos','Solo a sindicatos','A usuarios','A empresas externas y autónomos']},
-  {b:19,q:'¿Qué deben conocer los trabajadores de empresas externas de la normativa?',a:'Sus contratos',opts:['Sus contratos','La normativa interna completa','Solo instrucciones básicas','Suficientemente la presente Normativa']},
-  {b:19,q:'¿Qué tipo de normativa queda sin efecto en caso contradictorio?',a:'Externa',opts:['Externa','Internacional','Interna elaborada por Metro de Madrid','Estatal']},
-  {b:19,q:'¿A quién afecta la normativa dentro de las empresas externas?',a:'Solo gerentes',opts:['Solo gerentes','Solo técnicos','Personal dependiente y autónomos','Solo administrativos']},
-  {b:19,q:'¿Desde cuándo pierde efecto la normativa anterior contradictoria?',a:'Desde su publicación',opts:['Desde su publicación','Desde el inicio de vigencia de la nueva Normativa','Desde la aprobación sindical','A los 15 días','“']}
+  {b:19,q:'¿A quién se aplica también la Normativa además del personal de Metro de Madrid?',a:'A empresas externas y autónomos',opts:['Solo a directivos','Solo a sindicatos','A usuarios','A empresas externas y autónomos']},
+  {b:19,q:'¿Qué deben conocer los trabajadores de empresas externas de la normativa?',a:'Suficientemente la presente Normativa',opts:['Sus contratos','La normativa interna completa','Solo instrucciones básicas','Suficientemente la presente Normativa']},
+  {b:19,q:'¿Qué tipo de normativa queda sin efecto en caso contradictorio?',a:'Interna elaborada por Metro de Madrid',opts:['Externa','Internacional','Interna elaborada por Metro de Madrid','Estatal']},
+  {b:19,q:'¿A quién afecta la normativa dentro de las empresas externas?',a:'Personal dependiente y autónomos',opts:['Solo gerentes','Solo técnicos','Personal dependiente y autónomos','Solo administrativos']},
+  {b:19,q:'¿Desde cuándo pierde efecto la normativa anterior contradictoria?',a:'Desde el inicio de vigencia de la nueva Normativa',opts:['Desde su publicación','Desde el inicio de vigencia de la nueva Normativa','Desde la aprobación sindical','A los 15 días']}
 ];
 
 var bloques = [
@@ -443,102 +431,85 @@ var bloques = [
   {num:18, nombre:'NIC 18 — Accidentes y emergencias', preguntas:20},
   {num:19, nombre:'NIC 19 — Contratas y seguridad laboral', preguntas:20}
 ];
-// ── ESTADO ──
-var currentBlock = null;
-var questions = [];
-var currentIdx = 0;
-var hits = 0;
-var fails = [];
+var currentBlock=null,questions=[],currentIdx=0,hits=0,fails=[];
 
-// ── MENÚ ──
 function buildMenu(){
-  var grid = document.getElementById('grid-bloques');
-  grid.innerHTML = '';
+  var grid=document.getElementById('grid-bloques');
+  grid.innerHTML='';
   bloques.forEach(function(bl){
-    var btn = document.createElement('button');
-    btn.className = 'menu-btn';
-    btn.innerHTML = '<div><div class="label">'+bl.nombre+'</div><div class="meta">'+bl.preguntas+' preguntas</div></div><span class="arrow">›</span>';
-    btn.onclick = (function(n){return function(){startBlock(n);};})(bl.num);
+    var btn=document.createElement('button');
+    btn.className='menu-btn';
+    btn.innerHTML='<div><div class="label">'+bl.nombre+'</div><div class="meta">'+bl.preguntas+' preguntas</div></div><span class="arrow">›</span>';
+    btn.onclick=(function(n){return function(){startBlock(n);};})(bl.num);
     grid.appendChild(btn);
   });
-  // Botón todas
-  var total = db.length;
-  var btnAll = document.createElement('button');
-  btnAll.className = 'menu-btn menu-btn-all';
-  btnAll.innerHTML = '<div><div class="label">🔀 Todas las preguntas</div><div class="meta">'+total+' preguntas mezcladas</div></div><span class="arrow">›</span>';
-  btnAll.onclick = function(){startAll();};
+  var btnAll=document.createElement('button');
+  btnAll.className='menu-btn menu-btn-all';
+  btnAll.innerHTML='<div><div class="label">🔀 Todas las preguntas</div><div class="meta">'+db.length+' preguntas mezcladas</div></div><span class="arrow">›</span>';
+  btnAll.onclick=function(){startAll();};
   grid.appendChild(btnAll);
 }
 
 function startBlock(num){
-  currentBlock = num;
-  questions = db.filter(function(q){return q.b===num;}).sort(function(){return Math.random()-.5;});
+  currentBlock=num;
+  questions=db.filter(function(q){return q.b===num;}).sort(function(){return Math.random()-.5;});
   beginQuiz();
 }
-
 function startAll(){
-  currentBlock = null;
-  questions = db.slice().sort(function(){return Math.random()-.5;});
+  currentBlock=null;
+  questions=db.slice().sort(function(){return Math.random()-.5;});
   beginQuiz();
 }
-
 function volverMenu(){
   document.getElementById('menu-screen').classList.remove('hidden');
   document.getElementById('quiz-screen').classList.add('hidden');
   document.getElementById('results-screen').classList.add('hidden');
 }
-
 function repetirBloque(){
-  if(currentBlock!==null) startBlock(currentBlock);
-  else startAll();
+  if(currentBlock!==null)startBlock(currentBlock);else startAll();
 }
-
 function beginQuiz(){
-  currentIdx=0; hits=0; fails=[];
+  currentIdx=0;hits=0;fails=[];
   document.getElementById('menu-screen').classList.add('hidden');
   document.getElementById('results-screen').classList.add('hidden');
   document.getElementById('quiz-screen').classList.remove('hidden');
   showQuestion();
 }
-
+function norm(s){ return s.trim().replace(/\s+/g,' '); }
 function showQuestion(){
-  var q = questions[currentIdx];
+  var q=questions[currentIdx];
   document.getElementById('progreso-texto').textContent='Pregunta '+(currentIdx+1)+'/'+questions.length;
   document.getElementById('progress-fill').style.width=((currentIdx/questions.length)*100)+'%';
   document.getElementById('question-text').textContent=q.q;
   document.getElementById('nic-badge').textContent='NIC '+q.b;
   document.getElementById('btn-next').classList.remove('show');
-  var tipBox=document.getElementById('tip-box');
-  tipBox.classList.remove('show'); tipBox.textContent='';
   var container=document.getElementById('options-container');
   container.innerHTML='';
   q.opts.slice().sort(function(){return Math.random()-.5;}).forEach(function(opt){
     var btn=document.createElement('button');
-    btn.className='opt-btn'; btn.textContent=opt;
+    btn.className='opt-btn';btn.textContent=opt;
     btn.onclick=(function(b,o){return function(){checkAnswer(b,o,q.a);};})(btn,opt);
     container.appendChild(btn);
   });
 }
-
 function checkAnswer(btn,selected,correct){
   document.querySelectorAll('.opt-btn').forEach(function(b){b.disabled=true;});
-  if(selected===correct){
-    btn.classList.add('correct'); hits++;
-  } else {
+  if(norm(selected)===norm(correct)){
+    btn.classList.add('correct');hits++;
+  }else{
     btn.classList.add('wrong');
     fails.push({q:questions[currentIdx].q,a:correct});
     guardarFallo(questions[currentIdx].q,questions[currentIdx].opts,correct,'NIC '+questions[currentIdx].b);
-    document.querySelectorAll('.opt-btn').forEach(function(b){if(b.textContent===correct)b.classList.add('reveal');});
+    document.querySelectorAll('.opt-btn').forEach(function(b){
+      if(norm(b.textContent)===norm(correct))b.classList.add('reveal');
+    });
   }
   document.getElementById('btn-next').classList.add('show');
 }
-
 function nextQuestion(){
   currentIdx++;
-  if(currentIdx<questions.length) showQuestion();
-  else showResults();
+  if(currentIdx<questions.length)showQuestion();else showResults();
 }
-
 function showResults(){
   document.getElementById('quiz-screen').classList.add('hidden');
   document.getElementById('results-screen').classList.remove('hidden');
@@ -552,7 +523,6 @@ function showResults(){
     ?'<strong>Tus errores:</strong><br><br>'+fails.map(function(f){return '<div class="result-item">• '+f.q+'<br><span style="color:#27ae60">✔ '+f.a+'</span></div>';}).join('')
     :'🎉 ¡Sin ningún fallo! ¡Perfecto!';
 }
-
 function guardarFallo(pregunta,opciones,respuestaCorrecta,modulo){
   try{
     var lista=JSON.parse(localStorage.getItem('mis_fallos'))||[];
