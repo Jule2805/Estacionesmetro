@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRL - Prevención de Riesgos Laborales</title>
+    <style>
+        :root { --bg:#121212; --card:#1e1e1e; --accent:#e67e22; --correct:#009543; --wrong:#ff3b30; --text:#ffffff; --muted:#888; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); display:flex; justify-content:center; min-height:100vh; }
+        .container { width:100%; max-width:500px; padding:20px; }
+
+        /* ── MENÚ ── */
+        .menu-title { text-align:center; font-size:1.3rem; font-weight:700; margin-bottom:4px; margin-top:8px; }
+        .menu-subtitle { text-align:center; color:var(--muted); font-size:13px; margin-bottom:18px; }
+        .btn-salir { background:none; border:1px solid #444; color:#ccc; padding:5px 12px; border-radius:5px; cursor:pointer; font-size:13px; margin-bottom:18px; display:inline-block; }
+        .btn-salir:hover { border-color:#888; color:#fff; }
+
+        /* Separador de sección */
+        .section-sep { display:flex; align-items:center; gap:10px; margin:18px 0 12px; }
+        .section-sep span { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; white-space:nowrap; padding:3px 10px; border-radius:99px; }
+        .section-sep.prl span { background:#4a2c11; color:#f39c12; }
+        .section-sep::after { content:''; flex:1; height:1px; background:#2a2a2a; }
+
+        .menu-grid { display:flex; flex-direction:column; gap:10px; }
+        .menu-btn {
+            background:var(--card); border:1px solid #333; color:var(--text);
+            padding:16px 18px; border-radius:14px; text-align:left;
+            cursor:pointer; transition:0.2s; display:flex;
+            justify-content:space-between; align-items:center;
+        }
+        .menu-btn:hover { background:#2a2a2a; border-color:var(--accent); }
+        .menu-btn .label { font-size:15px; font-weight:600; }
+        .menu-btn .meta { font-size:12px; color:var(--muted); margin-top:3px; }
+        .menu-btn .arrow { color:var(--accent); font-size:20px; flex-shrink:0; margin-left:10px; }
+        .menu-btn-all { background:var(--accent); border-color:var(--accent); margin-top:6px; }
+        .menu-btn-all:hover { opacity:.9; }
+
+        /* ── QUIZ ── */
+        .quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        #progreso-texto { font-size:14px; color:var(--muted); }
+        .progress-bar { width:100%; height:6px; background:#333; border-radius:10px; margin-bottom:22px; overflow:hidden; }
+        .progress-fill { height:100%; background:var(--accent); width:0%; transition:width .3s; }
+        .question-card { background:var(--card); padding:24px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+        .cat-badge { display:inline-block; font-size:11px; padding:3px 10px; border-radius:99px; margin-bottom:12px; text-transform:uppercase; letter-spacing:.06em; }
+        .cat-badge.prl  { background:#4a2c11; color:#f39c12; }
+        h2 { font-size:1rem; line-height:1.55; margin-bottom:18px; margin-top:0; }
+        .options-grid { display:flex; flex-direction:column; gap:10px; }
+        .opt-btn { background:#2a2a2a; border:1px solid #333; color:white; padding:13px 14px; border-radius:12px; text-align:left; font-size:13px; cursor:pointer; transition:0.18s; line-height:1.4; }
+        .opt-btn:hover:not(:disabled) { background:#333; border-color:#555; }
+        .opt-btn.correct { background:var(--correct) !important; border-color:var(--correct); }
+        .opt-btn.wrong   { background:var(--wrong)   !important; border-color:var(--wrong); }
+        .opt-btn.reveal  { background:#005a28 !important; border-color:var(--correct); opacity:.85; }
+        .btn-next { width:100%; background:var(--accent); color:white; border:none; padding:14px; border-radius:10px; font-weight:bold; margin-top:14px; cursor:pointer; display:none; font-size:15px; }
+        .btn-next.show { display:block; }
+
+        /* ── RESULTADOS ── */
+        .results-list { text-align:left; background:#000; padding:15px; border-radius:10px; font-size:13px; max-height:300px; overflow-y:auto; margin-top:14px; }
+        .result-item { margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:5px; }
+        .hidden { display:none; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ════════ MENÚ ════════ -->
+    <div id="menu-screen">
+        <div class="menu-title">⛑️ Test PRL</div>
+        <div class="menu-subtitle">Elige un bloque de estudio</div>
+        <button class="btn-salir" onclick="window.location.href='detodo.html'">← Volver al menú general</button>
+
+        <div class="section-sep prl"><span>🚨 Primeros Auxilios</span></div>
+        <div class="menu-grid" id="grid-prl"></div>
+    </div>
+
+    <!-- ════════ QUIZ ════════ -->
+    <div id="quiz-screen" class="hidden">
+        <div class="quiz-header">
+            <div id="progreso-texto">Pregunta 1/30</div>
+            <button class="btn-salir" onclick="volverMenu()">✕ Salir</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="question-card">
+            <div id="cat-badge" class="cat-badge prl">PRL</div>
+            <h2 id="question-text">Cargando...</h2>
+            <div id="options-container" class="options-grid"></div>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE →</button>
+        </div>
+    </div>
+
+    <!-- ════════ RESULTADOS ════════ -->
+    <div id="results-screen" class="hidden">
+        <div class="question-card" style="text-align:center;">
+            <h1 id="score-percent" style="font-size:52px;margin:10px 0">0%</h1>
+            <p id="score-text" style="color:var(--muted);font-size:14px;margin-bottom:4px"></p>
+            <div id="failed-review" class="results-list"></div>
+            <button class="btn-next show" onclick="repetirBloque()">🔄 REPETIR BLOQUE</button>
+            <button class="btn-next show" style="background:#444;margin-top:10px;" onclick="volverMenu()">🏠 ELEGIR OTRO BLOQUE</button>
+        </div>
+    </div>
+
+</div>
+<script>
+// ════════════════════════════════════════════
+//  DB — PREVENCIÓN DE RIESGOS LABORALES
+// ════════════════════════════════════════════
+var dbPRL = [
+  // ── BLOQUE 1: METRO PRL 1 ──
+  {b:1,cat:"prl",q:"¿Dónde debe tomarse el pulso?",a:"En el lado derecho del cuello",opts:["En el lado derecho del cuello","En la muñeca izquierda","En el lado izquierdo del cuello","En la muñeca derecha"]},
+  {b:1,cat:"prl",q:"¿Cuándo debe cortarse la comunicación con emergencias?",a:"Cuando los médicos lo indiquen",opts:["Nunca","Cuando llegue la ambulancia","Cuando los médicos lo indiquen","Después de explicar el accidente"]},
+  {b:1,cat:"prl",q:"¿Qué debe hacerse antes de mover a una persona accidentada?",a:"Ver su situación y los daños que tiene",opts:["Ver su situación y los daños que tiene","Darle medicamentos","Llamar a su familia","Llamar a un médico"]},
+  {b:1,cat:"prl",q:"¿Qué debe evitarse cuando existe peligro por electricidad?",a:"El agua",opts:["El ruido","El calor","El agua","El humo"]},
+  {b:1,cat:"prl",q:"¿Qué puede ocurrir si se cometen errores al dar primeros auxilios?",a:"Que empeoren los daños o se ponga en peligro la vida",opts:["Que llegue antes la ambulancia","Que empeoren los daños o se ponga en peligro la vida","Que desaparezcan los síntomas","Sería una neglijencia"]},
+  {b:1,cat:"prl",q:"¿Por qué es necesaria una buena formación de los socorristas?",a:"Para evaluar correctamente al accidentado",opts:["Porque son el contacto entre el accidentado y los médicos","Para hacer diagnósticos médicos correctos","Para sustituir a los médicos, mientras estos llegan","Para evaluar correctamente al accidentado"]},
+  {b:1,cat:"prl",q:"¿Qué significa la letra P de PAS?",a:"Proteger",opts:["Prevenir","Proteger","Priorizar","Pensar"]},
+  {b:1,cat:"prl",q:"¿Por qué los primeros auxilios son limitados?",a:"Porque utilizan solo algunas técnicas médicas",opts:["Porque duran poco tiempo","Porque solo pueden hacerse en hospitales","Porque utilizan solo algunas técnicas médicas","Porque no siempre hay ambulancias"]},
+  {b:1,cat:"prl",q:"¿Qué significa la letra A de PAS?",a:"Avisar",opts:["Ayudar","Actuar","Avisar","Atender"]},
+  {b:1,cat:"prl",q:"¿Qué significa la letra S de PAS?",a:"Socorrer",opts:["Señalar","Salvar","Salir","Socorrer"]},
+  {b:1,cat:"prl",q:"¿Qué preguntarán los médicos por teléfono?",a:"Si está consciente, respira y tiene pulso",opts:["Si tiene vómitos, respira y tiene pulso","Si está consciente, sangra y tiene pulso","Si está consciente, respira y tiene pulso","Si está consciente, respira y tiene frio"]},
+  {b:1,cat:"prl",q:"¿Cuándo deben darse los primeros auxilios?",a:"En el momento en que sucede el accidente o aparece la enfermedad",opts:["Cuando hay heridas abiertas","En el momento en que sucede el accidente o aparece la enfermedad","Cuando existe riesgo para la salud","Solo cuando se pone en peligro la vida de una persona"]},
+  {b:1,cat:"prl",q:"¿Qué información es importante dar al llamar al 112?",a:"Dónde ha sido el accidente",opts:["Las circunstancias del accidente","Dónde ha sido el accidente","Cuantas personas hay implicadas en el accidente","Que ha causado el accidente"]},
+  {b:1,cat:"prl",q:"¿Qué debe hacerse cuando hay humo o escape de gas?",a:"Proteger nariz y boca",opts:["Abrir todas las ventanas","Proteger nariz y boca","Salir corriendo","Tumbarse en el suelo"]},
+  {b:1,cat:"prl",q:"¿Qué significa que los primeros auxilios sean temporales?",a:"Que duran hasta que llegan los médicos",opts:["Que los realiza cualquier persona","Que se realizan en un momento dado del día","Que siempre duran menos de una hora","Que duran hasta que llegan los médicos"]},
+  {b:1,cat:"prl",q:"¿Qué debe comprobarse en la persona accidentada durante el socorro?",a:"Si respira",opts:["Si lleva documentación","Si tiene sed","Si lleva reloj, anillos o pulseras","Si respira"]},
+  {b:1,cat:"prl",q:"¿Qué consejo se da sobre los medicamentos?",a:"No deben darse medicamentos",opts:["Deben darse siempre","Solo deben darse analgésicos","Deben darse si hay dolor","No deben darse medicamentos"]},
+  {b:1,cat:"prl",q:"¿Cuál es el teléfono de emergencias para toda España?",a:"112",opts:["112","61","91","80"]},
+  {b:1,cat:"prl",q:"¿Qué debe comprobarse antes de tomar decisiones en una emergencia?",a:"Que la persona accidentada y nosotros estamos fuera de peligro",opts:["Que la persona accidentada y nosotros estamos fuera de peligro","Solo que la persona accidentada este fuera de peligro","Únicamente que nosotros no estemos en peligro","Si existe algún peligro en la zona del accidente"]},
+  {b:1,cat:"prl",q:"¿Qué debe evitarse alrededor de la persona accidentada?",a:"Que la gente la rodee",opts:["La luz","La ventilación","La humedad","Que la gente la rodee"]},
+  {b:1,cat:"prl",q:"¿Qué debe hacerse con la persona accidentada para evitar que coja frío?",a:"Cubrirla y mantenerla caliente",opts:["Sentarla","Darle bebidas calientes","Cubrirla y mantenerla caliente","Ponerla al sol"]},
+  {b:1,cat:"prl",q:"¿Quién es el socorrista?",a:"La primera persona que atiende al accidentado",opts:["La primera persona en llegar al accidente","La persona que salva al accidentado","El médico que atiende al accidentado","La primera persona que atiende al accidentado"]},
+  {b:1,cat:"prl",q:"¿Cuál es un consejo para dar primeros auxilios?",a:"Mantener la calma",opts:["Darle agua inmediatamente","Moverle para mayor comodidad","Mantener la calma","Quitarle la ropa rápidamente"]},
+  {b:1,cat:"prl",q:"¿Qué dice la ley sobre los socorristas en la empresa?",a:"Que debe haber socorristas",opts:["Que no son obligatorios","Que debe haber socorristas","Que debe haber uno por planta","Que deben ser médicos"]},
+  {b:1,cat:"prl",q:"¿Cuáles son los tres pasos PAS?",a:"Proteger, avisar y socorrer",opts:["Proteger, avisar y socorrer","Prevenir, ayudar y socorrer","Proteger, ayudar y socorrer","Proteger, avisar y salvar"]},
+  {b:1,cat:"prl",q:"¿Qué debe hacerse con las manos cuando hay riesgo eléctrico?",a:"Mantenerlas secas",opts:["Mojarlas","Cubrirlas con papel","Lavarlas continuamente","Mantenerlas secas"]},
+  {b:1,cat:"prl",q:"¿Cuándo puede moverse a una persona accidentada?",a:"Cuando exista un peligro más importante, como un incendio",opts:["Cuando esté nerviosa","Cuando exista un peligro más importante, como un incendio","Cuando este inconsciente","Cuando tenga frío"]},
+  {b:1,cat:"prl",q:"¿Quiénes deben realizar los primeros auxilios?",a:"Socorristas o personas formadas en emergencias",opts:["Socorristas o personas formadas en emergencias","Solo los médicos","Únicamente enfermeros","Cualquier persona que se encuentre en el lugar del accidente"]},
+  {b:1,cat:"prl",q:"¿Qué son los primeros auxilios?",a:"Los pasos y técnicas para ayudar a una persona accidentada o enferma de repente",opts:["Los pasos y técnicas para ayudar a una persona accidentada o enferma de repente"]},
+  {b:1,cat:"prl",q:"¿Qué significa notar un latido al tomar el pulso?",a:"Que el corazón late",opts:["Que respira","Que el corazón late","Que está consciente","Que tiene fiebre"]},
+
+  // ── BLOQUE 2: METRO PRL 2 ──
+  {b:2,cat:"prl",q:"¿Cuál es la recomendación general de socorristas por trabajadores?",a:"1 por cada 50 trabajadores",opts:["1 por cada 10 trabajadores","1 por cada 25 trabajadores","1 por cada 50 trabajadores","1 por cada 30 trabajadores"]},
+  {b:2,cat:"prl",q:"¿Qué es la formación específica para socorristas?",a:"Formación concreta según los riesgos de la empresa",opts:["Formación para médicos","Formación concreta según los riesgos de la empresa","Formación sobre enfermería","Conocimientos sobre anatomía"]},
+  {b:2,cat:"prl",q:"¿Dónde se realiza el masaje cardíaco?",a:"En la zona del corazón",opts:["En la zona del corazón","En el cuello","Por debajo de la clavícula","Por encima del abdomen"]},
+  {b:2,cat:"prl",q:"¿Qué debe tener en cuenta la empresa respecto a los turnos para el número de socorristas?",a:"Si hay trabajadores de noche, día o fines de semana",opts:["Los días festivos nacionales","Si se realizan horas extras","Si hay trabajadores de noche, día o fines de semana","El horario de los turnos"]},
+  {b:2,cat:"prl",q:"¿Cuándo no debe estirarse el cuello?",a:"Cuando ha sufrido un accidente de cuello",opts:["Cuando tiene temblores","Cuando tiene fiebre","Cuando tiene tos","Cuando ha sufrido un accidente de cuello"]},
+  {b:2,cat:"prl",q:"¿Cuál es el ritmo correcto de la RCP?",a:"30 compresiones y 2 ventilaciones",opts:["20 compresiones y 1 ventilación","30 compresiones y 2 ventilaciones","15 compresiones y 2 ventilaciones","30 compresiones y 1 ventilación"]},
+  {b:2,cat:"prl",q:"¿Cómo deben mantenerse los brazos durante el masaje?",a:"Rectos",opts:["Flexionados","Rectos","Relajados","Pegados al cuerpo"]},
+  {b:2,cat:"prl",q:"¿Qué debe retirarse de la boca antes de la RCP?",a:"Cualquier objeto que pueda tener en la boca",opts:["El labial","La saliva","Cualquier objeto que pueda tener en la boca","La lengua"]},
+  {b:2,cat:"prl",q:"¿Cómo debe cerrarse la nariz en la ventilación boca a boca?",a:"Con los dedos como una pinza",opts:["Con ambas manos","Con los dedos como una pinza","Con una venda","Con la palma de una mano"]},
+  {b:2,cat:"prl",q:"¿Qué enseña la formación complementariade un socorrista?",a:"Atención en emergencias como quemaduras químicas y gases venenosos",opts:["Atender pequeñas quemaduras, esguinces o roturas","Conocimientos sobre anatomía","Operaciones quirúrgicas","Atención en emergencias como quemaduras químicas y gases venenosos"]},
+  {b:2,cat:"prl",q:"¿Dónde debe apoyarse la palma de la mano?",a:"En el centro del pecho",opts:["En el centro del pecho","En el lado derecho del pecho","En el lado izquierdo del pecho","Por debajo del pecho"]},
+  {b:2,cat:"prl",q:"¿Qué significan las siglas RCP?",a:"Reanimación cardiopulmonar",opts:["Respiración cardiaca primaria","Reanimación cardiopulmonar","Rescate corporal preventivo","Revisión cardiológica pulmonar"]},
+  {b:2,cat:"prl",q:"¿Qué debe hacerse después de cada ciclo de RCP?",a:"Comprobar si ha recuperado el latido",opts:["Comprobar si ha recuperado el latido","Cambiar de posición","Descansar 10 segundos","Cambiarse con otra persona"]},
+  {b:2,cat:"prl",q:"¿Qué debe hacerse primero en la RCP?",a:"Darle un masaje en la zona del corazón",opts:["Tomar la tensión","Levantar las piernas","Darle un masaje en la zona del corazón","Abrir la boca para que entre aire"]},
+  {b:2,cat:"prl",q:"¿Qué debe ponerse en la boca de la persona accidentada para hacer la ventilación boca a boca?",a:"Un protector, gasa o pañuelo",opts:["Un protector, gasa o pañuelo","Un algodón","Una venda","Una mascarilla de oxígeno obligatoriamente"]},
+  {b:2,cat:"prl",q:"¿Cuál NO aparece como constante vital?",a:"Nivel de azúcar",opts:["Pulso","Respiración","Temperatura","Nivel de azúcar"]},
+  {b:2,cat:"prl",q:"¿Qué significa que una persona está inconsciente?",a:"Que no responde y está desmayado",opts:["Que tiene fiebre","Que ha perdido mucha sangre","Que no responde y está desmayado","Que duerme profundamente"]},
+  {b:2,cat:"prl",q:"¿Qué debe comprobarse respecto a las pupilas?",a:"Si cambian de tamaño según la luz",opts:["Si cambian de color","Si cambian de tamaño según la luz","Si producen lagrimas","Si están cerradas"]},
+  {b:2,cat:"prl",q:"¿Qué es lo más importante cuando una persona está inconsciente?",a:"Comprobar si respira",opts:["Comprobar si respira","Ver si sangra","Tomarle la temperatura","Aflojarle la ropa"]},
+  {b:2,cat:"prl",q:"¿Cuál es el objetivo de la RCP?",a:"Conseguir que la persona respire y el corazón lata",opts:["Únicamente conseguir que la persona respire","Solo que el corazón siga latiendo","Conseguir que la persona respire y el corazón lata","Conseguir que la persona se despierte"]},
+  {b:2,cat:"prl",q:"¿Qué otro responsable debe existir además de los socorristas?",a:"Responsable de emergencias",opts:["Responsable de emergencias","Responsable sanitario","Inspector laboral","Responsable de mantenimiento"]},
+  {b:2,cat:"prl",q:"¿Cuándo puede ser necesario tener 2 socorristas por cada 50 trabajadores?",a:"Cuando hay máquinas o herramientas peligrosas",opts:["Cuando hay productos químicos","Cuando hay sustancias tóxicas","Cuando hay más de 3 plantas en el edificio","Cuando hay máquinas o herramientas peligrosas"]},
+  {b:2,cat:"prl",q:"¿Qué debe hacerse con una persona inconsciente?",a:"Dejarla en la misma posición",opts:["Sentarla","Darle agua","Levantarle las piernas siempre","Dejarla en la misma posición"]},
+  {b:2,cat:"prl",q:"¿Cuántas compresiones deben hacerse en unos 15 segundos?",a:"30",opts:["10","20","30","50"]},
+  {b:2,cat:"prl",q:"¿Sobre qué superficie debe tumbarse a la persona?",a:"Sobre una superficie dura",opts:["Sobre una superficie blanda","Sobre un colchón","Sobre una superficie dura","Sobre una manta"]},
+  {b:2,cat:"prl",q:"¿Qué incluye la formación básica de un socorrista?",a:"Atención en emergencias como infartos, heridas con mucha sangre o desmayos",opts:["Operaciones quirúrgicas","Atención en emergencias como quemaduras, heridas con mucha sangre o desmayos","Atención en emergencias como infartos, heridas con mucha sangre o roturas de huesos","Atención en emergencias como infartos, heridas con mucha sangre o desmayos"]},
+  {b:2,cat:"prl",q:"¿Qué debe hacer el socorrista después del PAS?",a:"Tomar las constantes vitales",opts:["Llevar al accidentado a un lugar seguro","Llevar al accidentado al hospital","Tomar las constantes vitales","Esperar a los médicos"]},
+  {b:2,cat:"prl",q:"¿Cuántas ventilaciones por minuto hay que realizar más o menos?",a:"8",opts:["2","4","8","6"]},
+  {b:2,cat:"prl",q:"¿Qué factor influye en el número de socorristas necesarios?",a:"El número de edificios donde están repartidos",opts:["El número de oficinas vacías","El número de edificios donde están repartidos","El número de plantas del edificio","El número de máquinas peligrosas existentes"]},
+  {b:2,cat:"prl",q:"¿Qué debe ocurrir con el pecho durante el masaje?",a:"Debe hundirse",opts:["Debe permanecer inmóvil","Debe moverse hacia un lado","Debe hundirse","Debe levantarse solo"]},
+
+  // ── BLOQUE 3: METRO PRL 3 ──
+  {b:3,cat:"prl",q:"¿Cómo debe hacerse la presión sobre la herida?",a:"Sin cortar la circulación de la sangre",opts:["Muy fuerte aunque corte la circulación","Sin cortar la circulación de la sangre","Con movimientos rápidos","Solo durante unos segundos"]},
+  {b:3,cat:"prl",q:"¿Qué es el trabajo preventivo?",a:"El grupo de tareas que organiza una empresa para prevenir riesgos laborales",opts:["El grupo de tareas que organiza una empresa para prevenir riesgos laborales","El grupo de tareas que organiza un médico para prevenir riesgos laborales","El grupo de tareas que organiza un trabajador para prevenir riesgos laborales","El grupo de tareas que organiza un técnico de emergencias para prevenir riesgos laborales"]},
+  {b:3,cat:"prl",q:"¿Qué es un botiquín?",a:"Un armario o maletín con material para emergencias",opts:["Un armario o maletín con material para emergencias","Un equipo de cirugía móvil","Una ambulancia portátil","Un armario o maletín con medicamentos"]},
+  {b:3,cat:"prl",q:"¿Qué materiales sirven para cubrir heridas y quemaduras?",a:"Gasas, vendas y apósitos",opts:["Gasas, vendas y apósitos","Medicinas","Pomadas","Martillos y pinzas"]},
+  {b:3,cat:"prl",q:"¿Cómo debe colocarse a una persona con mucha pérdida de sangre?",a:"Boca arriba y con las piernas algo levantadas",opts:["Sentada","De lado","Boca arriba y con las piernas algo levantadas","Boca abajo"]},
+  {b:3,cat:"prl",q:"¿Qué ocurre en una hemorragia externa?",a:"La sangre sale fuera del cuerpo",opts:["La sangre se queda dentro del cuerpo","La sangre sale fuera del cuerpo","No hay herida visible","Solo afecta a órganos externos"]},
+  {b:3,cat:"prl",q:"¿Quiénes pueden vender medicinas?",a:"Los farmacéuticos",opts:["Los médicos y farmacéuticos","Los socorristas","Los empresarios","Los farmacéuticos"]},
+  {b:3,cat:"prl",q:"¿Qué es una hemorragia?",a:"Una pérdida de sangre del cuerpo",opts:["Una rotura de huesos","Una pérdida de conciencia","Un dolor muscular","Una pérdida de sangre del cuerpo"]},
+  {b:3,cat:"prl",q:"¿Qué deben hacer las empresas con las personas encargadas de emergencias?",a:"Darles formación",opts:["Darles medicinas","Darles material adecuado","Darles formación","Darles cursos de medicina básica"]},
+  {b:3,cat:"prl",q:"¿Quién puede hacer la RCP?",a:"Todas las personas",opts:["Solo médicos","Solo socorristas titulados","Solo enfermeros","Todas las personas"]},
+  {b:3,cat:"prl",q:"¿Qué deben revisar las empresas periódicamente?",a:"Todas son correctas",opts:["Que las medidas de emergencia funcionan","Que los botiquines tengan el material correcto","Que las personas encargadas en emergencias esten formadas","Todas son correctas"]},
+  {b:3,cat:"prl",q:"¿Cómo debe colocarse a una persona desmayada que respira?",a:"De lado",opts:["De lado","Boca arriba","Sentada","Con las piernas levantadas"]},
+  {b:3,cat:"prl",q:"¿Qué debe hacerse con los enchufes cuando hay riesgo eléctrico?",a:"Desconectarlos si es posible",opts:["No mojarlos","No tocarlos","Cubrirlos con tela","Desconectarlos si es posible"]},
+  {b:3,cat:"prl",q:"¿Qué ocurre en un shock?",a:"Los órganos no reciben suficiente sangre",opts:["La sangre circula demasiado rápido","Los órganos no reciben suficiente sangre","El corazón se detiene siempre","La temperatura baja levemente"]},
+  {b:3,cat:"prl",q:"¿Qué debe hacerse si hay un trozo de cristal en la herida?",a:"No quitarlo ni apretarlo",opts:["Sacarlo rápidamente","Presionarlo","No quitarlo ni apretarlo","Cubrirlo con algodón"]},
+  {b:3,cat:"prl",q:"¿Qué líquidos debe llevar un botiquín para evitar infecciones?",a:"Agua oxigenada",opts:["Lejía","Jabón","Agua","Agua oxigenada"]},
+  {b:3,cat:"prl",q:"¿Qué obliga la ley respecto a las emergencias?",a:"Tener personas encargadas y material adecuado",opts:["Tener ambulancias propias","Tener personas encargadas y material adecuado","Contratar médicos permanentes","Cerrar la empresa en caso de accidente"]},
+  {b:3,cat:"prl",q:"¿Qué objetos deben existir en el botiquín?",a:"Tijeras, pinzas y guantes de un solo uso",opts:["Medicamentos recetados","Jeringuillas con medicación","Tijeras, pinzas y guantes de un solo uso","Todas son correctas"]},
+  {b:3,cat:"prl",q:"¿Qué deben tener las empresas respecto a los servicios médicos?",a:"Una forma de comunicación rápida",opts:["Una farmacia","Una forma de comunicación rápida","Un hospital propio","Un laboratorio"]},
+  {b:3,cat:"prl",q:"¿Quiénes pueden recetar medicinas?",a:"Los médicos",opts:["Los médicos","Los socorristas","El personal de enfermería","Los farmacéuticos"]},
+  {b:3,cat:"prl",q:"¿Qué debe utilizarse para frenar la pérdida de sangre?",a:"Una venda o gasa limpia",opts:["Un trozo de tela limpia","Algodón mojado","Cinta adhesiva","Una venda o gasa limpia"]},
+  {b:3,cat:"prl",q:"¿Qué puede indicar sangre por nariz, boca u oídos?",a:"Una posible hemorragia interna",opts:["Una posible hemorragia interna","Una posible hemorragia externa","Un golpe leve","Inhalación de gas tóxico"]},
+  {b:3,cat:"prl",q:"¿Hasta cuándo debe mantenerse la RCP?",a:"Hasta que respire, despierte o lleguen los médicos",opts:["Durante cinco minutos","Durante 30 minutos","Hasta que respire, despierte o lleguen los médicos","Hasta que abra los ojos"]},
+  {b:3,cat:"prl",q:"¿Qué está prohibido en los botiquines de empresa?",a:"Medicinas",opts:["Gasas","Tijeras","Medicinas","Guantes"]},
+  {b:3,cat:"prl",q:"¿Qué debe comprobarse antes de presionar una herida?",a:"Que no haya objetos extraños",opts:["Que no haya objetos extraños","La presión arterial","La temperatura corporal","La respiración"]},
+  {b:3,cat:"prl",q:"¿Cómo debe soltarse el aire en la ventilación boca a boca?",a:"Con energía, pero sin violencia",opts:["Muy rápido","Muy despacio","Con energía, pero sin violencia","A intervalos"]},
+  {b:3,cat:"prl",q:"¿Cómo debe colocarse a una persona con riesgo de shock?",a:"Boca arriba y con los pies un poco elevados",opts:["Boca abajo","Boca arriba y con los pies un poco elevados","Sentada","De lado"]},
+  {b:3,cat:"prl",q:"¿Con qué debe limpiarse una herida?",a:"Agua o suero",opts:["Alcohol únicamente","Agua o suero","Jabón","Agua oxigenada únicamente"]},
+  {b:3,cat:"prl",q:"¿Cuándo no deben levantarse las piernas con riesgo de shock?",a:"Cuando puede tener un daño en la espalda",opts:["Cuando tiene frío","Cuando sangra","Cuando puede tener un daño en la espalda","Cuando tiene fiebre"]},
+  {b:3,cat:"prl",q:"¿Qué debe hacerse con la persona herida para evitar que se enfríe?",a:"Cubrirla",opts:["Sentarla","Cubrirla","Hacerla caminar","Darle bebidas calientes"]}
+];
+
+// ════════════════════════════════════════════
+//  CONFIGURACIÓN DE BLOQUES
+// ════════════════════════════════════════════
+var bloquesPRL = [
+  {num:1, nombre:"Bloque 1 — METRO PRL 1", subtema:"30 preguntas"},
+  {num:2, nombre:"Bloque 2 — METRO PRL 2", subtema:"30 preguntas"},
+  {num:3, nombre:"Bloque 3 — METRO PRL 3", subtema:"30 preguntas"}
+];
+
+var currentBlock = null;
+var questions = [];
+var currentIdx = 0;
+var hits = 0;
+var fails = [];
+
+function buildMenu() {
+  var grid = document.getElementById('grid-prl');
+  grid.innerHTML = '';
+  bloquesPRL.forEach(function(bl) {
+    var btn = document.createElement('button');
+    btn.className = 'menu-btn';
+    btn.innerHTML = '<div><div class="label">' + bl.nombre + '</div><div class="meta">' + bl.subtema + '</div></div><span class="arrow">›</span>';
+    btn.onclick = function(){ startBlock(bl.num); };
+    grid.appendChild(btn);
+  });
+
+  var btnAll = document.createElement('button');
+  btnAll.className = 'menu-btn menu-btn-all';
+  btnAll.innerHTML = '<div><div class="label">🔀 Todas las preguntas</div><div class="meta">90 preguntas mezcladas</div></div><span class="arrow">›</span>';
+  btnAll.onclick = function(){ startAll(); };
+  grid.appendChild(btnAll);
+}
+
+function startBlock(num) {
+  currentBlock = num;
+  questions = dbPRL.filter(function(q){ return q.b === num; }).sort(function(){ return Math.random()-.5; });
+  beginQuiz();
+}
+
+function startAll() {
+  currentBlock = null;
+  questions = dbPRL.slice().sort(function(){ return Math.random()-.5; });
+  beginQuiz();
+}
+
+function volverMenu() {
+  document.getElementById('menu-screen').classList.remove('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.add('hidden');
+}
+
+function repetirBloque() {
+  if (currentBlock !== null) {
+    startBlock(currentBlock);
+  } else {
+    startAll();
+  }
+}
+
+function beginQuiz() {
+  currentIdx = 0; hits = 0; fails = [];
+  document.getElementById('menu-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  var q = questions[currentIdx];
+  document.getElementById('progreso-texto').textContent = 'Pregunta ' + (currentIdx+1) + '/' + questions.length;
+  document.getElementById('progress-fill').style.width = ((currentIdx/questions.length)*100) + '%';
+  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('btn-next').classList.remove('show');
+  
+  var container = document.getElementById('options-container');
+  container.innerHTML = '';
+  
+  var uniqueOpts = [...new Set(q.opts)];
+  uniqueOpts.sort(function(){ return Math.random()-.5; }).forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.className = 'opt-btn'; btn.textContent = opt;
+    btn.onclick = function(){ checkAnswer(btn, opt, q.a); };
+    container.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn, selected, correct) {
+  document.querySelectorAll('.opt-btn').forEach(function(b){ b.disabled=true; });
+  if (selected === correct) {
+    btn.classList.add('correct'); hits++;
+  } else {
+    btn.classList.add('wrong');
+    fails.push({q:questions[currentIdx].q, a:correct});
+    document.querySelectorAll('.opt-btn').forEach(function(b){ if(b.textContent===correct) b.classList.add('reveal'); });
+  }
+  document.getElementById('btn-next').classList.add('show');
+}
+
+function nextQuestion() {
+  currentIdx++;
+  if (currentIdx < questions.length) showQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  var pct = Math.round((hits/questions.length)*100);
+  var scoreEl = document.getElementById('score-percent');
+  scoreEl.textContent = pct + '%';
+  scoreEl.style.color = pct >= 70 ? '#27ae60' : '#ff3b30';
+  document.getElementById('score-text').textContent = 'Has acertado ' + hits + ' de ' + questions.length + ' · ' + (pct>=70?'¡Muy bien! ✅':'Sigue repasando 💪');
+  var review = document.getElementById('failed-review');
+  review.innerHTML = fails.length > 0
+    ? '<strong>Tus errores:</strong><br><br>' + fails.map(function(f){ return '<div class="result-item">• '+f.q+'<br><span style="color:#27ae60">✔ '+f.a+'</span></div>'; }).join('')
+    : '🎉 ¡Sin ningún fallo! ¡Perfecto!';
+}
+
+buildMenu();
+</script>
+</body>
+</html>
