@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIC - Simulador de Examen</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --accent: #007bff;
+            --timer: #e67e22;
+            --text-muted: #888;
+            --error: #e74c3c;
+            --success: #2ecc71;
+        }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            color: white; 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .header-wrapper {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .back-btn { 
+            background: none; 
+            border: none; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            font-size: 14px; 
+            padding: 0;
+            margin-bottom: 15px;
+            text-align: left;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover { color: white; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            width: 100%; 
+        }
+
+        .header h1 { font-size: 20px; margin: 0; }
+        .header p { color: var(--text-muted); font-size: 14px; margin: 0; }
+        
+        .timer-box {
+            background: #2a2a2a;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--timer);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 600px; 
+            background: var(--card); 
+            padding: 30px 20px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            box-sizing: border-box; 
+        }
+
+        .question-counter {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 18px;
+            line-height: 1.4;
+            margin-bottom: 25px;
+        }
+
+        .options-grid { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+
+        .option-btn { 
+            padding: 18px 20px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            background: #2a2a2a;
+            border: 2px solid transparent; 
+            color: white; 
+            font-size: 16px; 
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover { background: #333; }
+        .option-btn.selected { 
+            border-color: var(--accent); 
+            background: rgba(0, 123, 255, 0.1); 
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            background: #333;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .nav-btn.primary { background: var(--accent); }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        #results { display: none; text-align: center; }
+
+        .fallos-container {
+            margin-top: 20px;
+            text-align: left;
+            background: #121212;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .fallo-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .fallo-item:last-child { border-bottom: none; }
+        
+        .respuesta-mal { color: var(--error); font-size: 14px; }
+        .respuesta-bien { color: var(--success); font-size: 14px; }
+        
+    </style>
+</head>
+<body>
+
+    <div class="header-wrapper">
+        <button class="back-btn" onclick="window.location.href='index.html'">← Volver al Menú Principal</button>
+        <div class="header">
+            <div>
+                <h1>Simulador NIC</h1>
+                <p>80 Preguntas</p>
+            </div>
+            <div class="timer-box" id="time-display">25:00</div>
+        </div>
+    </div>
+
+    <div class="container" id="quiz-container">
+        <div class="question-counter" id="q-counter">Pregunta 1 de 80</div>
+        <div class="question-text" id="q-text">Cargando pregunta...</div>
+        
+        <div class="options-grid" id="options-container"></div>
+
+        <div class="controls">
+            <button class="nav-btn" id="btn-prev" onclick="prevQuestion()">← Anterior</button>
+            <button class="nav-btn primary" id="btn-next" onclick="nextQuestion()">Siguiente →</button>
+        </div>
+    </div>
+
+    <div class="container" id="results">
+        <h2>¡Examen finalizado!</h2>
+        <p id="score-text" style="font-size: 24px; font-weight: bold; margin: 10px 0;"></p>
+        
+        <div id="fallos-area" style="display: none;">
+            <h3 style="text-align: left; margin-top: 30px;">Preguntas Falladas:</h3>
+            <p style="text-align: left; font-size: 14px; color: var(--accent);">✅ Tus fallos se han guardado automáticamente en tu base de datos de repaso.</p>
+            <div id="fallos-list" class="fallos-container"></div>
+        </div>
+
+        <button class="nav-btn primary" onclick="location.reload()" style="margin-top: 20px; width: 100%;">Repetir Examen</button>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "1. ¿Qué permite el shuntado de circuitos de vía?", options: ["Cortocircuito de los dos carriles a través del freno de un tren", "Cortocircuito de un carril a través del eje de un tren", "Cambio de tensión", "Cortocircuito de los dos carriles a través del eje de un tren"], correct: 0 },
+            { q: "2. En un andén central, ¿cuántas franjas de Zona A existen?", options: ["Dos", "Ninguna", "Una", "Cuatro"], correct: 0 },
+            { q: "3. ¿Dónde pueden encontrarse agrupados o dispersos los equipos de trabajadores?", options: ["Solo en estaciones", "En depósitos únicamente", "En la plataforma de vía", "En el PCC"], correct: 2 },
+            { q: "4. En líneas circulares, la vía I es la:", options: ["Exterior", "Secundaria", "Principal", "Interior"], correct: 3 },
+            { q: "5. ¿Qué permite independizar un cambio de sección?", options: ["Sectores de tracción distintos", "Andenes centrales", "Zonas de trabajo", "Sectores de señalización"], correct: 0 },
+            { q: "6. ¿Dónde permanece encendido permanentemente el alumbrado del túnel?", options: ["En los sacos de maniobras", "En las interestaciones", "En las vías principales", "En toda la red"], correct: 0 },
+            { q: "7. ¿Qué delimita como mínimo el Área de Trabajo?", options: ["Agujas", "Balizas rojas o luces rojas", "Vallas", "Señales verdes"], correct: 1 },
+            { q: "8. El periodo fuera de servicio se usa normalmente para:", options: ["Pruebas con trenes", "Formación de conductores", "Trabajos nocturnos", "Limpieza de andenes"], correct: 2 },
+            { q: "9. ¿Cuál es el objeto principal de la Normativa Interna de Circulación de Metro de Madrid (NIC)?", options: ["Establecer normas de explotación comercial", "Todas son correctas", "Regular la circulación de forma eficaz y segura en la red principal y secundaria", "Definir las funciones del personal operativo"], correct: 2 },
+            { q: "10. ¿Entre qué elementos está delimitado un cantón?", options: ["Dos agujas", "Dos señales consecutivas", "Dos estaciones", "Dos cambios de sección"], correct: 1 },
+            { q: "11. La vía II es recorrida por trenes:", options: ["Acercándose al origen convencional", "En ATO obligatorio", "En retroceso", "Alejándose del origen convencional"], correct: 0 },
+            { q: "12. La vía de pruebas es una vía:", options: ["Banalizada", "Vía I", "Secundaria para pruebas dinámicas", "Vía II"], correct: 2 },
+            { q: "13. El retroceso es un desplazamiento:", options: ["Adelante con conductor", "Hacia atrás sin conductor en la cabeza del tren", "Lateral", "En ATO"], correct: 1 },
+            { q: "14. ¿Qué es un tren de trabajo?", options: ["Solo de viajeros", "Solo de pruebas", "El utilizado para transporte de materiales o realización de trabajos", "El que circula en vía I"], correct: 2 },
+            { q: "15. ¿Qué delimita los límites del andén?", options: ["Las señales de entrada", "Las luminarias", "Las agujas", "Los piñones de entrada y salida"], correct: 3 },
+            { q: "16. La red principal está formada por:", options: ["Depósitos", "Vías secundarias", "Estaciones y vías principales", "Todas son correctas"], correct: 2 },
+            { q: "17. El hombre muerto previene:", options: ["Cortes de tensión", "Pérdida de control de mandos por el conductor", "Exceso de velocidad", "Fallos de señalización"], correct: 1 },
+            { q: "18. En estaciones, la plataforma de vía es la zona entre:", options: ["Señales y agujas", "Los andenes o entre andén y paramento lateral", "Vías principales", "Zonas colindantes"], correct: 1 },
+            { q: "19. ¿Quién debe poner en conocimiento la NIC al personal afectado?", options: ["El PCC", "La Dirección de Metro de Madrid S.A.", "Las jefaturas de línea", "Recursos Humanos"], correct: 1 },
+            { q: "20. En líneas circulares, la vía II es la:", options: ["Interior", "Exterior", "Secundaria", "Principal"], correct: 1 },
+            { q: "21. ¿Qué caracteriza normalmente al Auto-Shunt respecto al conductor?", options: ["Debe haber conductor en ambas cabinas", "Siempre sin conductor", "Solo con dos conductores", "Puede realizarse sin conductor en una o en las dos cabinas extremas"], correct: 3 },
+            { q: "22. ¿Dónde están situadas las luminarias del alumbrado del túnel?", options: ["Solo en el suelo del túnel", "En los paramentos o bóveda del túnel", "En las traviesas", "Únicamente en las estaciones"], correct: 1 },
+            { q: "23. La rampa es un plano inclinado en sentido:", options: ["Descendente", "Lateral", "Ascendente", "Horizontal"], correct: 2 },
+            { q: "24. ¿Cuándo se autoriza la realización de trabajos en un Área de Trabajo?", options: ["En horas sin tránsito de trenes", "Durante el periodo de servicio", "En el periodo fuera de servicio", "Solo en fines de semana"], correct: 2 },
+            { q: "25. En trabajos itinerantes, el área de trabajo se corresponde con:", options: ["Desde el piñón de salida de una estación hasta el de salida de la siguiente", "Toda la línea", "Una sola estación", "Solo los túneles"], correct: 0 },
+            { q: "26. ¿Qué registra la hoja de recogida de firmas?", options: ["Horarios de trenes", "Averías", "Cambios de sección", "Enterado de conductores sobre presencia de trabajadores en vía"], correct: 3 },
+            { q: "27. ¿Cuándo se cumplimenta el Boletín de acceso a la plataforma de vía?", options: ["En periodo fuera de servicio", "Solo en cocheras", "Durante el periodo de servicio", "En el PCC"], correct: 2 },
+            { q: "28. El saco de maniobras en las estaciones finales de línea, está entre:", options: ["El piñón extremo y el final de la línea", "Dos estaciones", "Dos señales", "Dos andenes"], correct: 0 },
+            { q: "29. El freno de estacionamiento sirve para:", options: ["Reducir velocidad en pendiente", "Inmovilizar un tren de manera permanente", "Frenadas de emergencia", "Conducción a la vista"], correct: 1 },
+            { q: "30. ¿Cuál es el fin principal de la Comisión de programación?", options: ["Coordinar y programar trabajos para evitar interferencias", "Reparar trenes", "Autorizar boletines", "Gestionar la energía"], correct: 0 },
+            { q: "31. ¿Qué es la Zona B del andén?", options: ["Solo la parte cubierta", "La zona de acceso restringido", "La zona próxima a las escaleras", "Todo el andén excluyendo la Zona A"], correct: 3 },
+            { q: "32. En túnel, la plataforma de vía está delimitada por:", options: ["Andenes", "Señales", "La sección del propio túnel", "Cambios de sección"], correct: 2 },
+            { q: "33. ¿Qué puesto del PCC organiza y dirige la circulación de trenes?", options: ["Control de Seguridad", "Puesto de Mando de Trenes", "Despacho de Cargas", "Control de Estaciones"], correct: 1 },
+            { q: "34. ¿Dónde se sitúa el conductor en circulación a contravía?", options: ["En cabina intermedia", "En la parte trasera", "En la cabeza del tren", "Fuera del tren"], correct: 2 },
+            { q: "35. ¿Desde dónde se mide la Zona A del andén?", options: ["Desde el centro del andén", "Desde el comienzo de la banda amarilla del andén", "Desde la señal de salida", "Desde el paramento de la estación"], correct: 1 },
+            { q: "36. El periodo de servicio abarca hasta:", options: ["El último tren de trabajo", "El cierre de estaciones", "El encierre del último tren de viajeros", "El inicio de trabajos nocturnos"], correct: 2 },
+            { q: "37. ¿Para qué se utiliza el sistema de hojas intercambiables?", options: ["Facilitar sustituciones por rectificaciones o ampliaciones", "Facilitar rectificaciones por ampliaciones o sustituciones", "Facilitar sustituciones por rectificaciones o deficiencias", "Facilitar deficiencias por sustituciones o ampliaciones"], correct: 0 },
+            { q: "38. La zona colindante está entre:", options: ["Límites de plataforma de vía y cerramientos exteriores", "Dos estaciones", "Señales y agujas", "Andén y vía"], correct: 0 },
+            { q: "39. ¿Qué gestiona el Despacho de Cargas?", options: ["Viajeros", "Señales", "Andenes", "Corte, reposición de tensión y energía"], correct: 3 },
+            { q: "40. ¿En qué situación se utiliza el acantonamiento?", options: ["Cuando un tren supera la velocidad autorizada", "Cuando hay fallos en la catenaria", "Cuando un tren, en su recorrido no garantiza el correcto shuntado de los circuitos de vía", "Cuando se interrumpe el alumbrado del túnel"], correct: 2 },
+            { q: "41. ¿Qué instalaciones quedan fuera del ámbito de aplicación de la NIC?", options: ["Las estaciones terminales", "Las dependencias cerradas a la explotación", "Las cocheras", "Los depósitos"], correct: 1 },
+            { q: "42. ¿En qué casos no será de aplicación la NIC en la Red operada por Metro?", options: ["Cuando existan incidencias técnicas", "Durante horarios nocturnos", "Cuando existan explotaciones con Normativa propia", "En la red secundaria"], correct: 2 },
+            { q: "43. El CTC permite el telemando de:", options: ["Alumbrado", "Andenes", "Rampas", "Enclavamientos de señales"], correct: 3 },
+            { q: "44. La red secundaria está constituida por:", options: ["Saco de maniobras", "Vías de pruebas", "Vías secundarias", "Todas son correctas"], correct: 2 },
+            { q: "45. Una interestación va desde:", options: ["Centro de estación a centro de estación", "Señal a señal", "Piñón de salida de una estación al de entrada de la siguiente", "Piñón de salida de una estación al de salida de la siguiente"], correct: 2 },
+            { q: "46. ¿Cómo pueden modificarse o ampliarse las normas de la NIC?", options: ["Mediante instrucciones verbales", "Por acuerdos sindicales", "Por Circulares de Dirección", "Por decisión del PCC"], correct: 2 },
+            { q: "47. ¿Cuál es la finalidad de una estación?", options: ["Guardar trenes", "Realizar pruebas", "Permitir que los viajeros suban y bajen", "Cambiar secciones eléctricas"], correct: 2 },
+            { q: "48. La marcha a la vista obliga a:", options: ["Circular en ATO", "Usar freno mecánico", "Circular solo en estaciones", "Regular la velocidad según la parte de vía visualizada"], correct: 3 },
+            { q: "49. ¿A qué velocidad aproximada equivale la marcha a paso de hombre?", options: ["10 km/h", "3 km/h", "5 km/h", "8 km/h"], correct: 2 },
+            { q: "50. ¿Qué no se considera plataforma de vía?", options: ["Interior de naves de depósitos y cocheras", "Zona entre andenes", "Túnel hasta cerramiento", "Zona ampliada 3 m en exterior"], correct: 0 },
+            { q: "51. ¿Qué otra circunstancia justifica el uso del acantonamiento?", options: ["Trenes con exceso de viajeros", "Trenes con freno de estacionamiento averiado", "Trenes que realizan movimientos hacia delante y hacia atrás", "Trenes que circulan en vía de pruebas"], correct: 2 },
+            { q: "52. ¿Qué sistema de publicación utiliza la NIC?", options: ["Edición digital cerrada", "Publicación anual", "Sistema de hojas intercambiables", "Publicación por volúmenes"], correct: 2 },
+            { q: "53. Las Circulares de Dirección, una vez publicadas:", options: ["Se aplican solo temporalmente", "Pasan a formar parte integrada de la NIC", "Sustituyen a la NIC", "Se aplican solo a en casos puntuales"], correct: 1 },
+            { q: "54. En zona de obras se limita:", options: ["El número de trenes", "La velocidad de los trenes", "El uso de ATO", "La tensión"], correct: 1 },
+            { q: "55. Las vías secundarias son:", options: ["Las de saco de maniobras", "Las de estaciones finales", "Las que no son vías principales", "Las de túnel"], correct: 2 },
+            { q: "56. ¿Cuál puede ser el límite de un depósito según la normativa?", options: ["El andén principal", "La Zona A", "El PCC", "La boca del túnel de acceso a línea o la señal de salida"], correct: 3 },
+            { q: "57. El piñón es el punto donde:", options: ["Empieza el andén", "Termina el túnel", "Se ubica el PCC", "Finaliza el andén y comienza la interestación"], correct: 3 },
+            { q: "58. La vía banalizada permite circulación:", options: ["En uno y otro sentido indistintamente", "Solo en sentido habitual", "Sin señalización", "Solo de trenes de trabajo"], correct: 0 },
+            { q: "59. El testigo piloto autoriza:", options: ["Entrada a depósitos", "Un recorrido determinado en servicio degradado", "Uso de freno mecánico", "Trabajos nocturnos"], correct: 1 },
+            { q: "60. ¿Qué detecta la ocupación de trenes en un circuito de vía?", options: ["El PCC", "El enclavamiento de señales", "El CTC", "El freno mecánico"], correct: 1 },
+            { q: "61. ¿Qué se realiza en un depósito o cochera?", options: ["Limpieza de trenes", "Reparación de trenes", "Todas son correctas", "Estancia y revisión de trenes"], correct: 2 },
+            { q: "62. ¿Qué anchura aproximada tiene la Zona A del andén?", options: ["50 cm", "1 metro", "80 cm", "2 metros"], correct: 2 },
+            { q: "63. La circulación a contravía implica marcha:", options: ["Atrás", "Lateral", "Adelante en sentido contrario al usual", "Sin conductor"], correct: 2 },
+            { q: "64. Los vehículos bi-viales pueden:", options: ["Circular solo en túnel", "Circular por vías y desplazarse fuera de ellas", "Circular en depósitos", "Circular en estaciones"], correct: 1 },
+            { q: "65. La pendiente es un plano inclinado en sentido:", options: ["Ascendente", "Lateral", "Horizontal", "Descendente"], correct: 3 },
+            { q: "66. ¿Quién publica el momento en que las dependencias quedan o no en explotación?", options: ["El PCC", "Las jefaturas", "El personal de estaciones", "La Dirección"], correct: 3 },
+            { q: "67. Un tren es, en general:", options: ["Cualquier conjunto de vehículos ferroviarios acoplados", "Vehículos auxiliares", "Vehículos de viajeros", "Vehículos de mercancías"], correct: 0 },
+            { q: "68. ¿Qué sistema supervisa permanentemente circuitos de vía, señales, agujas y calzos?", options: ["CTC", "Enclavamiento de señales", "PCC", "Auto-Shunt"], correct: 1 },
+            { q: "69. La zona de trabajo es donde:", options: ["No hay personal trabajando en la plataforma de vía", "Hay personal trabajando en la plataforma de vía", "Se hacen pruebas dinámicas", "No circulan trenes"], correct: 1 },
+            { q: "70. ¿Para quién es de obligado cumplimiento la NIC?", options: ["Para todos los trabajadores que intervengan en la circulación", "Para personal externo", "Solo para mandos", "Solo para conductores"], correct: 0 },
+            { q: "71. ¿Quién debe autorizar el acceso a un Área de Trabajo?", options: ["El jefe de mantenimiento", "El responsable operativo", "El PCC", "La comisión de programación"], correct: 2 },
+            { q: "72. El Auto-Shunt es una maniobra realizada en modo de conducción:", options: ["Manual", "ATO", "ATP", "De emergencia"], correct: 1 },
+            { q: "73. ¿Qué se prohíbe en el Área de Seguridad sin autorización del PCC?", options: ["El uso de freno mecánico", "La circulación de trenes", "El encendido del alumbrado", "El estacionamiento de trenes"], correct: 1 },
+            { q: "74. En tramos a cielo abierto, la plataforma de vía se amplía:", options: ["1 metro", "3 metros desde los carriles exteriores", "10 metros", "5 metros"], correct: 1 },
+            { q: "75. ¿Qué compone un cantón?", options: ["Uno o varios circuitos de vía", "Solo un túnel", "Una estación", "Una vía secundaria"], correct: 0 },
+            { q: "76. También son zonas colindantes los recintos que comunican con:", options: ["El túnel", "PCC", "Andenes", "Vías principales únicamente"], correct: 0 },
+            { q: "77. La vía I es la recorrida por trenes:", options: ["Hacia el origen", "En retroceso", "Alejándose del origen convencional", "En contravía"], correct: 2 },
+            { q: "78. ¿Qué visualiza el CTC?", options: ["Consumo eléctrico", "Personal en estaciones", "Ocupación de los trenes en la línea", "Estado de los andenes"], correct: 2 },
+            { q: "79. ¿Quién elabora el Documento de programación?", options: ["La Comisión de programación", "El PCC", "El conductor jefe", "El responsable operativo"], correct: 0 },
+            { q: "80. ¿Cómo se denomina el freno de estacionamiento en vehículos auxiliares clásicos?", options: ["Freno mecánico", "Freno automático", "Freno dinámico", "Freno eléctrico"], correct: 1 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let timeLeft = 25 * 60; // 25 Minutos
+        let timerInterval;
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                let m = Math.floor(timeLeft / 60);
+                let s = timeLeft % 60;
+                document.getElementById('time-display').innerText = 
+                    `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showResults();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestionIndex];
+            document.getElementById('q-counter').innerText = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
+            document.getElementById('q-text').innerText = q.q;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                if (userAnswers[currentQuestionIndex] === index) btn.classList.add('selected');
+                
+                const letras = ['a) ', 'b) ', 'c) ', 'd) '];
+                btn.innerText = letras[index] + opt;
+                btn.onclick = () => selectOption(index);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('btn-prev').disabled = currentQuestionIndex === 0;
+            
+            const btnNext = document.getElementById('btn-next');
+            if (currentQuestionIndex === questions.length - 1) {
+                btnNext.innerText = "Finalizar Examen";
+                btnNext.classList.add('primary');
+            } else {
+                btnNext.innerText = "Siguiente →";
+                btnNext.classList.remove('primary');
+            }
+        }
+
+        function selectOption(index) {
+            userAnswers[currentQuestionIndex] = index;
+            loadQuestion(); 
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                if(confirm("¿Estás seguro de que deseas finalizar el examen?")) {
+                    showResults();
+                }
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        // Función de autoguardado de fallos (invisible para el usuario)
+        function guardarFalloLocal(pregunta, opciones, respuestaCorrecta, modulo) {
+            let listaFallos = JSON.parse(localStorage.getItem('mis_fallos')) || [];
+            
+            const nuevoFallo = {
+                id: Date.now() + Math.random(), // Evita ids duplicados si se guardan muy rápido
+                modulo: modulo,
+                q: pregunta,
+                opts: opciones,
+                a: respuestaCorrecta
+            };
+            
+            // Solo lo añade si esa pregunta no está ya en la lista de fallos
+            if (!listaFallos.find(f => f.q === pregunta)) {
+                listaFallos.push(nuevoFallo);
+                localStorage.setItem('mis_fallos', JSON.stringify(listaFallos));
+            }
+        }
+
+        function showResults() {
+            clearInterval(timerInterval);
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            
+            let score = 0;
+            let fallosHTML = "";
+            
+            userAnswers.forEach((ans, i) => {
+                const q = questions[i];
+                if (ans === q.correct) {
+                    score++;
+                } else {
+                    // 1. Generar HTML visual para mostrarle al usuario en qué falló
+                    let userAnswerText = (ans !== null) ? q.options[ans] : "No contestada";
+                    let correctAnswerText = q.options[q.correct];
+                    
+                    fallosHTML += `
+                        <div class="fallo-item">
+                            <p style="margin: 0 0 5px 0;"><strong>${q.q}</strong></p>
+                            <p style="margin: 0;" class="respuesta-mal">❌ Tu respuesta: ${userAnswerText}</p>
+                            <p style="margin: 0;" class="respuesta-bien">✅ Correcta: ${correctAnswerText}</p>
+                        </div>
+                    `;
+
+                    // 2. Guardar el fallo automáticamente en silencio
+                    guardarFalloLocal(q.q, q.options, q.correct, "NIC");
+                }
+            });
+            
+            let notaDecimal = (score / questions.length) * 10;
+            document.getElementById('score-text').innerHTML = `Has acertado <span style="color:var(--accent)">${score}</span> de ${questions.length} preguntas.<br><br>Tu nota es: ${notaDecimal.toFixed(2)} / 10`;
+
+            // Si hay fallos, mostramos la lista visual
+            if (score < questions.length) {
+                document.getElementById('fallos-area').style.display = 'block';
+                document.getElementById('fallos-list').innerHTML = fallosHTML;
+            }
+        }
+
+        window.onload = () => {
+            loadQuestion();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
