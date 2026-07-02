@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test PRL Campus</title>
+<style>
+    :root { --bg:#121212; --card:#1e1e1e; --accent:#27ae60; --correct:#009543; --wrong:#ff3b30; --text:#ffffff; --muted:#888; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:'Segoe UI',sans-serif; background:var(--bg); color:var(--text); display:flex; justify-content:center; min-height:100vh; }
+    .container { width:100%; max-width:500px; padding:20px; }
+
+    .menu-title { text-align:center; font-size:1.4rem; font-weight:700; margin-bottom:4px; margin-top:8px; }
+    .menu-subtitle { text-align:center; color:var(--muted); font-size:13px; margin-bottom:22px; }
+
+    .section-sep {
+        display:flex; align-items:center; gap:10px;
+        margin:18px 0 12px;
+    }
+    .section-sep span {
+        font-size:11px; font-weight:700; text-transform:uppercase;
+        letter-spacing:.08em; white-space:nowrap; padding:3px 10px;
+        border-radius:99px; background:#1a3a1a; color:#7de87d;
+    }
+    .section-sep::after { content:''; flex:1; height:1px; background:#2a2a2a; }
+
+    .menu-grid { display:flex; flex-direction:column; gap:10px; }
+    .menu-btn {
+        background:var(--card); border:1px solid #333; color:var(--text);
+        padding:16px 18px; border-radius:14px; text-align:left;
+        cursor:pointer; transition:0.2s; display:flex;
+        justify-content:space-between; align-items:center; width:100%;
+        font-family:inherit;
+    }
+    .menu-btn:hover { background:#2a2a2a; border-color:var(--accent); }
+    .menu-btn .label { font-size:15px; font-weight:600; }
+    .menu-btn .meta { font-size:12px; color:var(--muted); margin-top:3px; }
+    .menu-btn .arrow { color:var(--accent); font-size:20px; flex-shrink:0; margin-left:10px; }
+    .menu-btn-all { background:var(--accent); border-color:var(--accent); margin-top:6px; }
+    .menu-btn-all:hover { opacity:.9; }
+
+    .quiz-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    #progreso-texto { font-size:14px; color:var(--muted); }
+    .btn-salir { background:none; border:1px solid #444; color:#ccc; padding:5px 12px; border-radius:5px; cursor:pointer; font-size:13px; font-family:inherit; }
+    .btn-salir:hover { border-color:#888; color:#fff; }
+    .progress-bar { width:100%; height:6px; background:#333; border-radius:10px; margin-bottom:22px; overflow:hidden; }
+    .progress-fill { height:100%; background:var(--accent); width:0%; transition:width .3s; }
+    .question-card { background:var(--card); padding:24px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+    .cat-badge { display:inline-block; font-size:11px; padding:3px 10px; border-radius:99px; margin-bottom:12px; text-transform:uppercase; letter-spacing:.06em; background:#1a3a1a; color:#7de87d; }
+    h2 { font-size:1rem; line-height:1.55; margin-bottom:18px; margin-top:0; }
+    .options-grid { display:flex; flex-direction:column; gap:10px; }
+    .opt-btn { background:#2a2a2a; border:1px solid #333; color:white; padding:13px 14px; border-radius:12px; text-align:left; font-size:13px; cursor:pointer; transition:0.18s; line-height:1.4; font-family:inherit; }
+    .opt-btn:hover:not(:disabled) { background:#333; border-color:#555; }
+    .opt-btn.correct { background:var(--correct) !important; border-color:var(--correct); }
+    .opt-btn.wrong   { background:var(--wrong)   !important; border-color:var(--wrong); }
+    .opt-btn.reveal  { background:#005a28 !important; border-color:var(--correct); opacity:.85; }
+    .btn-next { width:100%; background:var(--accent); color:white; border:none; padding:14px; border-radius:10px; font-weight:bold; margin-top:14px; cursor:pointer; display:none; font-size:15px; font-family:inherit; }
+    .btn-next.show { display:block; }
+
+    .results-list { text-align:left; background:#000; padding:15px; border-radius:10px; font-size:13px; max-height:340px; overflow-y:auto; margin-top:14px; }
+    .result-item { margin-bottom:10px; border-bottom:1px solid #222; padding-bottom:6px; }
+    .result-item .rq { color:#ddd; }
+    .result-item .ra { color:#27ae60; margin-top:2px; }
+    .hidden { display:none; }
+</style>
+</head>
+<body>
+<div class="container">
+
+    <!-- MENU -->
+    <div id="menu-screen">
+        <div class="menu-title">Test PRL Campus</div>
+        <div class="menu-subtitle">Elige un bloque de estudio</div>
+        <div class="section-sep"><span>📋 Bloques</span></div>
+        <div class="menu-grid" id="grid-bloques"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quiz-screen" class="hidden">
+        <div class="quiz-header">
+            <div id="progreso-texto">Pregunta 1/30</div>
+            <button class="btn-salir" onclick="volverMenu()">✕ Salir</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="question-card">
+            <div class="cat-badge" id="cat-badge">PRL</div>
+            <h2 id="question-text">Cargando...</h2>
+            <div id="options-container" class="options-grid"></div>
+            <button id="btn-next" class="btn-next" onclick="nextQuestion()">SIGUIENTE →</button>
+        </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div id="results-screen" class="hidden">
+        <div class="question-card" style="text-align:center;">
+            <h1 id="score-percent" style="font-size:52px;margin:10px 0">0%</h1>
+            <p id="score-text" style="color:var(--muted);font-size:14px;margin-bottom:4px"></p>
+            <div id="failed-review" class="results-list"></div>
+            <button class="btn-next show" onclick="repetirBloque()">🔄 REPETIR BLOQUE</button>
+            <button class="btn-next show" style="background:#444;margin-top:10px;" onclick="volverMenu()">🏠 ELEGIR OTRO BLOQUE</button>
+        </div>
+    </div>
+
+</div>
+<script>
+// ════════════════════════════════════════════
+//  DB — Bloques de preguntas PRL (orden fijo, extraído del Word)
+// ════════════════════════════════════════════
+var bloques = [{"num": 1, "nombre": "Bloque 1", "count": 30, "questions": [{"q": "Es obligación del trabajador:", "opts": ["Desactivar protecciones", "Usar correctamente los EPI", "Ignorar riesgos", "Crear planes"], "correct": 1}, {"q": "¿Qué organismo paga prestaciones?", "opts": ["Ayuntamiento", "Seguridad Social", "Empresa", "Comité"], "correct": 1}, {"q": "Las directivas europeas:", "opts": ["Son opcionales", "Obligan a adaptar las leyes", "Solo afectan a España", "No son vinculantes"], "correct": 1}, {"q": "La LPRL aplica en España:", "opts": ["El Código Penal", "La Directiva Marco europea", "Convenios privados", "Reglamentos municipales"], "correct": 1}, {"q": "Los accidentes in itinere ocurren:", "opts": ["En vacaciones", "En la empresa", "Al ir o volver del trabajo", "En casa"], "correct": 2}, {"q": "La salud es:", "opts": ["Ausencia de enfermedad", "Bienestar físico, mental y social", "Tener fuerza física", "No faltar al trabajo"], "correct": 1}, {"q": "Una condición de trabajo es:", "opts": ["Solo el horario", "Cualquier característica que afecte a la salud o seguridad", "El salario", "La edad"], "correct": 1}, {"q": "¿Qué debe hacer primero una empresa ante un peligro?", "opts": ["Ignorarlo", "Eliminarlo", "Señalizarlo", "Comunicarlo"], "correct": 1}, {"q": "Puede parar su actividad ante:", "opts": ["Mucho trabajo", "Peligro grave e inminente", "Falta de compañeros", "Cambio horario"], "correct": 1}, {"q": "La seguridad en el trabajo busca:", "opts": ["Aumentar producción", "Reducir accidentes", "Reducir costes", "Controlar horarios"], "correct": 1}, {"q": "El capítulo que regula derechos y obligaciones es:", "opts": ["1", "2", "3", "7"], "correct": 2}, {"q": "¿Qué es un factor de riesgo?", "opts": ["Una ley", "Un accidente", "Todo aquello que puede causar peligro", "Una enfermedad"], "correct": 2}, {"q": "La psicosociología aplicada estudia:", "opts": ["Impuestos", "Comportamiento y organización del trabajo", "Producción", "Contabilidad"], "correct": 1}, {"q": "Es obligación del empresario:", "opts": ["Evitar riesgos", "Delegarlo todo", "Eliminar formación", "No evaluar riesgos"], "correct": 0}, {"q": "Un trabajador tiene derecho a:", "opts": ["Ignorar normas", "Recibir formación preventiva", "Quitar protecciones", "Negarse siempre a trabajar"], "correct": 1}, {"q": "La principal norma española de PRL es:", "opts": ["Código Civil", "Ley de Prevención de Riesgos Laborales", "Constitución", "Estatuto Básico"], "correct": 1}, {"q": "La actividad preventiva es:", "opts": ["Conjunto de tareas para conocer riesgos", "Una inspección", "Una sanción", "Un accidente"], "correct": 0}, {"q": "Un accidente de trabajo:", "opts": ["Ocurre lentamente", "Es inevitable", "Ocurre de repente", "No produce daños"], "correct": 2}, {"q": "La higiene industrial se relaciona con:", "opts": ["Salarios", "Productos químicos y entorno laboral", "Vacaciones", "Contratos"], "correct": 1}, {"q": "¿Qué es un riesgo laboral?", "opts": ["Una enfermedad", "La posibilidad de sufrir un daño relacionado con el trabajo", "Una sanción", "Un accidente ya ocurrido"], "correct": 1}, {"q": "En 2003 se añadió:", "opts": ["Eliminar prevención", "Integrarla en toda la empresa", "Reducir formación", "Eliminar planes"], "correct": 1}, {"q": "Los delegados de prevención representan a:", "opts": ["Empresarios", "Administración", "Trabajadores", "Clientes"], "correct": 2}, {"q": "La ergonomía estudia:", "opts": ["Economía", "Adaptación del trabajo a la persona", "Contratos", "Seguridad Social"], "correct": 1}, {"q": "Una enfermedad profesional es:", "opts": ["Cualquier enfermedad", "Una reconocida por ley causada por el trabajo", "Un accidente", "Una enfermedad común"], "correct": 1}, {"q": "La prevención de riesgos laborales consiste en:", "opts": ["Reducir salarios", "Actuar tras el accidente", "Evitar o reducir riesgos", "Contratar personal"], "correct": 2}, {"q": "El Comité de Seguridad y Salud es obligatorio con:", "opts": ["10 trabajadores", "25 trabajadores", "Más de 50 trabajadores", "100 trabajadores"], "correct": 2}, {"q": "Los costes indirectos suelen ser:", "opts": ["Menores", "Iguales", "Mayores y difíciles de calcular", "Inexistentes"], "correct": 2}, {"q": "El empresario debe priorizar:", "opts": ["Protección individual", "Protección colectiva", "Producción", "Ahorro económico"], "correct": 1}, {"q": "Un accidente de trabajo es:", "opts": ["Una enfermedad común", "Una lesión sufrida en el trabajo o por él", "Una sanción", "Un problema familiar"], "correct": 1}, {"q": "La medicina del trabajo se ocupa de:", "opts": ["Prevenir y tratar problemas de salud laborales", "Nóminas", "Producción", "Ventas"], "correct": 0}], "start_num": 1, "end_num": 30}, {"num": 2, "nombre": "Bloque 2", "count": 30, "questions": [{"q": "¿Qué afirmación es correcta sobre enfermedad profesional?", "opts": ["Enfermedad no reconocida por la ley, causada por el trabajo que se realiza", "Enfermedad reconocida por la ley, causada por el trabajo que se realiza", "Enfermedad reconocida por la ley, causada por agentes patógenos", "Enfermedad reconocida por la ley, causada fuera del trabajo que se realiza"], "correct": 1}, {"q": "¿Qué afirmación es correcta sobre actividad preventiva?", "opts": ["Tareas que realiza la seguridad social para conocer condiciones y factores de riesgo según las características, capacidades y necesidades de los trabajadores", "Tareas que realiza la empresa para conocer condiciones y factores de riesgo según las características, capacidades y necesidades de los trabajadores", "Tareas que realiza la empresa para conocer condiciones y factores de riesgo según las características, sexo y edad de los trabajadores", "Tareas que realiza la seguridad social para conocer condiciones y factores de riesgo según las características, sexo y edad de los trabajadores"], "correct": 1}, {"q": "¿Qué se define como salud?", "opts": ["La ausencia total de cansancio", "La capacidad de trabajar sin descanso", "Un estado físico, mental y social en el que se encuentra una persona", "Un estado de bienestar físico, mental y social"], "correct": 3}, {"q": "¿Qué significa un riesgo laboral?", "opts": ["La posibilidad de sufrir un daño relacionado con el trabajo", "Una enfermedad inevitable causada por el trabajo", "Un accidente en el trabajo", "Un accidente de camino al trabajo"], "correct": 0}, {"q": "¿Qué afirmación es correcta sobre higiene industrial?", "opts": ["Técnica para evitar accidentes y enfermedades profesionales en el trabajo, relacionado con el uso de productos químicos", "Técnica para evitar accidentes y enfermedades profesionales en el trabajo, relacionado con el uso de productos biológicos", "Técnica para evitar accidentes y enfermedades profesionales en el trabajo, relacionado con el uso de productos físicos", "Técnica para evitar accidentes y enfermedades profesionales en el trabajo, relacionado con el uso de productos explosivos"], "correct": 0}, {"q": "¿Qué afirmación es correcta sobre Comité de Seguridad y Salud?", "opts": ["Obligatorio en empresas de más de 50 trabajadores", "Obligatorio en empresas de más de 80 trabajadores", "Obligatorio en empresas de más de 30 trabajadores", "Obligatorio en empresas de más de 25 trabajadores"], "correct": 0}, {"q": "¿Qué son los costes indirectos por problemas de salud laboral?", "opts": ["El dinero que pierde la empresa por materiales adaptados al trabajador", "El dinero que pierde la empresa en prevención de accidentes", "El dinero que gana la empresa por accidentes o enfermedades de los trabajadores", "El dinero que pierde la empresa por accidentes o enfermedades de los trabajadores"], "correct": 3}, {"q": "¿Qué afirmación es correcta sobre agentes químicos?", "opts": ["Indica las características de seguridad y salud cuando hay productos químicos", "Indica las características de seguridad y salud cuando hay productos químicos, biológicos y explosivos", "Indica las características de seguridad y salud cuando hay productos biológicos", "Indica las características de seguridad y salud cuando hay productos explosivos"], "correct": 0}, {"q": "¿Qué es un accidente in itínere?", "opts": ["El que ocurre al ir o volver del trabajo", "El que ocurre durante una huelga", "El causado por máquinas", "El que ocurre en el puesto de trabajo"], "correct": 0}, {"q": "¿Qué es la prevención en el ámbito laboral?", "opts": ["Tener equipos de protección", "Formación de los trabajadores", "Actividades y decisiones para evitar o reducir riesgos laborales", "Todas son correctas"], "correct": 2}, {"q": "¿Qué afirmación es correcta sobre condición de trabajo?", "opts": ["Cualquier característica del trabajo que tenga consecuencias para la prevención laboral", "Cualquier característica del trabajo que tenga consecuencias para la salud mental", "Cualquier característica del trabajo que tenga consecuencias para la salud y seguridad de los trabajadores", "Cualquier característica del trabajo que tenga consecuencias para el bienestar social"], "correct": 2}, {"q": "¿Qué ley española es la principal sobre prevención de riesgos laborales?", "opts": ["La Ley de Prevención de Riesgos Laborales de 1995", "La Ley de Prevención de Riesgos Laborales de 1998", "La Ley de Prevención de Riesgos Laborales de 1994", "La Ley de Prevención de Riesgos Laborales de 1996"], "correct": 0}, {"q": "¿Qué afirmación es correcta sobre delegados de prevención?", "opts": ["Representan a los trabajadores para temas relacionados con PRL", "Hasta 30 trabajadores solo hay un representante", "Cuando solo hay un representante será delegado de personal y prevención", "Todas son correctas"], "correct": 3}, {"q": "¿Qué paso debe hacerse primero cuando existe un peligro en el trabajo?", "opts": ["Informar a los trabajadores", "Eliminar el peligro", "Contratar un servicio de emergencias", "Formar a los trabajadores"], "correct": 1}, {"q": "¿Qué afirmación es correcta sobre factor de riesgo?", "opts": ["Todo lo que puede suponer un peligro o afectar a la salud mental del trabajador", "Todo lo que puede suponer una amenaza para la seguridad del trabajador", "Todo lo que puede suponer un peligro o afectar a la seguridad del trabajador", "Todo lo que puede suponer un peligro o afectar a la salud del trabajador"], "correct": 3}, {"q": "¿Qué estudia la ergonomía?", "opts": ["Las técnicas aplicadas y materiales para que la persona se adapte al trabajo", "Las técnicas aplicadas y materiales para que el trabajo sea adecuado a la persona", "La organización del trabajo", "Los materiales usados por el trabajador"], "correct": 1}, {"q": "¿Qué afirmación es correcta sobre medicina del trabajo?", "opts": ["Todas son correctas", "Medicinas que tiene una empresa para curar a los trabajadores", "Medicina aplicada a situaciones de trabajo que previene, cura o rehabilita al trabajador", "Medicina aplicada a situaciones de estrés que previene, cura o rehabilita al trabajador"], "correct": 2}, {"q": "¿Qué organismo paga pensiones y ayudas?", "opts": ["El ayuntamiento", "La mutua privada", "La Seguridad Social", "El comité de empresa"], "correct": 2}, {"q": "¿Qué afirmación es correcta sobre Comité de Seguridad y Salud?", "opts": ["Se encarga de conocer y estudiar temas relacionados con PRL", "Participan en la creación de los planes de PRL, ponen en marcha y revisan su funcionamiento", "Proponen una mejora en condiciones de seguridad y salud o la corrección de fallos que existan", "Todas son correctas"], "correct": 3}, {"q": "¿Qué característica tiene un accidente de trabajo?", "opts": ["Nadie desea que ocurra y puede causar daños y lesiones a una persona", "Ocurre de repente y se podría evitar", "Interrumpe el ritmo de trabajo", "Todas son correctas"], "correct": 3}, {"q": "¿En que capítulo de la ley PRL se crea la Comisión Nacional de Seguridad y Salud en el Trabajo?", "opts": ["Capítulo 2", "Capítulo 4", "Capítulo 6", "Capítulo 5"], "correct": 0}, {"q": "La reforma de la ley PRL de 2009 añade…", "opts": ["La posibilidad de hacer un plan de PRL más ajustado en algunos tipos de empresas", "La posibilidad de hacer un plan de PRL más específico en algunos tipos de empresas", "La posibilidad de hacer un plan de PRL más técnico en algunos tipos de empresas", "La posibilidad de hacer un plan de PRL más sencillo en algunos tipos de empresas"], "correct": 3}, {"q": "¿Qué capítulo de la ley PRL habla de sanciones?", "opts": ["Capítulo 4", "Capítulo 7", "Capítulo 5", "Capítulo 6"], "correct": 1}, {"q": "¿Qué debe hacer el empresario respecto a medidas preventivas colectivas?", "opts": ["Darles más importancia que a las individuales", "Evitarlas", "Aplicarlas solo en grandes empresas", "Sustituirlas por medidas individuales"], "correct": 0}, {"q": "¿Qué afirmación es correcta sobre Directiva Marco?", "opts": ["Es la directiva que toman las leyes españolas de PRL", "Indica el contenido que debe aparecer en las normas de cada país", "Es del año 1989", "Todas son correctas"], "correct": 3}, {"q": "Si no se puede eliminar un peligro, ¿qué debe hacerse?", "opts": ["Suspender la actividad temporalmente", "Colocar equipos de protección", "Todas son correctas", "Estudiar los motivos que provocan el peligro y proponer medidas preventivas"], "correct": 3}, {"q": "¿Qué estudia la psicosociología aplicada?", "opts": ["La coordinación entre compañeros de trabajo", "El trato entre trabajador y empresario", "La relación entre compañeros de trabajo", "Cómo la organización y el comportamiento afectan a la salud"], "correct": 3}, {"q": "¿Qué afirmación es correcta sobre la ley de PRL?", "opts": ["Es del año 1995 con 6 capítulos", "Es del año 1995 con 5 capítulos", "Es del año 1995 con 7 capítulos", "Es del año 1995 con 8 capítulos"], "correct": 2}, {"q": "El capitulo 4 de la ley PRL explica…", "opts": ["Los diferentes tipos de servicios de PRL en las empresas", "Los diferentes tipos de estrategias de PRL en las empresas", "Los diferentes tipos de planes de PRL en las empresas", "Los diferentes tipos de seguridad de PRL en las empresas"], "correct": 0}, {"q": "¿En que año se produce la reforma de la ley PRL donde se indica como realizar la coordinación entre 2 o más empresas que trabajan en un mismo lugar?", "opts": ["2003", "2004", "2005", "2009"], "correct": 1}], "start_num": 1, "end_num": 30}, {"num": 3, "nombre": "Bloque 3", "count": 30, "questions": [{"q": "¿Cómo se llaman los accidentes ocurridos al ir o volver del trabajo?", "opts": ["Accidentes in itínere", "Accidentes laborales indirectos", "Accidentes laborales directos", "Accidentes preventivos"], "correct": 0}, {"q": "Los derechos de los trabajadores y obligaciones de las empresas sobre PRL se explican en el capítulo…", "opts": ["4", "6", "3", "2"], "correct": 2}, {"q": "¿Cuál de estos elementos puede ser una condición de trabajo?", "opts": ["Los edificios, instalaciones, máquinas y organización", "Los productos fabricados", "Todas son correctas", "Oficinas o talleres"], "correct": 2}, {"q": "¿Qué afirmación es correcta sobre delegados de prevención?", "opts": ["Colaboran con la empresa para mejorar las actividades de prevención", "Opinan sobre algunas decisiones relacionadas con PRL", "Vigilan que todos los trabajadores cumplan las normas de PRL", "Todas son correctas"], "correct": 3}, {"q": "¿Qué son las otras patologías relacionadas con el trabajo?", "opts": ["Lesiones deportivas", "Enfermedades hereditarias", "Dolencias que afectan a emociones, salud mental o relaciones", "Adicciones a drogas y alcohol"], "correct": 2}, {"q": "¿Qué reconoce la Constitución respecto al trabajo?", "opts": ["Derecho a proteger la salud e integridad física", "Derecho a recibir formación", "Solo el derecho a proteger la salud", "Únicamente el derecho a proteger la integridad física"], "correct": 0}, {"q": "El capitulo 1 de la ley PRL de 1995 indica…", "opts": ["Los derechos de los trabajadores y obligaciones de las empresas sobre PRL", "Las actuaciones que pueden realizar las administraciones públicas", "El objetivo final de la ley, donde se aplica y ofrece las definiciones de las principales palabras y expresiones relacionadas con PRL", "Los derechos de las empresas y obligaciones de los trabajadores sobre PRL"], "correct": 2}, {"q": "¿Qué afirmación es correcta sobre delegados de prevención?", "opts": ["Una empresa que tiene entre 50 y 100 trabajadores tiene que tener 2 delegados", "Una empresa que tiene entre mil y 2 mil trabajadores tiene que tener 5 delegados", "Una empresa que tiene más de 4 mil trabajadores tiene que tener 8 delegados", "Todas son correctas"], "correct": 3}, {"q": "¿Cómo surge una enfermedad relacionada con el trabajo?", "opts": ["De forma inmediata", "Poco a poco y lentamente", "Por un accidente puntual", "Poco a poco y rápidamente"], "correct": 1}, {"q": "¿Qué objetivo tiene la Unión Europea respecto a protección laboral?", "opts": ["Evitar que unos países protejan a sus trabajadores más o menos que otros", "Eliminar legislación nacional de cada país", "Reducir los accidentes y enfermedades en el trabajo", "Todas son correctas"], "correct": 0}, {"q": "¿Qué norma europea aplica la ley española de prevención?", "opts": ["Directiva Marco de salud y seguridad en el trabajo", "Directiva Marco de emergencias y salud en el trabajo", "Directiva Marco de emergencias y seguridad en el trabajo", "Reglamento Social Europeo"], "correct": 0}, {"q": "¿Qué obligación se añadió en la reforma de PRL de 2003?", "opts": ["Que la PRL estuviera incluida en todas las actividades y decisiones de la empresa", "La necesidad de hacer planes de PRL en las empresas", "Un recurso preventivo, que alguien se dedicara a temas de PRL", "Todas son correctas"], "correct": 3}, {"q": "¿Qué explica el reglamento sobre prevención?", "opts": ["Cómo hacer las evaluaciones de PRL", "Todas son correctas", "Quiénes pueden trabajar en este tipo de servicios de prevención", "Cómo hay que organizar los servicios de prevención"], "correct": 1}, {"q": "¿Cómo se llaman las normas europeas que obligan a adaptaciones nacionales?", "opts": ["Directivas", "Estatutos laborales", "Reglamentos internos", "Convenios privados"], "correct": 0}, {"q": "¿De qué habla el capítulo 5?", "opts": ["Delegados de prevención y Técnicos en emergencias", "La Seguridad Social", "Delegados de prevención y Comités de Seguridad y Salud", "Técnicos en emergencias y Comités de Seguridad y Salud"], "correct": 2}, {"q": "¿Cuál de estos es un equipo de protección individual?", "opts": ["Ordenador", "Teléfono", "Gafas de protección", "Escritorio"], "correct": 2}, {"q": "¿Qué indican las directivas sobre seguridad del producto?", "opts": ["Que los productos vendidos sean seguros", "Que todos los productos sean baratos", "Que todos los productos sean iguales", "Que se fabriquen en Europa"], "correct": 0}, {"q": "¿Qué regulan las directivas sobre agentes contaminantes?", "opts": ["Protección frente productos químicos", "Protección frente a ruido", "Protección frente a productos que producen cáncer", "Todas son correctas"], "correct": 3}, {"q": "También hay normas sobre…", "opts": ["Cómo evitar riesgos cuando un trabajador mueve objetos pesados o de gran tamaño", "Uso de pantallas de ordenador", "Utilizar señales de seguridad en el trabajo", "Todas son correctas"], "correct": 3}, {"q": "¿Qué norma regula talleres, fábricas y oficinas?", "opts": ["Agentes químicos", "Seguridad del producto", "Lugares de trabajo", "Equipos de trabajo"], "correct": 2}, {"q": "¿Qué caracteristicas regula la norma de los lugares de trabajo?", "opts": ["Las entradas y salidas", "La temperatura o cantidad de luz necesaria", "La ventilación o los servicios que tienen que tener", "Todas son correctas"], "correct": 3}, {"q": "¿Quiénes pueden ser delegados de prevención?", "opts": ["Cualquier trabajador", "Técnicos en emergencias", "Representantes de los trabajadores", "Trabajadores formados en prevención"], "correct": 2}, {"q": "En la directiva sobre grupos especiales se mencionan…", "opts": ["Embarazadas, mayores y jóvenes", "Embarazadas, personas con discapacidad y jóvenes", "Embarazadas, temporales y jóvenes", "Autónomos y funcionarios"], "correct": 2}, {"q": "¿De qué año es el Reglamento de los Servicios de Prevención?", "opts": ["1997", "1995", "1989", "1998"], "correct": 0}, {"q": "¿Quiénes se reúnen en la Comisión Nacional de Seguridad y Salud?", "opts": ["Administraciones, empresarios y técnicos de la comisión", "Administraciones, empresarios y trabajadores", "Administraciones, empresarios y trabajadores", "Administraciones, empresarios y delegados de prevención"], "correct": 1}, {"q": "Los trabajadores también tienen derecho a…", "opts": ["Recibir información y cursos de formación sobre PRL", "Todas son correctas", "Parar en el trabajo cuando hay una situación de peligro importante", "Opinar y participar en temas relacionados con PRL"], "correct": 1}, {"q": "¿Qué regula la norma sobre equipos de trabajo?", "opts": ["Características de seguridad y salud de los equipos que utilizan los trabajadores", "Caducidad de los equipos que utilizan los trabajadores", "Productos explosivos en los equipos que utilizan los trabajadores", "Materiales de seguridad y salud de los equipos que utilizan los trabajadores"], "correct": 0}, {"q": "¿Qué permite la directiva a cada país?", "opts": ["Hacer ajustes como convenga a cada país", "Hacer ajustes que permitan unirse con otras leyes", "Hacer ajustes que permitan unirse con otras leyes de otros paises", "Todas son correctas"], "correct": 1}, {"q": "¿Qué regula la norma sobre agentes químicos?", "opts": ["La seguridad ante productos biológicos peligrosos", "La seguridad ante productos químicos peligrosos", "La seguridad ante productos físicos peligrosos", "La seguridad ante productos explosivos peligrosos"], "correct": 1}, {"q": "¿De qué habla el capítulo 6?", "opts": ["La jubilación parcial", "Las ayudas europeas", "Las enfermedades mentales", "Obligaciones de fabricantes, compradores y proveedores"], "correct": 3}], "start_num": 1, "end_num": 30}, {"num": 4, "nombre": "Bloque 4", "count": 20, "questions": [{"q": "¿Cuántos delegados de prevención debe tener una empresa de 50 a 100 trabajadores?", "opts": ["1", "2", "5", "8"], "correct": 1}, {"q": "¿Cuál es la obligación principal del empresario?", "opts": ["El mantenimiento de los equipos de protección", "Tener planes de actuación", "Proteger a los trabajadores de riesgos en seguridad y salud", "Todas son correctas"], "correct": 2}, {"q": "¿Qué obligación tiene el empresario con los riesgos inevitables?", "opts": ["Conocerlos y evaluarlos", "Aumentar la seguridad", "Actualizar los materiales", "Informar a los trabajadores"], "correct": 0}, {"q": "¿Quién decide el delegado de prevención en empresas mayores de 30 trabajadores?", "opts": ["Los delegados de personal", "Los trabajadores", "La Seguridad Social", "El empresario"], "correct": 0}, {"q": "¿A quién tienen la obligación de informar los trabajadores sobre riesgos?", "opts": ["A jefes y compañeros", "A inspectores y delegados", "A sindicatos y compañeros", "A jefes y delegados"], "correct": 0}, {"q": "¿Quiénes se reunen en el Comité de Seguridad y Salud?", "opts": ["Técnicos en emergencias y empresario en igual número", "Delegados de prevención y empresario en igual número", "Representantes de trabajadores y delegados de prevención en igual número", "Representantes de trabajadores y empresario en igual número"], "correct": 3}, {"q": "¿Qué obligación tiene el empresario de incluir en la empresa?", "opts": ["Sistemas de seguridad", "Todas las medidas y actividades necesarias de prevención", "Controles médicos", "Todas son correctas"], "correct": 1}, {"q": "¿Qué puede proponer un delegado de prevención ante peligro grave?", "opts": ["Todas son correctas", "Suspensión del trabajo en la zona afectada", "Cambiar de edificio", "La paralización de una parte del trabajo"], "correct": 3}, {"q": "¿Cuántos delegados de prevención corresponden a empresas de más de 4.000 trabajadores?", "opts": ["4", "5", "8", "6"], "correct": 2}, {"q": "¿Cuál es un principio activo que debe aplicar el empresario?", "opts": ["Tener en cuenta los cambios y la mejora en las técnicas", "Conocer y evaluar los riesgos cuando no se pueden evitar", "Frenar los riesgos desde el principio", "Todas son correctas"], "correct": 3}, {"q": "¿Qué debe hacer el delegado para justificar la paralización de una parte del trabajo?", "opts": ["Escribir un informe", "Reunir firmas sindicales", "Presentar una denuncia penal", "Solicitar permiso europeo"], "correct": 0}, {"q": "¿De qué deben preocuparse los trabajadores en sus obligaciones?", "opts": ["De su seguridad y salud y la de otras personas afectadas", "Únicamente de su seguridad", "De la producción de su trabajo", "De las condiciones de seguridad de su zona de trabajo"], "correct": 0}, {"q": "¿Qué debe hacer el empresario si rechaza la propuesta del delegado por la paralización de una parte del trabajo?", "opts": ["Consultar a los trabajadores", "Explicar los motivos", "Consultar a los sindicatos", "Ninguna es correcta"], "correct": 1}, {"q": "¿De qué depende el cumplimiento de obligaciones preventivas del trabajador?", "opts": ["Del convenio colectivo", "De la formación y las instrucciones del empresario", "De las instrucciones de los delegados de prevención", "Ninguna es correcta"], "correct": 1}, {"q": "¿Cuándo es obligatorio el Comité de Seguridad y Salud?", "opts": ["Empresas de más de 10 trabajadores", "Empresas de más de 30 trabajadores", "Empresas de más de 50 trabajadores", "Todas las empresas"], "correct": 2}, {"q": "¿Cuál es el primer principio de acción preventiva como obligación del empresario?", "opts": ["Sustituir maquinaria", "Dar instrucciones", "Evaluar daños", "Evitar los riesgos"], "correct": 3}, {"q": "¿Cuál es un principio activo que debe aplicar el empresario?", "opts": ["Adaptar el puesto de trabajo al trabajador", "Hacer planes de prevención en todos los lugares", "Sustituir lo que es peligroso por otras opciones sin peligro", "Todas son correctas"], "correct": 3}, {"q": "¿Qué obligación tienen los trabajadores de usar correctamente?", "opts": ["Solo maquinaria pesada", "Solo herramientas", "Todos los medios de trabajo", "Solo sustancias peligrosas"], "correct": 2}, {"q": "¿Qué medidas deben tener prioridad?", "opts": ["Las que protejan colectivamente", "Las individuales", "Las de zonas peligrosas", "Las de todos los edificios"], "correct": 0}, {"q": "¿Qué indica la obligación sobre los dispositivos de seguridad?", "opts": ["En caso de peligro desconectarlos", "Pueden desconectarse temporalmente", "Deben retirarse al finalizar la jornada", "Nunca deben desconectarse"], "correct": 3}], "start_num": 1, "end_num": 20}];
+
+var LETTERS = ['a', 'b', 'c', 'd'];
+var currentBlockIdx = null;
+var questions = [];
+var currentIdx = 0;
+var hits = 0;
+var fails = [];
+
+function buildMenu() {
+    var grid = document.getElementById('grid-bloques');
+    grid.innerHTML = '';
+    bloques.forEach(function(bl, i) {
+        var btn = document.createElement('button');
+        btn.className = 'menu-btn';
+        btn.innerHTML = '<div><div class="label">' + bl.nombre + '</div><div class="meta">Preguntas ' + (bl.start_num) + '–' + (bl.end_num) + ' · ' + bl.count + ' preguntas</div></div><span class="arrow">›</span>';
+        btn.onclick = function(){ startBlock(i); };
+        grid.appendChild(btn);
+    });
+    var btnAll = document.createElement('button');
+    var total = bloques.reduce(function(acc, b){ return acc + b.count; }, 0);
+    btnAll.className = 'menu-btn menu-btn-all';
+    btnAll.innerHTML = '<div><div class="label">📚 Todas las preguntas</div><div class="meta">' + total + ' preguntas, en orden</div></div><span class="arrow">›</span>';
+    btnAll.onclick = function(){ startAll(); };
+    grid.appendChild(btnAll);
+}
+
+function startBlock(i) {
+    currentBlockIdx = i;
+    questions = bloques[i].questions;
+    beginQuiz();
+}
+
+function startAll() {
+    currentBlockIdx = null;
+    questions = [];
+    bloques.forEach(function(bl){ questions = questions.concat(bl.questions); });
+    beginQuiz();
+}
+
+function volverMenu() {
+    document.getElementById('menu-screen').classList.remove('hidden');
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.add('hidden');
+}
+
+function repetirBloque() {
+    if (currentBlockIdx !== null) startBlock(currentBlockIdx);
+    else startAll();
+}
+
+function beginQuiz() {
+    currentIdx = 0; hits = 0; fails = [];
+    document.getElementById('menu-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    document.getElementById('cat-badge').textContent = currentBlockIdx !== null ? bloques[currentBlockIdx].nombre : 'Todas las preguntas';
+    showQuestion();
+}
+
+function showQuestion() {
+    var q = questions[currentIdx];
+    document.getElementById('progreso-texto').textContent = 'Pregunta ' + (currentIdx+1) + '/' + questions.length;
+    document.getElementById('progress-fill').style.width = ((currentIdx/questions.length)*100) + '%';
+    document.getElementById('question-text').textContent = (currentIdx+1) + '. ' + q.q;
+    document.getElementById('btn-next').classList.remove('show');
+    var container = document.getElementById('options-container');
+    container.innerHTML = '';
+    q.opts.forEach(function(opt, idx) {
+        var btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.textContent = LETTERS[idx] + ') ' + opt;
+        btn.onclick = function(){ checkAnswer(btn, idx, q); };
+        container.appendChild(btn);
+    });
+}
+
+function checkAnswer(btn, selectedIdx, q) {
+    var allBtns = document.querySelectorAll('.opt-btn');
+    allBtns.forEach(function(b){ b.disabled = true; });
+    if (selectedIdx === q.correct) {
+        btn.classList.add('correct');
+        hits++;
+    } else {
+        btn.classList.add('wrong');
+        fails.push({ q: q.q, correct: LETTERS[q.correct] + ') ' + q.opts[q.correct] });
+        allBtns[q.correct].classList.add('reveal');
+    }
+    document.getElementById('btn-next').classList.add('show');
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx < questions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.remove('hidden');
+    var pct = Math.round((hits/questions.length)*100);
+    var scoreEl = document.getElementById('score-percent');
+    scoreEl.textContent = pct + '%';
+    scoreEl.style.color = pct >= 70 ? '#27ae60' : '#ff3b30';
+    document.getElementById('score-text').textContent = 'Has acertado ' + hits + ' de ' + questions.length + ' · ' + (pct>=70?'¡Muy bien! ✅':'Sigue repasando 💪');
+    var review = document.getElementById('failed-review');
+    review.innerHTML = fails.length > 0
+        ? '<strong>Tus errores:</strong><br><br>' + fails.map(function(f){
+            return '<div class="result-item"><div class="rq">• '+f.q+'</div><div class="ra">✔ '+f.correct+'</div></div>';
+          }).join('')
+        : '🎉 ¡Sin ningún fallo! ¡Perfecto!';
+}
+
+buildMenu();
+</script>
+</body>
+</html>
